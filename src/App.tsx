@@ -31,11 +31,13 @@ const App = () => (
             <Route path="/login" element={<Auth mode="login" />} />
             <Route path="/signup" element={<Auth mode="signup" />} />
             <Route path="/share/:shareId" element={<SharedTrip />} />
+            <Route path="/invite/:token" element={<AcceptInvite />} />
             <Route path="/app" element={<AppLayout />}>
               <Route index element={<Dashboard />} />
               <Route path="trips" element={<MyTrips />} />
               <Route path="trips/:id" element={<TripDetail />} />
               <Route path="new" element={<CreateTrip />} />
+              <Route path="friends" element={<Friends />} />
               <Route path="profile" element={<Profile />} />
             </Route>
             <Route path="/dashboard" element={<Navigate to="/app" replace />} />
