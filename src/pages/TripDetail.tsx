@@ -875,9 +875,10 @@ function BudgetView({ trip, update }: { trip: Trip; update: (p: Partial<Trip>) =
 
 function KpiCard({ label, value, accent }: { label: string; value: string; accent?: boolean }) {
   return (
-    <Card className={`p-4 ${accent ? 'bg-gradient-hero text-primary-foreground' : ''}`}>
-      <div className={`text-xs uppercase tracking-wider ${accent ? 'opacity-80' : 'text-muted-foreground'}`}>{label}</div>
-      <div className="font-display text-2xl font-bold">{value}</div>
+    <Card className={`group relative overflow-hidden border-border/60 p-5 transition-all duration-500 hover:-translate-y-0.5 hover:shadow-soft ${accent ? 'bg-foreground text-background' : ''}`}>
+      <div className={`text-[10px] font-semibold uppercase tracking-[0.18em] ${accent ? 'opacity-70' : 'text-muted-foreground'}`}>{label}</div>
+      <div className="mt-2 font-display text-3xl font-extrabold tabular-nums leading-none">{value}</div>
+      {accent && <div className="pointer-events-none absolute -right-12 -top-12 h-32 w-32 rounded-full bg-background/10 blur-2xl" />}
     </Card>
   );
 }
