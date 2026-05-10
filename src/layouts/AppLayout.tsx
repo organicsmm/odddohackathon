@@ -14,7 +14,7 @@ const links = [
 ];
 
 export default function AppLayout() {
-  const { user } = useAuth();
+  const { user, isAdmin, signOut } = useAuth();
   const navigate = useNavigate();
 
   useEffect(() => {
