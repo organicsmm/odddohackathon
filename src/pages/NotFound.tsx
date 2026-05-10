@@ -18,9 +18,9 @@ const NotFound = () => {
         <span className="mx-auto grid h-14 w-14 place-items-center rounded-2xl bg-gradient-hero shadow-glow">
           <Plane className="h-7 w-7 text-primary-foreground" />
         </span>
-        <h1 className="mt-5 font-display text-6xl font-extrabold tracking-tight text-gradient">404</h1>
-        <p className="mt-2 text-lg font-medium">This page took a wrong turn</p>
-        <p className="mt-1 text-sm text-muted-foreground">We couldn't find anything at <code className="rounded bg-muted px-1.5 py-0.5 text-xs">{location.pathname}</code></p>
+        <Display as="h1" gradient className="mt-5">404</Display>
+        <Lead className="mt-2">This page took a wrong turn</Lead>
+        <Muted variant="small" className="mt-1">We couldn't find anything at <code className="rounded bg-muted px-1.5 py-0.5 text-xs">{location.pathname}</code></Muted>
         <Button asChild variant="premium" size="lg" className="mt-6">
           <Link to="/"><ArrowLeft className="h-4 w-4" /> Return home</Link>
         </Button>
