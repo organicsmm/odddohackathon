@@ -541,7 +541,7 @@ function StopCard({ stop, index, onRemove, onUpdate, onSetDuration, dragHandle, 
 
         {/* cost panel */}
         <aside className="space-y-3 rounded-2xl border border-border/60 bg-muted/30 p-5">
-          <h4 className="font-display text-[11px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">Costs · entered in USD</h4>
+          <Eyebrow className="block">Costs · entered in USD</Eyebrow>
           <CostInput label="Transport" value={stop.costs.transport} onChange={v => onUpdate(stop.id, { costs: { ...stop.costs, transport: v } })} />
           <CostInput label="Stay / night" value={stop.costs.stay} onChange={v => onUpdate(stop.id, { costs: { ...stop.costs, stay: v } })} />
           <CostInput label="Meals / day" value={stop.costs.meals} onChange={v => onUpdate(stop.id, { costs: { ...stop.costs, meals: v } })} />
