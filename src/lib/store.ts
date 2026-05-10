@@ -20,6 +20,25 @@ export function upsertTrip(trip: Trip) {
   trip.updatedAt = new Date().toISOString();
   if (idx >= 0) all[idx] = trip; else all.push(trip);
   saveTrips(all);
+  // Fire-and-forget cloud sync (so admins can see all trips)
+  void syncTripToCloud(trip);
+}
+
+async function syncTripToCloud(trip: Trip) {
+  try {
+    const { supabase } = await import('@/integrations/supabase/client');
+    const { data: { session } } = await supabase.auth.getSession();
+    if (!session?.user) return;
+    await supabase.from('trips').upsert({
+      user_id: session.user.id,
+      client_trip_id: trip.id,
+      name: trip.name,
+      start_date: trip.startDate,
+      end_date: trip.endDate,
+      data: trip as never,
+    }, { onConflict: 'user_id,client_trip_id' });
+  } catch { /* offline ok */ }
+}
 }
 export function deleteTrip(id: string) {
   saveTrips(loadTrips().filter(t => t.id !== id));
