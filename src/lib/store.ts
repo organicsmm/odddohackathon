@@ -39,7 +39,6 @@ async function syncTripToCloud(trip: Trip) {
     }, { onConflict: 'user_id,client_trip_id' });
   } catch { /* offline ok */ }
 }
-}
 export function deleteTrip(id: string) {
   saveTrips(loadTrips().filter(t => t.id !== id));
 }
