@@ -334,8 +334,8 @@ You can point the gateway at **any** OpenAI-compatible provider — OpenRouter, 
 
 ### 1. Clone & install
 ```bash
-git clone https://github.com/<your-org>/traveloop.git
-cd traveloop
+git clone https://github.com/organicsmm/odddohackathon.git
+cd odddohackathon
 bun install        # or: npm install
 ```
 
