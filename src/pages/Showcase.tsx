@@ -535,6 +535,16 @@ toast('Invite sent', {
             { name: 'focus-visible:ring-*', type: 'tailwind', default: 'ring-2 ring-ring ring-offset-2', desc: 'Standard focus ring — already baked into Button, Input, and most primitives.' },
           ]} />
         </Section>
+
+        {/* Playground */}
+        <Section
+          eyebrow="09 · Playground"
+          title="Interactive props playground"
+          description="Tweak props on the left, see the live component and generated JSX update instantly. Great for designing variants without leaving the page."
+        >
+          <Playground />
+        </Section>
+
         <footer className="border-t border-border/60 pt-8">
 
           <Muted variant="small">
