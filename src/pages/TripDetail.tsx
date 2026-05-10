@@ -346,11 +346,13 @@ function Itinerary({ trip, update, highlightedStopId }: { trip: Trip; update: (p
             <SortableContext items={trip.stops.map(s => s.id)} strategy={verticalListSortingStrategy}>
               <div className="space-y-4">
                 {trip.stops.map((s, i) => (
-                  <SortableStopCard
-                    key={s.id} stop={s} index={i}
-                    onRemove={removeStop} onUpdate={updateStop} onSetDuration={setDuration}
-                    highlighted={highlightedStopId === s.id}
-                  />
+                  <div key={s.id} className="animate-fade-up" style={{ animationDelay: `${i * 70}ms` }}>
+                    <SortableStopCard
+                      stop={s} index={i}
+                      onRemove={removeStop} onUpdate={updateStop} onSetDuration={setDuration}
+                      highlighted={highlightedStopId === s.id}
+                    />
+                  </div>
                 ))}
               </div>
             </SortableContext>
