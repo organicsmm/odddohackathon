@@ -21,7 +21,7 @@ import CitySearchDialog from '@/components/CitySearchDialog';
 import ActivitySearchDialog from '@/components/ActivitySearchDialog';
 import RouteTimeline from '@/components/RouteTimeline';
 import RouteMap from '@/components/RouteMap';
-import { WeatherBadge } from '@/lib/weather';
+import { WeatherBadge, WeatherForecast } from '@/lib/weather';
 import { toast } from 'sonner';
 import {
   DndContext, closestCenter, KeyboardSensor, PointerSensor, useSensor, useSensors,
@@ -306,6 +306,10 @@ function StopCard({ stop, index, onRemove, onUpdate, onSetDuration, dragHandle }
           </div>
 
         </div>
+      </div>
+
+      <div className="px-5 pt-5">
+        <WeatherForecast city={stop.city} startDate={stop.startDate} endDate={stop.endDate} />
       </div>
 
       <div className="grid gap-4 p-5 md:grid-cols-[1fr_240px]">
