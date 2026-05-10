@@ -543,7 +543,7 @@ export default function RouteMap({ stops, onSelectStop, highlightedStopId }: { s
           tabIndex={0}
           className="pointer-events-auto absolute bottom-3 left-3 rounded-lg border border-border/60 bg-card/90 px-2.5 py-1.5 text-[10px] shadow-soft backdrop-blur outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
         >
-          <h3 id="legend-marker-heading" className="mb-1 font-semibold uppercase tracking-wider text-muted-foreground">Legend</h3>
+          <Eyebrow id="legend-marker-heading" className="mb-1 block">Legend</Eyebrow>
           <ul
             className="flex flex-wrap items-center gap-x-3 gap-y-1"
             role="list"
