@@ -47,6 +47,19 @@ export default function TripDetail() {
   const navigate = useNavigate();
   const { user } = useAuth();
   const [trip, setTrip] = useState<Trip | undefined>(getTrip(id!));
+  const [activeTab, setActiveTab] = useState('itinerary');
+  const [highlightedStopId, setHighlightedStopId] = useState<string | null>(null);
+
+  const focusStop = (stopId: string) => {
+    setActiveTab('itinerary');
+    setHighlightedStopId(stopId);
+    // wait for tab/list render then scroll
+    setTimeout(() => {
+      const el = document.getElementById(`stop-${stopId}`);
+      el?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }, 80);
+    setTimeout(() => setHighlightedStopId(null), 2200);
+  };
 
   useEffect(() => {
     if (!trip) navigate('/app/trips', { replace: true });
