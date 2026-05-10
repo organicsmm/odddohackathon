@@ -306,10 +306,10 @@ export default function SharedTrip() {
                       <div className="text-[10px] font-semibold uppercase tracking-[0.16em] text-muted-foreground">
                         Stop {i + 1} · {sd} day{sd > 1 ? 's' : ''}
                       </div>
-                      <h3 className="font-display text-xl font-bold flex items-center gap-2">
+                      <Heading level={3} className="!text-xl flex items-center gap-2">
                         <MapPin className="h-4 w-4 text-primary" />
                         {s.city}{s.country ? <span className="font-normal text-muted-foreground text-base">, {s.country}</span> : null}
-                      </h3>
+                      </Heading>
                     </div>
                     <div className="flex flex-col items-end gap-1 text-xs">
                       <span className="text-muted-foreground tabular-nums">

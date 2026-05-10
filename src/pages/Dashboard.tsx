@@ -204,7 +204,7 @@ export default function Dashboard() {
                   </div>
 
                   <Eyebrow className="mt-5 !text-[10px]">Signature route</Eyebrow>
-                  <h3 className="mt-1 font-display text-xl font-bold tracking-tight">{t.title}</h3>
+                  <Heading level={3} className="mt-1 !text-xl tracking-tight">{t.title}</Heading>
                   <Muted className="mt-1 text-sm line-clamp-2">{t.tagline}</Muted>
 
                   <div className="mt-5 flex items-center justify-between border-t border-border/60 pt-4 text-xs">

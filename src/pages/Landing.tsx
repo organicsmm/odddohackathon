@@ -188,7 +188,7 @@ export default function Landing() {
               <div className="mb-4 inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-primary/10 text-primary group-hover:bg-gradient-hero group-hover:text-primary-foreground group-hover:shadow-glow transition-spring">
                 <f.icon className="h-6 w-6" />
               </div>
-              <h3 className="font-display text-lg font-bold">{f.title}</h3>
+              <Heading level={3} className="!text-lg">{f.title}</Heading>
               <Muted className="mt-1 text-sm">{f.desc}</Muted>
               <div className="mt-4 inline-flex items-center gap-1 text-xs font-semibold text-primary opacity-0 group-hover:opacity-100 transition-smooth">
                 Learn more <ChevronRight className="h-3 w-3" />
@@ -210,7 +210,7 @@ export default function Landing() {
             {steps.map((s, i) => (
               <Card key={s.n} variant="glass" className="p-6 animate-fade-up" style={{ animationDelay: `${i * 80}ms` }}>
                 <div className="font-display text-5xl font-extrabold text-gradient leading-none">{s.n}</div>
-                <h3 className="mt-3 font-display text-lg font-bold">{s.title}</h3>
+                <Heading level={3} className="mt-3 !text-lg">{s.title}</Heading>
                 <Muted className="mt-1 text-sm">{s.desc}</Muted>
               </Card>
             ))}
@@ -271,11 +271,11 @@ export default function Landing() {
                   <span className="h-px flex-1 bg-border" />
                   <span className="font-mono text-[10px] uppercase tracking-[0.22em] text-muted-foreground">{d.days} days</span>
                 </div>
-                <h3 className="mt-2 font-display text-2xl font-bold tracking-tight">
+                <Heading level={3} className="mt-2 !text-2xl tracking-tight">
                   <Link to={cta} className="bg-[linear-gradient(currentColor,currentColor)] bg-[length:0%_1px] bg-no-repeat bg-left-bottom transition-[background-size] duration-500 hover:bg-[length:100%_1px]">
                     {d.city}
                   </Link>
-                </h3>
+                </Heading>
                 <p className="mt-1 text-sm text-muted-foreground italic">"{d.kicker}."</p>
                 <div className="mt-3 flex items-center justify-between text-xs">
                   <span className="text-muted-foreground">From <span className="font-display text-base font-bold tabular-nums text-foreground">${d.price.toLocaleString()}</span> <span className="text-muted-foreground/80">/ person</span></span>
@@ -294,9 +294,9 @@ export default function Landing() {
         <Card variant="aurora" className="overflow-hidden p-10 md:p-14 text-center">
           <div className="mx-auto max-w-3xl">
             <Compass className="mx-auto h-8 w-8 text-primary" />
-            <p className="mt-4 font-display text-2xl md:text-3xl font-bold leading-snug text-balance">
+            <Lead as="p" className="mt-4 !text-2xl md:!text-3xl !font-bold leading-snug text-balance">
               "It's like a private travel concierge with the polish of a luxury magazine. We planned three trips in a weekend."
-            </p>
+            </Lead>
             <div className="mt-6 inline-flex items-center gap-3">
               <span className="grid h-10 w-10 place-items-center rounded-full bg-gradient-hero text-primary-foreground font-bold">A</span>
               <div className="text-left">
