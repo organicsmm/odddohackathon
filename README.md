@@ -226,31 +226,121 @@ Every table has RLS **enabled**.
 
 ---
 
-## 🏃 Getting Started (local development)
+## 🔗 Live Demo
+
+| Environment | URL |
+|---|---|
+| 🚀 **Production** | https://odddohackathon.lovable.app |
+| 🧪 Preview (login required) | https://id-preview--82eaa6a9-82f4-4b41-9b64-4b59993322c1.lovable.app |
+
+**Demo admin login:** request from the team (admin emails are whitelisted via `site_settings.admin_emails`).
+
+---
+
+## 🏃 Getting Started (Local Development)
 
 ### Prerequisites
-- Node.js 18+ and `bun` or `npm`
+- **Node.js 18+**
+- **bun** (recommended) or **npm**
+- A **Supabase** project (free tier works) — only needed for self-hosting; Lovable Cloud users skip this
 
-### Install & run
+### 1. Clone & install
 ```bash
-git clone <your-repo-url>
+git clone https://github.com/<your-org>/traveloop.git
 cd traveloop
 bun install        # or: npm install
+```
+
+### 2. Configure environment variables
+Create a `.env` file in the project root:
+
+```env
+# Supabase / Lovable Cloud
+VITE_SUPABASE_URL=https://<your-project-ref>.supabase.co
+VITE_SUPABASE_PUBLISHABLE_KEY=<your-anon-publishable-key>
+VITE_SUPABASE_PROJECT_ID=<your-project-ref>
+```
+
+> ℹ️ When using Lovable Cloud these are **auto-injected** — no manual setup required.
+
+### 3. Set Edge Function secrets (server-side only)
+In the Supabase dashboard → **Project Settings → Edge Functions → Secrets**, add:
+
+| Secret | Where to get it |
+|---|---|
+| `LOVABLE_API_KEY` | https://lovable.dev → Workspace → API Keys (or use your own OpenAI/Gemini key + adapt the function) |
+| `SUPABASE_URL` | Auto-set |
+| `SUPABASE_SERVICE_ROLE_KEY` | Project Settings → API → `service_role` |
+| `SUPABASE_ANON_KEY` | Project Settings → API → `anon` |
+
+### 4. Run database migrations
+```bash
+# Option A: Supabase CLI
+supabase link --project-ref <your-project-ref>
+supabase db push
+
+# Option B: paste each file from supabase/migrations/ into the SQL editor in order
+```
+
+### 5. Deploy Edge Functions
+```bash
+supabase functions deploy generate-trip
+supabase functions deploy trip-suggestions
+```
+
+### 6. Start the dev server
+```bash
 bun run dev        # or: npm run dev
 ```
+App runs at **http://localhost:8080**.
 
-The app runs at `http://localhost:8080`.
+### Useful scripts
+| Command | What it does |
+|---|---|
+| `bun run dev` | Start Vite dev server with HMR |
+| `bun run build` | Production build (code-split + chunked) |
+| `bun run preview` | Preview the production build locally |
+| `bun run lint` | ESLint check |
+| `bunx vitest run` | Run unit tests |
 
-### Environment
-Lovable Cloud auto-provisions backend; the following are set in `.env` (managed automatically):
+---
 
-```
-VITE_SUPABASE_URL=...
-VITE_SUPABASE_PUBLISHABLE_KEY=...
-VITE_SUPABASE_PROJECT_ID=...
-```
+## 🚀 Deployment
 
-For self-hosting, point these at your own Supabase project and run the migrations in `supabase/migrations/`.
+You have **three** deployment paths — pick whichever fits your setup.
+
+### Option A — Lovable (one-click, recommended)
+1. Open the project in [Lovable](https://lovable.dev).
+2. Top-right → **Publish**.
+3. App goes live at `https://<your-slug>.lovable.app`.
+4. (Optional) **Project Settings → Domains** to attach a custom domain.
+
+> ⚡ Backend changes (Edge Functions, migrations) deploy **automatically**. Frontend changes require clicking **Update** in the publish dialog.
+
+### Option B — Vercel + Supabase (self-hosted)
+1. Push your repo to GitHub (Lovable auto-syncs via the GitHub integration).
+2. Go to [vercel.com](https://vercel.com) → **Import Git Repository**.
+3. **Framework preset:** Vite. **Build command:** `bun run build` (or `npm run build`). **Output dir:** `dist`.
+4. Add the three `VITE_SUPABASE_*` env vars in Vercel → **Settings → Environment Variables**.
+5. Deploy.
+6. For backend:
+   - Create a Supabase project at [supabase.com](https://supabase.com).
+   - Run migrations from `supabase/migrations/` (CLI or SQL editor).
+   - Deploy edge functions: `supabase functions deploy generate-trip` & `trip-suggestions`.
+   - Add the secrets listed above in **Edge Functions → Secrets**.
+
+### Option C — Netlify / Cloudflare Pages
+Same as Vercel — they auto-detect Vite. Just set the same `VITE_SUPABASE_*` env vars and use `bun run build` → `dist`.
+
+### Post-deployment checklist
+- [ ] Auth → **URL Configuration** → add your prod URL to **Site URL** and **Redirect URLs**
+- [ ] Google OAuth → add prod URL to authorized redirect URIs in Google Cloud Console
+- [ ] Run a smoke test: signup → create trip → AI generate → share link
+- [ ] Add admin emails to `site_settings.admin_emails` JSONB array
+
+---
+
+
 
 ---
 
