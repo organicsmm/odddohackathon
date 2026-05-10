@@ -39,9 +39,9 @@ Deno.serve(async (req) => {
       return new Response(JSON.stringify({ error: "Missing prompt" }), { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } });
     }
 
-    const apiKey = Deno.env.get("AI_GATEWAY_KEY") ?? Deno.env.get("LOVABLE_API_KEY");
-    const baseUrl = Deno.env.get("AI_GATEWAY_URL") ?? "https://ai.gateway.lovable.dev/v1";
-    const model = Deno.env.get("AI_MODEL") ?? "google/gemini-3-flash-preview";
+    const apiKey = Deno.env.get("AI_GATEWAY_KEY");
+    const baseUrl = Deno.env.get("AI_GATEWAY_URL") ?? "https://api.openai.com/v1";
+    const model = Deno.env.get("AI_MODEL") ?? "gpt-4o-mini";
     if (!apiKey) {
       return new Response(JSON.stringify({ error: "AI gateway not configured" }), { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } });
     }
