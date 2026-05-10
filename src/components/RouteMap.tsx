@@ -397,6 +397,43 @@ export default function RouteMap({ stops, onSelectStop, highlightedStopId }: { s
           );
         })()}
 
+        {/* Legend */}
+        <div className="pointer-events-none absolute bottom-3 left-3 rounded-lg border border-border/60 bg-card/90 px-2.5 py-1.5 text-[10px] shadow-soft backdrop-blur">
+          <div className="mb-1 font-semibold uppercase tracking-wider text-muted-foreground">Legend</div>
+          <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
+            {highlightEnds && (
+              <span className="inline-flex items-center gap-1.5">
+                <span className="h-2.5 w-2.5 rounded-full border border-white/80" style={{ background: 'hsl(var(--success))' }} />
+                <span className="text-foreground/80">Start</span>
+              </span>
+            )}
+            {highlightEnds && (
+              <span className="inline-flex items-center gap-1.5">
+                <span className="h-2.5 w-2.5 rounded-full border border-white/80" style={{ background: 'hsl(var(--accent))' }} />
+                <span className="text-foreground/80">End</span>
+              </span>
+            )}
+            <span className="inline-flex items-center gap-1.5">
+              <span className="h-2.5 w-2.5 rounded-full border border-white/80" style={{ background: 'hsl(var(--primary))' }} />
+              <span className="text-foreground/80">Stop</span>
+            </span>
+            <span className="inline-flex items-center gap-1.5">
+              <span
+                className="h-3 w-3 rounded-full"
+                style={{ border: '1.5px dashed hsl(var(--ring))' }}
+              />
+              <span className="text-foreground/80">Selected</span>
+            </span>
+            <span className="inline-flex items-center gap-1.5">
+              <span
+                className="h-2.5 w-2.5 rounded-full border border-white/80"
+                style={{ background: 'hsl(var(--primary))', borderStyle: 'dashed', borderColor: 'hsl(var(--warning))' }}
+              />
+              <span className="text-foreground/80">Approx.</span>
+            </span>
+          </div>
+        </div>
+
         {(isLocating || failedCities.length > 0) && (
           <div
             className="pointer-events-auto absolute bottom-3 right-3 max-w-[18rem] rounded-md bg-card/90 px-2.5 py-1.5 text-[10px] text-muted-foreground shadow-soft backdrop-blur"
