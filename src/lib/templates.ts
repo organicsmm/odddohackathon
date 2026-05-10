@@ -14,8 +14,12 @@ export type TripTemplate = {
   tagline: string;
   days: number;
   estimate: number;
+  cover: string;
+  countries: string[];
   build: () => Pick<Trip, 'name' | 'description' | 'startDate' | 'endDate' | 'budget' | 'stops'>;
 };
+
+const cover = (id: string) => `https://images.unsplash.com/photo-${id}?auto=format&fit=crop&w=1000&q=70`;
 
 const offsetDate = (days: number) => {
   const d = new Date();
