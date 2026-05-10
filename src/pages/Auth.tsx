@@ -10,7 +10,6 @@ import { Label } from '@/components/ui/label';
 import { Card } from '@/components/ui/card';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
-import { lovable } from '@/integrations/lovable';
 import { toast } from 'sonner';
 
 const loginSchema = z.object({
@@ -73,17 +72,14 @@ export default function Auth({ mode }: { mode: 'login' | 'signup' }) {
   const onGoogle = async () => {
     setBusy(true);
     try {
-      const result = await lovable.auth.signInWithOAuth('google', {
-        redirect_uri: `${window.location.origin}/app`,
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider: 'google',
+        options: { redirectTo: `${window.location.origin}/app` },
       });
-      if (result.error) {
-        toast.error((result.error as Error).message || 'Google sign-in failed');
+      if (error) {
+        toast.error(error.message || 'Google sign-in failed');
         setBusy(false);
-        return;
       }
-      if (result.redirected) return;
-      refresh();
-      goNext();
     } catch (err) {
       toast.error((err as Error).message || 'Google sign-in failed');
       setBusy(false);
