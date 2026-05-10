@@ -20,6 +20,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import CitySearchDialog from '@/components/CitySearchDialog';
 import ActivitySearchDialog from '@/components/ActivitySearchDialog';
 import RouteTimeline from '@/components/RouteTimeline';
+import RouteMap from '@/components/RouteMap';
 import { WeatherBadge } from '@/lib/weather';
 import { toast } from 'sonner';
 import {
