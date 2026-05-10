@@ -5,6 +5,7 @@ import {
 } from 'lucide-react';
 import ImageGallery from '@/components/ui/image-gallery';
 import { HeroSlider } from '@/components/HeroSlider';
+import { TravelMarquee } from '@/components/TravelMarquee';
 import { Display, Eyebrow, Heading, Lead, Muted } from "@/components/ui/typography";
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
