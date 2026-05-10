@@ -859,10 +859,10 @@ function BudgetView({ trip, update, currency }: { trip: Trip; update: (p: Partia
                 <BarChart data={barData} margin={{ top: 8, right: 8, bottom: 4, left: -12 }}>
                   <CartesianGrid stroke="hsl(var(--border))" strokeDasharray="3 3" vertical={false} />
                   <XAxis dataKey="city" stroke="hsl(var(--muted-foreground))" fontSize={12} />
-                  <YAxis stroke="hsl(var(--muted-foreground))" fontSize={12} tickFormatter={(v) => `$${v}`} />
+                  <YAxis stroke="hsl(var(--muted-foreground))" fontSize={12} tickFormatter={(v) => formatMoney(v, currency)} />
                   <RTooltip
                     contentStyle={{ background: 'hsl(var(--card))', border: '1px solid hsl(var(--border))', borderRadius: 8, fontSize: 12 }}
-                    formatter={(v: number) => `$${Number(v).toLocaleString()}`}
+                    formatter={(v: number) => formatMoney(Number(v), currency)}
                   />
                   <Legend wrapperStyle={{ fontSize: 12 }} />
                   <Bar dataKey="Transport" stackId="a" fill={COLORS.Transport} radius={[0, 0, 0, 0]} />
