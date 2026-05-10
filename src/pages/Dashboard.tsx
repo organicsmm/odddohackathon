@@ -15,6 +15,7 @@ import { useMemo } from 'react';
 
 export default function Dashboard() {
   const { user } = useAuth();
+  const navigate = useNavigate();
   const allTrips = useTrips();
   const trips = useMemo(() => allTrips.filter(t => t.ownerEmail === user?.email), [allTrips, user]);
   const upcoming = trips
