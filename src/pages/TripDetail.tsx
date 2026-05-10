@@ -9,6 +9,7 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogDescription } from '@/components/ui/dialog';
 
 import { exportTripPDF, exportTripCSV } from '@/lib/export';
+import { CURRENCIES, refreshRates, type CurrencyCode } from '@/lib/currency';
 import { useAuth } from '@/contexts/AuthContext';
 import { getTrip, upsertTrip, uid, tripCost, stopDays, tripDays, resequenceStops, createInvite, revokeInvite, unshareWith } from '@/lib/store';
 import type { Trip, Stop, Activity, Note, PackItem, Friend } from '@/lib/types';
@@ -49,6 +50,9 @@ export default function TripDetail() {
   const [trip, setTrip] = useState<Trip | undefined>(getTrip(id!));
   const [activeTab, setActiveTab] = useState('itinerary');
   const [highlightedStopId, setHighlightedStopId] = useState<string | null>(null);
+  const [exportCurrency, setExportCurrency] = useState<CurrencyCode>('USD');
+
+  useEffect(() => { refreshRates(); }, []);
 
   const focusStop = (stopId: string) => {
     setActiveTab('itinerary');
@@ -109,11 +113,25 @@ export default function TripDetail() {
               <DropdownMenuTrigger asChild>
                 <Button variant="secondary"><Download className="h-4 w-4" /> Export</Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-52">
-                <DropdownMenuItem onClick={() => { exportTripPDF(trip); toast.success('PDF downloaded'); }}>
+              <DropdownMenuContent align="end" className="w-64">
+                <div className="px-2 py-1.5">
+                  <label className="text-xs text-muted-foreground">Currency</label>
+                  <Select value={exportCurrency} onValueChange={(v) => setExportCurrency(v as CurrencyCode)}>
+                    <SelectTrigger className="mt-1 h-8"><SelectValue /></SelectTrigger>
+                    <SelectContent className="max-h-72">
+                      {CURRENCIES.map(c => (
+                        <SelectItem key={c.code} value={c.code}>
+                          {c.symbol} {c.code} — {c.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem onClick={() => { exportTripPDF(trip, exportCurrency); toast.success(`PDF downloaded (${exportCurrency})`); }}>
                   <FileText className="h-4 w-4 mr-2" /> Download PDF summary
                 </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => { exportTripCSV(trip); toast.success('CSV downloaded'); }}>
+                <DropdownMenuItem onClick={() => { exportTripCSV(trip, exportCurrency); toast.success(`CSV downloaded (${exportCurrency})`); }}>
                   <FileSpreadsheet className="h-4 w-4 mr-2" /> Cost breakdown CSV
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />

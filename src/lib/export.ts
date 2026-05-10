@@ -2,9 +2,11 @@ import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import type { Trip } from './types';
 import { stopDays, tripCost, tripDays } from './store';
+import { formatMoney, convertFromUSD, type CurrencyCode } from './currency';
 
 // ============= PDF EXPORT =============
-export function exportTripPDF(trip: Trip) {
+export function exportTripPDF(trip: Trip, currency: CurrencyCode = 'USD') {
+  const fmt = (usd: number) => formatMoney(usd, currency);
   const doc = new jsPDF({ unit: 'pt', format: 'a4' });
   const pageW = doc.internal.pageSize.getWidth();
   const margin = 40;
@@ -39,12 +41,13 @@ export function exportTripPDF(trip: Trip) {
   doc.setFont('helvetica', 'normal');
   doc.setFontSize(10);
   const summaryRows: [string, string][] = [
-    ['Total estimated cost', `$${cost.total.toLocaleString()}`],
-    ['Budget', trip.budget ? `$${trip.budget.toLocaleString()}` : 'Not set'],
-    ['Transport', `$${cost.transport.toLocaleString()}`],
-    ['Stay', `$${cost.stay.toLocaleString()}`],
-    ['Meals', `$${cost.meals.toLocaleString()}`],
-    ['Activities', `$${cost.activities.toLocaleString()}`],
+    ['Total estimated cost', fmt(cost.total)],
+    ['Budget', trip.budget ? fmt(trip.budget) : 'Not set'],
+    ['Transport', fmt(cost.transport)],
+    ['Stay', fmt(cost.stay)],
+    ['Meals', fmt(cost.meals)],
+    ['Activities', fmt(cost.activities)],
+    ['Currency', currency],
   ];
   autoTable(doc, {
     startY: y,
@@ -74,7 +77,7 @@ export function exportTripPDF(trip: Trip) {
       `${new Date(s.startDate).toLocaleDateString()} → ${new Date(s.endDate).toLocaleDateString()}`,
       `${days}d`,
       String(s.activities.length),
-      `$${stopTotal.toLocaleString()}`,
+      fmt(stopTotal),
     ];
   });
   autoTable(doc, {
@@ -105,7 +108,7 @@ export function exportTripPDF(trip: Trip) {
         a.name,
         a.category,
         `${a.durationHours}h`,
-        `$${a.cost.toLocaleString()}`,
+        fmt(a.cost),
       ]),
       theme: 'grid',
       headStyles: { fillColor: [240, 240, 245], textColor: 30, fontSize: 9 },
@@ -146,14 +149,18 @@ export function exportTripPDF(trip: Trip) {
 }
 
 // ============= CSV EXPORT =============
-export function exportTripCSV(trip: Trip) {
+export function exportTripCSV(trip: Trip, currency: CurrencyCode = 'USD') {
+  const conv = (usd: number) => Number(convertFromUSD(usd, currency).toFixed(2));
   const rows: (string | number)[][] = [];
   rows.push(['Trip', trip.name]);
   rows.push(['Dates', trip.startDate, trip.endDate]);
   rows.push(['Days', tripDays(trip)]);
-  rows.push(['Budget (USD)', trip.budget ?? '']);
+  rows.push(['Currency', currency]);
+  rows.push([`Budget (${currency})`, trip.budget != null ? conv(trip.budget) : '']);
   rows.push([]);
-  rows.push(['Stop #', 'City', 'Country', 'Start', 'End', 'Days', 'Transport', 'Stay total', 'Meals total', 'Activities total', 'Stop total']);
+  rows.push(['Stop #', 'City', 'Country', 'Start', 'End', 'Days',
+    `Transport (${currency})`, `Stay total (${currency})`, `Meals total (${currency})`,
+    `Activities total (${currency})`, `Stop total (${currency})`]);
 
   trip.stops.forEach((s, i) => {
     const days = stopDays(s);
@@ -161,29 +168,30 @@ export function exportTripCSV(trip: Trip) {
     const meals = (s.costs.meals || 0) * days;
     const acts = s.activities.reduce((a, b) => a + b.cost, 0);
     const total = (s.costs.transport || 0) + stay + meals + acts;
-    rows.push([i + 1, s.city, s.country, s.startDate, s.endDate, days, s.costs.transport || 0, stay, meals, acts, total]);
+    rows.push([i + 1, s.city, s.country, s.startDate, s.endDate, days,
+      conv(s.costs.transport || 0), conv(stay), conv(meals), conv(acts), conv(total)]);
   });
 
   rows.push([]);
   rows.push(['Activity breakdown']);
-  rows.push(['Stop', 'City', 'Activity', 'Category', 'Time', 'Hours', 'Cost (USD)']);
+  rows.push(['Stop', 'City', 'Activity', 'Category', 'Time', 'Hours', `Cost (${currency})`]);
   trip.stops.forEach((s, i) => {
     s.activities.forEach(a => {
-      rows.push([i + 1, s.city, a.name, a.category, a.time || '', a.durationHours, a.cost]);
+      rows.push([i + 1, s.city, a.name, a.category, a.time || '', a.durationHours, conv(a.cost)]);
     });
   });
 
   rows.push([]);
   const cost = tripCost(trip);
   rows.push(['Totals']);
-  rows.push(['Transport', cost.transport]);
-  rows.push(['Stay', cost.stay]);
-  rows.push(['Meals', cost.meals]);
-  rows.push(['Activities', cost.activities]);
-  rows.push(['Total', cost.total]);
+  rows.push([`Transport (${currency})`, conv(cost.transport)]);
+  rows.push([`Stay (${currency})`, conv(cost.stay)]);
+  rows.push([`Meals (${currency})`, conv(cost.meals)]);
+  rows.push([`Activities (${currency})`, conv(cost.activities)]);
+  rows.push([`Total (${currency})`, conv(cost.total)]);
 
   const csv = rows.map(r => r.map(csvCell).join(',')).join('\n');
-  download(`${slug(trip.name)}-costs.csv`, csv, 'text/csv;charset=utf-8;');
+  download(`${slug(trip.name)}-costs-${currency.toLowerCase()}.csv`, csv, 'text/csv;charset=utf-8;');
 }
 
 function csvCell(v: string | number): string {
