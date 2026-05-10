@@ -1,5 +1,6 @@
 import { useEffect, useMemo } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
+import { Display, Eyebrow, Heading, Lead, Muted } from "@/components/ui/typography";
 import {
   Calendar, MapPin, Plane, Copy, Twitter, Facebook, Link as LinkIcon, Globe, Lock,
   Wallet, Users, Compass, Share2, ExternalLink, ArrowRight, Sparkles,
@@ -9,7 +10,6 @@ import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Card } from '@/components/ui/card';
-import { Display, Heading, Lead, Eyebrow, Muted } from '@/components/ui/typography';
 import { toast } from 'sonner';
 import RouteMap from '@/components/RouteMap';
 import { WeatherForecast } from '@/lib/weather';
@@ -327,7 +327,7 @@ export default function SharedTrip() {
 
                   <div className="p-6 space-y-4">
                     {s.notes && (
-                      <p className="text-sm text-muted-foreground italic border-l-2 border-primary/40 pl-3">{s.notes}</p>
+                      <Muted className="text-sm italic border-l-2 border-primary/40 pl-3">{s.notes}</Muted>
                     )}
 
                     {/* Weather */}

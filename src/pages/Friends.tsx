@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
+import { Eyebrow, Heading, Lead, Muted } from "@/components/ui/typography";
 import { UserPlus, Trash2, Users, MapPinned, Mail } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { addFriend, removeFriend, tripsSharedWithMe, loadTrips } from '@/lib/store';
@@ -9,7 +10,6 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Heading, Lead, Eyebrow } from '@/components/ui/typography';
 import { toast } from 'sonner';
 
 export default function Friends() {
@@ -86,7 +86,7 @@ export default function Friends() {
           <Card variant="glass" className="p-6">
             <Heading level={3} weight="bold" className="flex items-center gap-2"><Users className="h-5 w-5 text-primary" /> Your friends ({friends.length})</Heading>
             {friends.length === 0 ? (
-              <p className="mt-3 text-sm text-muted-foreground">No friends yet. Add one to start sharing trips privately.</p>
+              <Muted className="mt-3 text-sm">No friends yet. Add one to start sharing trips privately.</Muted>
             ) : (
               <ul className="mt-4 divide-y divide-border">
                 {friends.map(f => (
@@ -107,7 +107,7 @@ export default function Friends() {
           <Card variant="glass" className="p-6">
             <Heading level={3} weight="bold" className="flex items-center gap-2"><MapPinned className="h-5 w-5 text-primary" /> Shared with you</Heading>
             {sharedIn.length === 0 ? (
-              <p className="mt-3 text-sm text-muted-foreground">Nothing yet. Open an invite link from a friend to see their trip here.</p>
+              <Muted className="mt-3 text-sm">Nothing yet. Open an invite link from a friend to see their trip here.</Muted>
             ) : (
               <ul className="mt-4 space-y-2">
                 {sharedIn.map(t => (
@@ -128,7 +128,7 @@ export default function Friends() {
           <Card variant="glass" className="p-6">
             <Heading level={3} weight="bold" className="flex items-center gap-2"><MapPinned className="h-5 w-5 text-primary" /> Trips you're sharing</Heading>
             {sharedOut.length === 0 ? (
-              <p className="mt-3 text-sm text-muted-foreground">You haven't privately shared any trips yet. Open a trip and use "Share privately".</p>
+              <Muted className="mt-3 text-sm">You haven't privately shared any trips yet. Open a trip and use "Share privately".</Muted>
             ) : (
               <ul className="mt-4 space-y-2">
                 {sharedOut.map(t => (

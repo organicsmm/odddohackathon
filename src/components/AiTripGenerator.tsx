@@ -1,5 +1,6 @@
 import { useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { Muted } from "@/components/ui/typography";
 import {
   Sparkles, Loader2, MapPin, Wallet, Calendar, Users, Plus, Trash2, ChevronLeft,
   AlertCircle, CheckCircle2, Clock,
@@ -252,9 +253,9 @@ function FormStep(props: {
       </FormField>
 
       <div className="flex flex-col-reverse gap-2 border-t border-border/60 pt-5 sm:flex-row sm:items-center sm:justify-between">
-        <p className="text-xs text-muted-foreground">
+        <Muted className="text-xs">
           You'll review and edit everything before it's saved.
-        </p>
+        </Muted>
         <Button variant="premium" size="lg" onClick={generate} disabled={busy} className="sm:min-w-[200px]">
           {busy
             ? <><Loader2 className="h-4 w-4 animate-spin" /> Drafting itinerary…</>
@@ -515,7 +516,7 @@ function StopEditor({
             );
           })}
           {stop.activities.length === 0 && (
-            <p className="text-xs text-muted-foreground">No activities yet — add one or save as-is.</p>
+            <Muted className="text-xs">No activities yet — add one or save as-is.</Muted>
           )}
         </div>
       </div>

@@ -1,5 +1,6 @@
 import { useNavigate, useParams } from 'react-router-dom';
 import { useEffect, useMemo, useState } from 'react';
+import { Display, Eyebrow, Heading, Lead, Muted } from "@/components/ui/typography";
 import {
   Calendar, MapPin, Plus, Trash2, Share2, Globe, Lock, GripVertical,
   Wallet, ListChecks, StickyNote, MapIcon, ChevronLeft, Clock, Download,
@@ -14,7 +15,6 @@ import { useAuth } from '@/contexts/AuthContext';
 import { getTrip, upsertTrip, uid, tripCost, stopDays, tripDays, resequenceStops, createInvite, revokeInvite, unshareWith } from '@/lib/store';
 import type { Trip, Stop, Activity, Note, PackItem, Friend } from '@/lib/types';
 import { Button } from '@/components/ui/button';
-import { Display, Heading, Lead, Eyebrow } from '@/components/ui/typography';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
@@ -344,16 +344,16 @@ function Itinerary({ trip, update, highlightedStopId, currency }: { trip: Trip; 
       {trip.stops.length === 0 && (
         <div className="rounded-2xl border border-dashed border-border bg-muted/30 p-12 text-center">
           <Heading level={3} className="!text-xl">No stops yet</Heading>
-          <p className="mt-1 text-muted-foreground">Add cities to start building your route.</p>
+          <Muted className="mt-1">Add cities to start building your route.</Muted>
         </div>
       )}
 
       {view === 'list' ? (
         <>
           {trip.stops.length > 1 && (
-            <p className="text-xs text-muted-foreground flex items-center gap-1.5">
+            <Muted className="text-xs flex items-center gap-1.5">
               <GripVertical className="h-3 w-3" /> Drag stops to reorder · change duration to auto-shift dates
-            </p>
+            </Muted>
           )}
           <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={onDragEnd}>
             <SortableContext items={trip.stops.map(s => s.id)} strategy={verticalListSortingStrategy}>
@@ -498,7 +498,7 @@ function StopCard({ stop, index, onRemove, onUpdate, onSetDuration, dragHandle, 
             } />
           </div>
           {stop.activities.length === 0 ? (
-            <p className="py-2 text-sm text-muted-foreground">Nothing planned yet — a free day in {stop.city}.</p>
+            <Muted className="py-2 text-sm">Nothing planned yet — a free day in {stop.city}.</Muted>
           ) : (
             <ul className="divide-y divide-border/60">
               {stop.activities.map((a, ai) => (
@@ -621,7 +621,7 @@ function CalendarView({ trip, currency }: { trip: Trip; currency: CurrencyCode }
   }, [trip]);
 
   if (days.length === 0) {
-    return <p className="text-sm text-muted-foreground">Set a start and end date to see the day-by-day plan.</p>;
+    return <Muted className="text-sm">Set a start and end date to see the day-by-day plan.</Muted>;
   }
 
   return (
@@ -672,9 +672,9 @@ function CalendarView({ trip, currency }: { trip: Trip; currency: CurrencyCode }
               )}
 
               {d.stop && d.activities.length === 0 && (
-                <p className="mt-3 text-xs text-muted-foreground italic">
+                <Muted className="mt-3 text-xs italic">
                   No activities planned — a free day to explore {d.stop.city}.
-                </p>
+                </Muted>
               )}
 
               {d.activities.length > 0 && (
@@ -690,7 +690,7 @@ function CalendarView({ trip, currency }: { trip: Trip; currency: CurrencyCode }
                           <span className="text-xs text-muted-foreground capitalize shrink-0">· {a.category}</span>
                         </div>
                         {a.description && (
-                          <p className="text-xs text-muted-foreground truncate">{a.description}</p>
+                          <Muted className="text-xs truncate">{a.description}</Muted>
                         )}
                       </div>
                       <span className="text-xs text-muted-foreground shrink-0 flex items-center gap-1">
@@ -782,7 +782,7 @@ function BudgetView({ trip, update, currency }: { trip: Trip; update: (p: Partia
                 <Wallet className="h-5 w-5" />
               </span>
               <p className="text-sm font-medium">No costs yet</p>
-              <p className="max-w-[34ch] text-xs text-muted-foreground">Add stops and activities to see your breakdown come to life.</p>
+              <Muted className="max-w-[34ch] text-xs">Add stops and activities to see your breakdown come to life.</Muted>
             </div>
           ) : (
             <div className="grid gap-6 sm:grid-cols-[200px_1fr] items-center">
@@ -854,7 +854,7 @@ function BudgetView({ trip, update, currency }: { trip: Trip; update: (p: Partia
             <Label htmlFor="budget" className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Trip budget (USD)</Label>
             <Input id="budget" type="number" min={0} value={trip.budget ?? ''} onChange={e => update({ budget: e.target.value ? Number(e.target.value) : undefined })} placeholder="Set a budget" />
             {trip.budget ? (
-              <p className="text-[11px] text-muted-foreground tabular-nums">≈ {formatMoney(trip.budget, currency)} in {currency}</p>
+              <Muted className="text-[11px] tabular-nums">≈ {formatMoney(trip.budget, currency)} in {currency}</Muted>
             ) : null}
           </div>
           {trip.budget ? (
@@ -877,12 +877,12 @@ function BudgetView({ trip, update, currency }: { trip: Trip; update: (p: Partia
               </div>
             </div>
           ) : (
-            <p className="mt-3 text-xs text-muted-foreground">Set a target to track your spending.</p>
+            <Muted className="mt-3 text-xs">Set a target to track your spending.</Muted>
           )}
 
           <div className="mt-6 space-y-1">
             <Eyebrow className="block">Category goals</Eyebrow>
-            <p className="text-xs text-muted-foreground">Set a target per category to track each one independently.</p>
+            <Muted className="text-xs">Set a target per category to track each one independently.</Muted>
           </div>
           <div className="mt-3 space-y-3">
             {([
@@ -928,7 +928,7 @@ function BudgetView({ trip, update, currency }: { trip: Trip; update: (p: Partia
               <MapPin className="h-5 w-5" />
             </span>
             <p className="text-sm font-medium">No stops yet</p>
-            <p className="max-w-[34ch] text-xs text-muted-foreground">Add stops to compare per-city spending side by side.</p>
+            <Muted className="max-w-[34ch] text-xs">Add stops to compare per-city spending side by side.</Muted>
           </div>
         ) : (
           <>
@@ -1159,14 +1159,14 @@ function Notes({ trip, update }: { trip: Trip; update: (p: Partial<Trip> | ((t: 
         </form>
       </Card>
       <div className="space-y-3">
-        {trip.notes.length === 0 && <p className="text-sm text-muted-foreground">No notes yet.</p>}
+        {trip.notes.length === 0 && <Muted className="text-sm">No notes yet.</Muted>}
         {trip.notes.map(n => (
           <Card key={n.id} className="p-5">
             <div className="flex items-start justify-between gap-3">
               <div className="min-w-0 flex-1">
                 <Heading level={4} className="!text-base">{n.title}</Heading>
-                <p className="mt-1 whitespace-pre-wrap text-sm text-muted-foreground">{n.body}</p>
-                <p className="mt-2 text-xs text-muted-foreground">{new Date(n.createdAt).toLocaleString()}</p>
+                <Muted className="mt-1 whitespace-pre-wrap text-sm">{n.body}</Muted>
+                <Muted className="mt-2 text-xs">{new Date(n.createdAt).toLocaleString()}</Muted>
               </div>
               <Button size="icon" variant="ghost" onClick={() => remove(n.id)}><Trash2 className="h-4 w-4 text-destructive" /></Button>
             </div>
@@ -1205,13 +1205,13 @@ function Settings({ trip, update, onDelete }: { trip: Trip; update: (p: Partial<
         <div className="flex items-center justify-between rounded-xl border border-border p-4">
           <div>
             <div className="font-medium">Public itinerary</div>
-            <p className="text-sm text-muted-foreground">Anyone with the link can view (read-only).</p>
+            <Muted className="text-sm">Anyone with the link can view (read-only).</Muted>
           </div>
           <Switch checked={trip.isPublic} onCheckedChange={v => update({ isPublic: v })} />
         </div>
         <div className="rounded-xl border border-destructive/30 bg-destructive/5 p-4">
           <div className="font-medium text-destructive">Danger zone</div>
-          <p className="text-sm text-muted-foreground">Permanently delete this trip.</p>
+          <Muted className="text-sm">Permanently delete this trip.</Muted>
           <Button variant="destructive" className="mt-3" onClick={() => {
             if (confirm('Delete this trip permanently?')) {
               import('@/lib/store').then(({ deleteTrip }) => { deleteTrip(trip.id); onDelete(); toast.success('Trip deleted'); });
@@ -1270,9 +1270,9 @@ function ShareDialog({ trip, update }: { trip: Trip; update: (p: Partial<Trip> |
                 {trip.isPublic ? <Globe className="h-4 w-4 text-primary" /> : <Lock className="h-4 w-4" />}
                 {trip.isPublic ? 'Public' : 'Private'}
               </div>
-              <p className="text-xs text-muted-foreground">
+              <Muted className="text-xs">
                 {trip.isPublic ? 'Anyone with the link can view this trip.' : 'Only people you invite can view this trip.'}
-              </p>
+              </Muted>
             </div>
             <Switch
               checked={trip.isPublic}
@@ -1284,9 +1284,9 @@ function ShareDialog({ trip, update }: { trip: Trip; update: (p: Partial<Trip> |
           <div className="rounded-xl border border-border p-3">
             <div className="font-medium flex items-center gap-2"><Users className="h-4 w-4 text-primary" /> Invite a friend</div>
             {friends.length === 0 ? (
-              <p className="mt-2 text-xs text-muted-foreground">
+              <Muted className="mt-2 text-xs">
                 No friends yet. <a href="/app/friends" className="text-primary hover:underline">Add some</a> to invite them in one click.
-              </p>
+              </Muted>
             ) : (
               <ul className="mt-2 max-h-40 overflow-auto divide-y divide-border">
                 {friends.map(f => {

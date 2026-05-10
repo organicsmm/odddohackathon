@@ -1,5 +1,6 @@
 import { Link, useNavigate } from 'react-router-dom';
 import { useState } from 'react';
+import { Display, Eyebrow, Heading, Lead, Muted } from "@/components/ui/typography";
 import { z } from 'zod';
 import { Plane, ShieldCheck, Sparkles, ArrowRight } from 'lucide-react';
 import heroImg from '@/assets/hero-travel.jpg';
@@ -7,7 +8,6 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card } from '@/components/ui/card';
-import { Display, Heading, Lead, Eyebrow, Muted } from '@/components/ui/typography';
 import { login, signup } from '@/lib/store';
 import { useAuth } from '@/contexts/AuthContext';
 import { toast } from 'sonner';
@@ -154,13 +154,13 @@ export default function Auth({ mode }: { mode: 'login' | 'signup' }) {
               Continue with email link
             </Button>
 
-            <p className="mt-6 text-center text-sm text-muted-foreground">
+            <Muted className="mt-6 text-center text-sm">
               {mode === 'login' ? (
                 <>New to Traveloop? <Link to="/signup" className="font-semibold text-primary hover:underline">Sign up</Link></>
               ) : (
                 <>Already have an account? <Link to="/login" className="font-semibold text-primary hover:underline">Log in</Link></>
               )}
-            </p>
+            </Muted>
           </Card>
 
           <Muted className="mt-6 text-center text-xs">

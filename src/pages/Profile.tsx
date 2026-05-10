@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { Eyebrow, Heading, Muted, Text } from "@/components/ui/typography";
 import { useAuth } from '@/contexts/AuthContext';
 import { updateUser, deleteAccount, logout, loadTrips } from '@/lib/store';
 import { CITIES } from '@/lib/catalog';
@@ -11,8 +12,6 @@ import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { toast } from 'sonner';
 import { Trash2, Heart, MapPin } from 'lucide-react';
-import { Heading, Eyebrow, Text, Muted } from '@/components/ui/typography';
-
 export default function Profile() {
   const { user, refresh } = useAuth();
   const navigate = useNavigate();
@@ -61,7 +60,7 @@ export default function Profile() {
 
         <div className="mt-8">
           <Heading level={3} weight="bold" className="flex items-center gap-2"><Heart className="h-4 w-4 text-accent" /> Saved destinations</Heading>
-          {user.saved.length === 0 && <p className="mt-2 text-sm text-muted-foreground">Save destinations to inspire your next trip.</p>}
+          {user.saved.length === 0 && <Muted className="mt-2 text-sm">Save destinations to inspire your next trip.</Muted>}
           <div className="mt-3 flex flex-wrap gap-2">
             {user.saved.map(city => (
               <Badge key={city} variant="glass" className="cursor-pointer gap-1 px-3 py-1 hover:bg-primary/15" onClick={() => toggleSaved(city)}>
