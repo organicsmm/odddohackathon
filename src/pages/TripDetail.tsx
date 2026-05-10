@@ -1116,7 +1116,7 @@ function Packing({ trip, update }: { trip: Trip; update: (p: Partial<Trip> | ((t
         </div>
       </Card>
       <Card className="h-fit p-6">
-        <h3 className="font-display text-lg font-bold">Add item</h3>
+        <Heading level={3} className="!text-lg">Add item</Heading>
         <form onSubmit={add} className="mt-3 space-y-3">
           <Input value={label} onChange={e => setLabel(e.target.value)} placeholder="e.g. Hiking boots" />
           <Select value={cat} onValueChange={v => setCat(v as PackItem['category'])}>
