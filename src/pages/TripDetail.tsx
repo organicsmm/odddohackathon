@@ -171,7 +171,7 @@ export default function TripDetail() {
 
 /* ------------------- ITINERARY ------------------- */
 
-function Itinerary({ trip, update }: { trip: Trip; update: (p: Partial<Trip> | ((t: Trip) => Trip)) => void }) {
+function Itinerary({ trip, update, highlightedStopId }: { trip: Trip; update: (p: Partial<Trip> | ((t: Trip) => Trip)) => void; highlightedStopId?: string | null }) {
   const [view, setView] = useState<'list' | 'calendar'>('list');
 
   const addStop = (p: { city: string; country: string; startDate: string; endDate: string }) => {
