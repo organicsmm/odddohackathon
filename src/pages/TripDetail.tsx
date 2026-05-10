@@ -9,7 +9,7 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogDescription } from '@/components/ui/dialog';
 
 import { exportTripPDF, exportTripCSV } from '@/lib/export';
-import { CURRENCIES, refreshRates, type CurrencyCode } from '@/lib/currency';
+import { CURRENCIES, refreshRates, formatMoney, type CurrencyCode } from '@/lib/currency';
 import { useAuth } from '@/contexts/AuthContext';
 import { getTrip, upsertTrip, uid, tripCost, stopDays, tripDays, resequenceStops, createInvite, revokeInvite, unshareWith } from '@/lib/store';
 import type { Trip, Stop, Activity, Note, PackItem, Friend } from '@/lib/types';
@@ -50,7 +50,9 @@ export default function TripDetail() {
   const [trip, setTrip] = useState<Trip | undefined>(getTrip(id!));
   const [activeTab, setActiveTab] = useState('itinerary');
   const [highlightedStopId, setHighlightedStopId] = useState<string | null>(null);
-  const [exportCurrency, setExportCurrency] = useState<CurrencyCode>('USD');
+  const [displayCurrency, setDisplayCurrency] = useState<CurrencyCode>('USD');
+  const exportCurrency = displayCurrency;
+  const setExportCurrency = setDisplayCurrency;
 
   useEffect(() => { refreshRates(); }, []);
 
@@ -81,7 +83,7 @@ export default function TripDetail() {
   const overBudget = trip.budget && cost.total > trip.budget;
 
   const budgetPct = trip.budget ? Math.min(100, (cost.total / trip.budget) * 100) : 0;
-  const fmtUsd = (n: number) => `$${Math.round(n).toLocaleString()}`;
+  const fmtMoney = (n: number) => formatMoney(n, displayCurrency);
 
   return (
     <div className="space-y-10 pb-12">
@@ -116,17 +118,27 @@ export default function TripDetail() {
           <dl className="flex flex-wrap items-center gap-x-8 gap-y-3">
             <HeroStat label="Duration" value={`${tripDays(trip)} days`} />
             <HeroStat label="Stops" value={trip.stops.length.toString()} />
-            <HeroStat label="Estimated" value={fmtUsd(cost.total)} accent />
+            <HeroStat label="Estimated" value={fmtMoney(cost.total)} accent />
             {trip.budget && (
               <HeroStat
                 label={overBudget ? 'Over budget' : 'Remaining'}
-                value={fmtUsd(Math.abs(trip.budget - cost.total))}
+                value={fmtMoney(Math.abs(trip.budget - cost.total))}
                 tone={overBudget ? 'destructive' : 'success'}
               />
             )}
           </dl>
 
-          <div className="flex flex-wrap gap-2">
+          <div className="flex flex-wrap items-center gap-2">
+            <Select value={displayCurrency} onValueChange={(v) => setDisplayCurrency(v as CurrencyCode)}>
+              <SelectTrigger className="h-8 w-[140px] gap-1.5 text-xs" aria-label="Display currency">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent className="max-h-72">
+                {CURRENCIES.map(c => (
+                  <SelectItem key={c.code} value={c.code} className="text-xs">{c.symbol} {c.code} — {c.name}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
             <Button variant="ghost" size="sm" className="gap-1.5" onClick={() => {
               update({ isPublic: !trip.isPublic });
               toast.success(trip.isPublic ? 'Trip is now private' : 'Trip is now public');
@@ -178,7 +190,7 @@ export default function TripDetail() {
           <div className="mt-6 animate-fade-up" style={{ animationDelay: '120ms' }}>
             <div className="flex items-end justify-between text-xs text-muted-foreground">
               <span className="font-medium">{Math.round(budgetPct)}% of budget</span>
-              <span className="tabular-nums">{fmtUsd(cost.total)} <span className="text-border">/</span> {fmtUsd(trip.budget)}</span>
+              <span className="tabular-nums">{fmtMoney(cost.total)} <span className="text-border">/</span> {fmtMoney(trip.budget)}</span>
             </div>
             <div className="mt-2 h-[3px] w-full overflow-hidden rounded-full bg-muted">
               <div
@@ -211,8 +223,8 @@ export default function TripDetail() {
           </TabsList>
         </div>
 
-        <TabsContent value="itinerary" className="mt-8 animate-fade-in"><Itinerary trip={trip} update={update} highlightedStopId={highlightedStopId} /></TabsContent>
-        <TabsContent value="budget" className="mt-8 animate-fade-in"><BudgetView trip={trip} update={update} /></TabsContent>
+        <TabsContent value="itinerary" className="mt-8 animate-fade-in"><Itinerary trip={trip} update={update} highlightedStopId={highlightedStopId} currency={displayCurrency} /></TabsContent>
+        <TabsContent value="budget" className="mt-8 animate-fade-in"><BudgetView trip={trip} update={update} currency={displayCurrency} /></TabsContent>
         <TabsContent value="packing" className="mt-8 animate-fade-in"><Packing trip={trip} update={update} /></TabsContent>
         <TabsContent value="notes" className="mt-8 animate-fade-in"><Notes trip={trip} update={update} /></TabsContent>
         <TabsContent value="settings" className="mt-8 animate-fade-in"><Settings trip={trip} update={update} onDelete={() => navigate('/app/trips')} /></TabsContent>
@@ -259,7 +271,7 @@ function EditorialTab({ value, icon, children }: { value: string; icon?: React.R
 
 /* ------------------- ITINERARY ------------------- */
 
-function Itinerary({ trip, update, highlightedStopId }: { trip: Trip; update: (p: Partial<Trip> | ((t: Trip) => Trip)) => void; highlightedStopId?: string | null }) {
+function Itinerary({ trip, update, highlightedStopId, currency }: { trip: Trip; update: (p: Partial<Trip> | ((t: Trip) => Trip)) => void; highlightedStopId?: string | null; currency: CurrencyCode }) {
   const [view, setView] = useState<'list' | 'calendar'>('list');
 
   const addStop = (p: { city: string; country: string; startDate: string; endDate: string }) => {
@@ -351,6 +363,7 @@ function Itinerary({ trip, update, highlightedStopId }: { trip: Trip; update: (p
                       stop={s} index={i}
                       onRemove={removeStop} onUpdate={updateStop} onSetDuration={setDuration}
                       highlighted={highlightedStopId === s.id}
+                      currency={currency}
                     />
                   </div>
                 ))}
@@ -359,7 +372,7 @@ function Itinerary({ trip, update, highlightedStopId }: { trip: Trip; update: (p
           </DndContext>
         </>
       ) : (
-        <CalendarView trip={trip} />
+        <CalendarView trip={trip} currency={currency} />
       )}
     </div>
   );
@@ -371,6 +384,7 @@ function SortableStopCard(props: {
   onUpdate: (id: string, p: Partial<Stop>) => void;
   onSetDuration: (id: string, days: number) => void;
   highlighted?: boolean;
+  currency: CurrencyCode;
 }) {
   const { stop, highlighted } = props;
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id: stop.id });
@@ -392,12 +406,13 @@ function SortableStopCard(props: {
   );
 }
 
-function StopCard({ stop, index, onRemove, onUpdate, onSetDuration, dragHandle }: {
+function StopCard({ stop, index, onRemove, onUpdate, onSetDuration, dragHandle, currency }: {
   stop: Stop; index: number;
   onRemove: (id: string) => void;
   onUpdate: (id: string, p: Partial<Stop>) => void;
   onSetDuration: (id: string, days: number) => void;
   dragHandle?: React.HTMLAttributes<HTMLButtonElement>;
+  currency: CurrencyCode;
 }) {
   const days = stopDays(stop);
   const stopTotal =
@@ -437,7 +452,7 @@ function StopCard({ stop, index, onRemove, onUpdate, onSetDuration, dragHandle }
             <span className="text-border">·</span>
             <span className="tabular-nums">{days} day{days > 1 ? 's' : ''}</span>
             <span className="text-border">·</span>
-            <span className="font-semibold tabular-nums text-foreground">${stopTotal.toLocaleString()}</span>
+            <span className="font-semibold tabular-nums text-foreground">{formatMoney(stopTotal, currency)}</span>
             <WeatherBadge city={stop.city} date={stop.startDate} />
           </div>
         </div>
@@ -502,7 +517,7 @@ function StopCard({ stop, index, onRemove, onUpdate, onSetDuration, dragHandle }
                         <span className="mx-1.5 text-border">·</span>
                         <span className="tabular-nums">{a.durationHours}h</span>
                         <span className="mx-1.5 text-border">·</span>
-                        <span className="tabular-nums">${a.cost}</span>
+                        <span className="tabular-nums">{formatMoney(a.cost, currency)}</span>
                       </div>
                     </div>
                   </div>
@@ -525,13 +540,13 @@ function StopCard({ stop, index, onRemove, onUpdate, onSetDuration, dragHandle }
 
         {/* cost panel */}
         <aside className="space-y-3 rounded-2xl border border-border/60 bg-muted/30 p-5">
-          <h4 className="font-display text-[11px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">Costs · USD</h4>
+          <h4 className="font-display text-[11px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">Costs · entered in USD</h4>
           <CostInput label="Transport" value={stop.costs.transport} onChange={v => onUpdate(stop.id, { costs: { ...stop.costs, transport: v } })} />
           <CostInput label="Stay / night" value={stop.costs.stay} onChange={v => onUpdate(stop.id, { costs: { ...stop.costs, stay: v } })} />
           <CostInput label="Meals / day" value={stop.costs.meals} onChange={v => onUpdate(stop.id, { costs: { ...stop.costs, meals: v } })} />
           <div className="mt-3 flex items-end justify-between border-t border-border/60 pt-3">
-            <span className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">Total</span>
-            <span className="font-display text-2xl font-bold tabular-nums leading-none">${stopTotal.toLocaleString()}</span>
+            <span className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">Total · {currency}</span>
+            <span className="font-display text-2xl font-bold tabular-nums leading-none">{formatMoney(stopTotal, currency)}</span>
           </div>
         </aside>
       </div>
@@ -555,7 +570,7 @@ function CostInput({ label, value, onChange }: { label: string; value: number; o
   );
 }
 
-function CalendarView({ trip }: { trip: Trip }) {
+function CalendarView({ trip, currency }: { trip: Trip; currency: CurrencyCode }) {
   type DayEntry = {
     date: string;
     stop?: Stop;
@@ -647,7 +662,7 @@ function CalendarView({ trip }: { trip: Trip }) {
                   <div className="flex items-center gap-2">
                     <WeatherBadge city={d.stop.city} date={d.date} />
                     <span className="text-xs font-medium text-muted-foreground">
-                      ~${Math.round(d.dailyCost)}
+                      ~{formatMoney(d.dailyCost, currency)}
                     </span>
                   </div>
                 </div>
@@ -678,7 +693,7 @@ function CalendarView({ trip }: { trip: Trip }) {
                         )}
                       </div>
                       <span className="text-xs text-muted-foreground shrink-0 flex items-center gap-1">
-                        <Clock className="h-3 w-3" />{a.durationHours}h · ${a.cost}
+                        <Clock className="h-3 w-3" />{a.durationHours}h · {formatMoney(a.cost, currency)}
                       </span>
                     </li>
                   ))}
@@ -694,7 +709,7 @@ function CalendarView({ trip }: { trip: Trip }) {
 
 /* ------------------- BUDGET ------------------- */
 
-function BudgetView({ trip, update }: { trip: Trip; update: (p: Partial<Trip>) => void }) {
+function BudgetView({ trip, update, currency }: { trip: Trip; update: (p: Partial<Trip>) => void; currency: CurrencyCode }) {
   const cost = tripCost(trip);
   const days = tripDays(trip);
   const avg = days > 0 ? cost.total / days : 0;
@@ -736,8 +751,8 @@ function BudgetView({ trip, update }: { trip: Trip; update: (p: Partial<Trip>) =
       {/* KPI strip */}
       <div className="grid gap-3 sm:grid-cols-4">
         {[
-          { label: 'Total', value: `$${cost.total.toLocaleString()}`, accent: true },
-          { label: 'Avg / day', value: `$${Math.round(avg).toLocaleString()}` },
+          { label: 'Total', value: formatMoney(cost.total, currency), accent: true },
+          { label: 'Avg / day', value: formatMoney(avg, currency) },
           { label: 'Stops', value: trip.stops.length.toString() },
           { label: 'Trip length', value: `${days} day${days > 1 ? 's' : ''}` },
         ].map((k, i) => (
@@ -765,7 +780,7 @@ function BudgetView({ trip, update }: { trip: Trip; update: (p: Partial<Trip>) =
                     </Pie>
                     <RTooltip
                       contentStyle={{ background: 'hsl(var(--card))', border: '1px solid hsl(var(--border))', borderRadius: 8, fontSize: 12 }}
-                      formatter={(v: number) => `$${v.toLocaleString()}`}
+                      formatter={(v: number) => formatMoney(v, currency)}
                     />
                   </PieChart>
                 </ResponsiveContainer>
@@ -775,7 +790,7 @@ function BudgetView({ trip, update }: { trip: Trip; update: (p: Partial<Trip>) =
                   <li key={i.name} className="flex items-center gap-3 text-sm">
                     <span className="h-3 w-3 rounded-full" style={{ background: COLORS[i.name as keyof typeof COLORS] }} />
                     <span className="flex-1">{i.name}</span>
-                    <span className="font-medium">${i.value.toLocaleString()}</span>
+                    <span className="font-medium">{formatMoney(i.value, currency)}</span>
                     <span className="w-12 text-right text-muted-foreground">{Math.round((i.value / total) * 100)}%</span>
                   </li>
                 ))}
@@ -790,14 +805,17 @@ function BudgetView({ trip, update }: { trip: Trip; update: (p: Partial<Trip>) =
           <div className="mt-4 space-y-2">
             <Label htmlFor="budget">Trip budget (USD)</Label>
             <Input id="budget" type="number" min={0} value={trip.budget ?? ''} onChange={e => update({ budget: e.target.value ? Number(e.target.value) : undefined })} placeholder="Set a budget" />
+            {trip.budget ? (
+              <p className="text-[11px] text-muted-foreground tabular-nums">≈ {formatMoney(trip.budget, currency)} in {currency}</p>
+            ) : null}
           </div>
           {trip.budget ? (
             <div className="mt-4 space-y-2">
               <Progress value={Math.min(100, (cost.total / trip.budget) * 100)} />
               {cost.total > trip.budget ? (
-                <p className="text-sm text-destructive font-medium">⚠ Over budget by ${(cost.total - trip.budget).toLocaleString()}</p>
+                <p className="text-sm text-destructive font-medium">⚠ Over budget by {formatMoney(cost.total - trip.budget, currency)}</p>
               ) : (
-                <p className="text-sm text-success font-medium">✓ ${(trip.budget - cost.total).toLocaleString()} remaining</p>
+                <p className="text-sm text-success font-medium">✓ {formatMoney(trip.budget - cost.total, currency)} remaining</p>
               )}
             </div>
           ) : (
@@ -821,6 +839,7 @@ function BudgetView({ trip, update }: { trip: Trip; update: (p: Partial<Trip>) =
                 color={c.color}
                 spent={c.spent}
                 goal={trip.categoryBudgets?.[c.key]}
+                currency={currency}
                 onChange={(v) => update({ categoryBudgets: { ...(trip.categoryBudgets || {}), [c.key]: v } })}
               />
             ))}
@@ -840,10 +859,10 @@ function BudgetView({ trip, update }: { trip: Trip; update: (p: Partial<Trip>) =
                 <BarChart data={barData} margin={{ top: 8, right: 8, bottom: 4, left: -12 }}>
                   <CartesianGrid stroke="hsl(var(--border))" strokeDasharray="3 3" vertical={false} />
                   <XAxis dataKey="city" stroke="hsl(var(--muted-foreground))" fontSize={12} />
-                  <YAxis stroke="hsl(var(--muted-foreground))" fontSize={12} tickFormatter={(v) => `$${v}`} />
+                  <YAxis stroke="hsl(var(--muted-foreground))" fontSize={12} tickFormatter={(v) => formatMoney(v, currency)} />
                   <RTooltip
                     contentStyle={{ background: 'hsl(var(--card))', border: '1px solid hsl(var(--border))', borderRadius: 8, fontSize: 12 }}
-                    formatter={(v: number) => `$${Number(v).toLocaleString()}`}
+                    formatter={(v: number) => formatMoney(Number(v), currency)}
                   />
                   <Legend wrapperStyle={{ fontSize: 12 }} />
                   <Bar dataKey="Transport" stackId="a" fill={COLORS.Transport} radius={[0, 0, 0, 0]} />
@@ -869,20 +888,20 @@ function BudgetView({ trip, update }: { trip: Trip; update: (p: Partial<Trip>) =
                   {barData.map(r => (
                     <tr key={r.city}>
                       <td className="py-2 font-medium flex items-center gap-2"><MapPin className="h-3 w-3 text-primary" />{r.city}</td>
-                      <td className="py-2 text-right">${r.Transport.toLocaleString()}</td>
-                      <td className="py-2 text-right">${r.Stay.toLocaleString()}</td>
-                      <td className="py-2 text-right">${r.Meals.toLocaleString()}</td>
-                      <td className="py-2 text-right">${r.Activities.toLocaleString()}</td>
-                      <td className="py-2 text-right font-semibold">${r.total.toLocaleString()}</td>
+                      <td className="py-2 text-right tabular-nums">{formatMoney(r.Transport, currency)}</td>
+                      <td className="py-2 text-right tabular-nums">{formatMoney(r.Stay, currency)}</td>
+                      <td className="py-2 text-right tabular-nums">{formatMoney(r.Meals, currency)}</td>
+                      <td className="py-2 text-right tabular-nums">{formatMoney(r.Activities, currency)}</td>
+                      <td className="py-2 text-right font-semibold tabular-nums">{formatMoney(r.total, currency)}</td>
                     </tr>
                   ))}
                   <tr className="border-t-2 border-border">
                     <td className="py-2 font-semibold">Total</td>
-                    <td className="py-2 text-right font-semibold">${cost.transport.toLocaleString()}</td>
-                    <td className="py-2 text-right font-semibold">${cost.stay.toLocaleString()}</td>
-                    <td className="py-2 text-right font-semibold">${cost.meals.toLocaleString()}</td>
-                    <td className="py-2 text-right font-semibold">${cost.activities.toLocaleString()}</td>
-                    <td className="py-2 text-right font-bold text-primary">${cost.total.toLocaleString()}</td>
+                    <td className="py-2 text-right font-semibold tabular-nums">{formatMoney(cost.transport, currency)}</td>
+                    <td className="py-2 text-right font-semibold tabular-nums">{formatMoney(cost.stay, currency)}</td>
+                    <td className="py-2 text-right font-semibold tabular-nums">{formatMoney(cost.meals, currency)}</td>
+                    <td className="py-2 text-right font-semibold tabular-nums">{formatMoney(cost.activities, currency)}</td>
+                    <td className="py-2 text-right font-bold text-primary tabular-nums">{formatMoney(cost.total, currency)}</td>
                   </tr>
                 </tbody>
               </table>
@@ -904,15 +923,17 @@ function KpiCard({ label, value, accent }: { label: string; value: string; accen
   );
 }
 
-function CategoryGoal({ label, color, spent, goal, onChange }: {
+function CategoryGoal({ label, color, spent, goal, currency, onChange }: {
   label: string; color: string; spent: number;
   goal?: number;
+  currency: CurrencyCode;
   onChange: (v: number | undefined) => void;
 }) {
   const hasGoal = typeof goal === 'number' && goal > 0;
   const pct = hasGoal ? Math.min(100, (spent / goal!) * 100) : 0;
   const over = hasGoal && spent > goal!;
   const remaining = hasGoal ? Math.abs(goal! - spent) : 0;
+  const sym = CURRENCIES.find(c => c.code === currency)?.symbol ?? '$';
 
   return (
     <div className="rounded-xl border border-border/60 bg-muted/20 p-3">
@@ -922,16 +943,17 @@ function CategoryGoal({ label, color, spent, goal, onChange }: {
           {label}
         </div>
         <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
-          <span className="tabular-nums font-medium text-foreground">${Math.round(spent).toLocaleString()}</span>
+          <span className="tabular-nums font-medium text-foreground">{formatMoney(spent, currency)}</span>
           <span className="text-border">/</span>
           <div className="relative">
             <span className="pointer-events-none absolute left-2 top-1/2 -translate-y-1/2 text-xs text-muted-foreground">$</span>
             <Input
               type="number" min={0}
               value={goal ?? ''}
-              placeholder="goal"
+              placeholder="USD"
               onChange={e => onChange(e.target.value ? Number(e.target.value) : undefined)}
               className="h-7 w-24 border-border/60 bg-background/60 pl-5 text-right text-xs tabular-nums"
+              title="Goal entered in USD"
             />
           </div>
         </div>
@@ -950,7 +972,7 @@ function CategoryGoal({ label, color, spent, goal, onChange }: {
           <>
             <span className="tabular-nums text-muted-foreground">{Math.round(pct)}% used</span>
             <span className={`tabular-nums font-medium ${over ? 'text-destructive' : 'text-success'}`}>
-              {over ? `Over by $${Math.round(remaining).toLocaleString()}` : `$${Math.round(remaining).toLocaleString()} left`}
+              {over ? `Over by ${formatMoney(remaining, currency)}` : `${formatMoney(remaining, currency)} left`}
             </span>
           </>
         ) : (
