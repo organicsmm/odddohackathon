@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
+import { toast } from 'sonner';
 import {
   Sparkles, Plane, Star, Heart, Plus, ArrowRight, Trash2, Code2,
 } from 'lucide-react';
@@ -351,6 +352,53 @@ function Showcase() {
             <Swatch token="destructive" />
             <Swatch token="ring" />
           </div>
+        </Section>
+
+        <Section
+          eyebrow="07 · Toasts"
+          title="Notifications that match the system"
+          description="All app feedback flows through `sonner`. The toaster is themed with our gradient-card surface, semantic accent strip, and design-token icons."
+        >
+          <Card variant="premium" className="flex flex-wrap items-center gap-3 p-6">
+            <Button variant="outline" onClick={() => toast.success('Trip saved', { description: 'Your itinerary is up to date.' })}>
+              Success
+            </Button>
+            <Button variant="outline" onClick={() => toast.error('Could not save', { description: 'Check your connection and try again.' })}>
+              Error
+            </Button>
+            <Button variant="outline" onClick={() => toast.info('Heads up', { description: 'A new feature just shipped.' })}>
+              Info
+            </Button>
+            <Button variant="outline" onClick={() => toast.warning('Budget exceeded', { description: 'You are 12% over the planned spend.' })}>
+              Warning
+            </Button>
+            <Button variant="outline" onClick={() => {
+              const id = toast.loading('Generating itinerary…');
+              setTimeout(() => toast.success('Itinerary ready', { id }), 1500);
+            }}>
+              Loading → Success
+            </Button>
+            <Button variant="outline" onClick={() => toast('Invite sent', {
+              description: 'alex@example.com will receive the link.',
+              action: { label: 'Undo', onClick: () => toast.info('Undone') },
+            })}>
+              With action
+            </Button>
+          </Card>
+
+          <Snippet>{`import { toast } from 'sonner';
+
+toast.success('Trip saved', { description: 'Your itinerary is up to date.' });
+toast.error('Could not save');
+toast.info('Heads up');
+toast.warning('Budget exceeded');
+
+const id = toast.loading('Generating…');
+toast.success('Done', { id });
+
+toast('Invite sent', {
+  action: { label: 'Undo', onClick: () => undo() },
+});`}</Snippet>
         </Section>
 
         <footer className="border-t border-border/60 pt-8">
