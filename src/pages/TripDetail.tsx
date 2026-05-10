@@ -363,6 +363,7 @@ function Itinerary({ trip, update, highlightedStopId, currency }: { trip: Trip; 
                       stop={s} index={i}
                       onRemove={removeStop} onUpdate={updateStop} onSetDuration={setDuration}
                       highlighted={highlightedStopId === s.id}
+                      currency={currency}
                     />
                   </div>
                 ))}
@@ -371,7 +372,7 @@ function Itinerary({ trip, update, highlightedStopId, currency }: { trip: Trip; 
           </DndContext>
         </>
       ) : (
-        <CalendarView trip={trip} />
+        <CalendarView trip={trip} currency={currency} />
       )}
     </div>
   );
