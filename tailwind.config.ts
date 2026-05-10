@@ -5,7 +5,11 @@ export default {
   content: ["./pages/**/*.{ts,tsx}", "./components/**/*.{ts,tsx}", "./app/**/*.{ts,tsx}", "./src/**/*.{ts,tsx}"],
   prefix: "",
   theme: {
-    container: { center: true, padding: "1.5rem", screens: { "2xl": "1400px" } },
+    container: {
+      center: true,
+      padding: { DEFAULT: "1rem", sm: "1.25rem", lg: "1.5rem", xl: "2rem" },
+      screens: { "2xl": "1400px" },
+    },
     extend: {
       fontFamily: {
         sans: ['Inter', 'ui-sans-serif', 'system-ui', 'sans-serif'],
