@@ -188,7 +188,7 @@ export default function Landing() {
               <div className="mb-4 inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-primary/10 text-primary group-hover:bg-gradient-hero group-hover:text-primary-foreground group-hover:shadow-glow transition-spring">
                 <f.icon className="h-6 w-6" />
               </div>
-              <h3 className="font-display text-lg font-bold">{f.title}</h3>
+              <Heading level={3} className="!text-lg">{f.title}</Heading>
               <Muted className="mt-1 text-sm">{f.desc}</Muted>
               <div className="mt-4 inline-flex items-center gap-1 text-xs font-semibold text-primary opacity-0 group-hover:opacity-100 transition-smooth">
                 Learn more <ChevronRight className="h-3 w-3" />
