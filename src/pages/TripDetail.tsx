@@ -751,8 +751,8 @@ function BudgetView({ trip, update, currency }: { trip: Trip; update: (p: Partia
       {/* KPI strip */}
       <div className="grid gap-3 sm:grid-cols-4">
         {[
-          { label: 'Total', value: `$${cost.total.toLocaleString()}`, accent: true },
-          { label: 'Avg / day', value: `$${Math.round(avg).toLocaleString()}` },
+          { label: 'Total', value: formatMoney(cost.total, currency), accent: true },
+          { label: 'Avg / day', value: formatMoney(avg, currency) },
           { label: 'Stops', value: trip.stops.length.toString() },
           { label: 'Trip length', value: `${days} day${days > 1 ? 's' : ''}` },
         ].map((k, i) => (
