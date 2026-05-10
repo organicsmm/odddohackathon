@@ -297,14 +297,37 @@ export default function RouteMap({ stops, onSelectStop, highlightedStopId }: { s
               const labelText = showNumbers
                 ? `${p.index + 1}. ${p.stop.city}`
                 : p.stop.city;
+              const confidenceLabel =
+                p.confidence === 'exact'
+                  ? `Exact location from ${p.source === 'builtin' ? 'built-in city database' : 'geocoder'}.`
+                  : `Approximate location — best-effort match${p.matchedName ? ` to ${p.matchedName}` : ''}. Verify the marker.`;
+              const stopAriaLabel =
+                `Stop ${p.index + 1} of ${stops.length}: ${p.stop.city}${p.stop.country ? ', ' + p.stop.country : ''}. ` +
+                `${isStart ? 'Start of trip. ' : ''}${isEnd ? 'End of trip. ' : ''}` +
+                `${isSelected ? 'Currently selected. ' : ''}` +
+                confidenceLabel +
+                ' Press Enter to select.';
               return (
                 <Marker
                   key={p.stop.id}
                   coordinates={p.coords}
                   onMouseEnter={() => setHover(p.stop.id)}
                   onMouseLeave={() => setHover(null)}
+                  onFocus={() => setHover(p.stop.id)}
+                  onBlur={() => setHover(prev => (prev === p.stop.id ? null : prev))}
                   onClick={() => onSelectStop?.(p.stop.id)}
-                  style={{ default: { cursor: 'pointer' }, hover: { cursor: 'pointer' }, pressed: { cursor: 'pointer' } }}
+                  onKeyDown={(e: React.KeyboardEvent) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      onSelectStop?.(p.stop.id);
+                    }
+                  }}
+                  tabIndex={0}
+                  role="button"
+                  aria-label={stopAriaLabel}
+                  aria-pressed={isSelected}
+                  style={{ default: { cursor: 'pointer', outline: 'none' }, hover: { cursor: 'pointer' }, pressed: { cursor: 'pointer' } }}
                 >
                   {/* pulse ring */}
                   <circle
