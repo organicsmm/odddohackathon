@@ -36,8 +36,11 @@ export default function CitySearchDialog({
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>{trigger}</DialogTrigger>
-      <DialogContent className="max-w-2xl">
-        <DialogHeader><DialogTitle className="font-display">Add a stop</DialogTitle></DialogHeader>
+      <DialogContent className="max-w-2xl border-border/60 bg-gradient-card backdrop-blur-xl">
+        <DialogHeader>
+          <span className="text-[10px] font-semibold uppercase tracking-[0.2em] text-primary">Itinerary</span>
+          <DialogTitle className="font-display text-2xl font-bold tracking-tight">Add a stop</DialogTitle>
+        </DialogHeader>
         <div className="space-y-4">
           <div className="grid gap-3 sm:grid-cols-[1fr_auto]">
             <div className="relative">
@@ -61,15 +64,15 @@ export default function CitySearchDialog({
               <Input type="date" value={end} onChange={e => setEnd(e.target.value)} />
             </div>
           </div>
-          <div className="max-h-72 overflow-y-auto rounded-xl border border-border">
+          <div className="max-h-72 overflow-y-auto rounded-xl border border-border/60 bg-card/40">
             {filtered.length === 0 && <div className="p-6 text-center text-sm text-muted-foreground">No matches.</div>}
             {filtered.map(c => (
-              <div key={c.city} className="flex items-center justify-between border-b border-border/60 p-3 last:border-0 hover:bg-muted/50">
+              <div key={c.city} className="flex items-center justify-between border-b border-border/40 p-3 last:border-0 transition-smooth hover:bg-muted/50">
                 <div>
                   <div className="font-medium">{c.city}, <span className="text-muted-foreground font-normal">{c.country}</span></div>
                   <div className="text-xs text-muted-foreground">{c.region} · {c.tags.join(', ')}</div>
                 </div>
-                <Button size="sm" variant="hero" onClick={() => { onAdd({ city: c.city, country: c.country, startDate: start, endDate: end }); setOpen(false); }}>
+                <Button size="sm" variant="premium" onClick={() => { onAdd({ city: c.city, country: c.country, startDate: start, endDate: end }); setOpen(false); }}>
                   <Plus className="h-4 w-4" /> Add
                 </Button>
               </div>
