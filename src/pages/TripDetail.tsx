@@ -80,49 +80,79 @@ export default function TripDetail() {
   const cost = tripCost(trip);
   const overBudget = trip.budget && cost.total > trip.budget;
 
-  return (
-    <div className="space-y-6">
-      <Button variant="ghost" size="sm" onClick={() => navigate('/app/trips')}><ChevronLeft className="h-4 w-4" /> Back to trips</Button>
+  const budgetPct = trip.budget ? Math.min(100, (cost.total / trip.budget) * 100) : 0;
+  const fmtUsd = (n: number) => `$${Math.round(n).toLocaleString()}`;
 
-      <header className="overflow-hidden rounded-3xl bg-gradient-hero p-6 text-primary-foreground shadow-elegant md:p-10">
-        <div className="flex flex-wrap items-start justify-between gap-4">
-          <div className="min-w-0 flex-1">
-            <div className="flex flex-wrap items-center gap-2 text-xs uppercase tracking-wider opacity-90">
-              <Calendar className="h-3 w-3" /> {new Date(trip.startDate).toLocaleDateString()} → {new Date(trip.endDate).toLocaleDateString()}
-              <span>·</span> {tripDays(trip)} days <span>·</span> {trip.stops.length} stops
-            </div>
-            <h1 className="mt-2 font-display text-4xl font-extrabold leading-tight md:text-5xl">{trip.name}</h1>
-            {trip.description && <p className="mt-2 max-w-2xl opacity-90">{trip.description}</p>}
-          </div>
+  return (
+    <div className="space-y-10 pb-12">
+      <Button variant="ghost" size="sm" onClick={() => navigate('/app/trips')} className="-ml-2 text-muted-foreground hover:text-foreground">
+        <ChevronLeft className="h-4 w-4" /> Back to trips
+      </Button>
+
+      {/* ───────── EDITORIAL HERO ───────── */}
+      <header className="relative animate-fade-up">
+        {/* eyebrow */}
+        <div className="flex flex-wrap items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
+          <span className="inline-flex items-center gap-1.5">
+            <span className="h-1.5 w-1.5 rounded-full bg-primary animate-pulse" />
+            {trip.isPublic ? 'Public itinerary' : 'Private itinerary'}
+          </span>
+          <span className="text-border">·</span>
+          <span className="tabular-nums">{new Date(trip.startDate).toLocaleDateString(undefined, { day: 'numeric', month: 'short', year: 'numeric' })}</span>
+          <span className="text-border">→</span>
+          <span className="tabular-nums">{new Date(trip.endDate).toLocaleDateString(undefined, { day: 'numeric', month: 'short', year: 'numeric' })}</span>
+        </div>
+
+        <h1 className="mt-3 font-display text-5xl font-extrabold leading-[1.02] tracking-tight md:text-7xl">
+          {trip.name}
+        </h1>
+
+        {trip.description && (
+          <p className="mt-4 max-w-2xl text-lg leading-relaxed text-muted-foreground">{trip.description}</p>
+        )}
+
+        {/* meta strip + actions */}
+        <div className="mt-8 flex flex-wrap items-center justify-between gap-4 border-t border-border/60 pt-6">
+          <dl className="flex flex-wrap items-center gap-x-8 gap-y-3">
+            <HeroStat label="Duration" value={`${tripDays(trip)} days`} />
+            <HeroStat label="Stops" value={trip.stops.length.toString()} />
+            <HeroStat label="Estimated" value={fmtUsd(cost.total)} accent />
+            {trip.budget && (
+              <HeroStat
+                label={overBudget ? 'Over budget' : 'Remaining'}
+                value={fmtUsd(Math.abs(trip.budget - cost.total))}
+                tone={overBudget ? 'destructive' : 'success'}
+              />
+            )}
+          </dl>
+
           <div className="flex flex-wrap gap-2">
-            <Button variant="secondary" onClick={() => {
+            <Button variant="ghost" size="sm" className="gap-1.5" onClick={() => {
               update({ isPublic: !trip.isPublic });
               toast.success(trip.isPublic ? 'Trip is now private' : 'Trip is now public');
             }}>
-              {trip.isPublic ? <><Globe className="h-4 w-4" /> Public</> : <><Lock className="h-4 w-4" /> Private</>}
+              {trip.isPublic ? <><Globe className="h-3.5 w-3.5" /> Public</> : <><Lock className="h-3.5 w-3.5" /> Private</>}
             </Button>
             <ShareDialog trip={trip} update={update} />
             {trip.isPublic && (
-              <Button variant="secondary" onClick={() => {
+              <Button variant="ghost" size="sm" className="gap-1.5" onClick={() => {
                 const url = `${window.location.origin}/share/${trip.shareId}`;
                 navigator.clipboard.writeText(url);
                 toast.success('Public link copied!');
-              }}><Share2 className="h-4 w-4" /> Copy link</Button>
+              }}><Share2 className="h-3.5 w-3.5" /> Copy link</Button>
             )}
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="secondary"><Download className="h-4 w-4" /> Export</Button>
+                <Button size="sm" className="gap-1.5"><Download className="h-3.5 w-3.5" /> Export</Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-64">
                 <div className="px-2 py-1.5">
-                  <label className="text-xs text-muted-foreground">Currency</label>
+                  <label className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">Currency</label>
                   <Select value={exportCurrency} onValueChange={(v) => setExportCurrency(v as CurrencyCode)}>
                     <SelectTrigger className="mt-1 h-8"><SelectValue /></SelectTrigger>
                     <SelectContent className="max-h-72">
                       {CURRENCIES.map(c => (
-                        <SelectItem key={c.code} value={c.code}>
-                          {c.symbol} {c.code} — {c.name}
-                        </SelectItem>
+                        <SelectItem key={c.code} value={c.code}>{c.symbol} {c.code} — {c.name}</SelectItem>
                       ))}
                     </SelectContent>
                   </Select>
@@ -143,47 +173,87 @@ export default function TripDetail() {
           </div>
         </div>
 
-        {/* budget bar */}
-        <div className="mt-6 rounded-2xl bg-white/15 p-4 backdrop-blur">
-          <div className="flex items-center justify-between text-sm">
-            <span className="opacity-90">Estimated cost</span>
-            <span className="font-display text-2xl font-bold">${cost.total.toLocaleString()}</span>
+        {/* refined budget meter */}
+        {trip.budget && (
+          <div className="mt-6 animate-fade-up" style={{ animationDelay: '120ms' }}>
+            <div className="flex items-end justify-between text-xs text-muted-foreground">
+              <span className="font-medium">{Math.round(budgetPct)}% of budget</span>
+              <span className="tabular-nums">{fmtUsd(cost.total)} <span className="text-border">/</span> {fmtUsd(trip.budget)}</span>
+            </div>
+            <div className="mt-2 h-[3px] w-full overflow-hidden rounded-full bg-muted">
+              <div
+                className={`h-full rounded-full transition-all duration-700 ease-out ${overBudget ? 'bg-destructive' : 'bg-foreground'}`}
+                style={{ width: `${budgetPct}%` }}
+              />
+            </div>
           </div>
-          {trip.budget ? (
-            <>
-              <Progress value={Math.min(100, (cost.total / trip.budget) * 100)} className="mt-2 h-2 bg-white/30" />
-              <div className="mt-1 flex justify-between text-xs opacity-90">
-                <span>Budget: ${trip.budget.toLocaleString()}</span>
-                <span className={overBudget ? 'font-bold' : ''}>{overBudget ? `Over by $${(cost.total - trip.budget).toLocaleString()}` : `$${(trip.budget - cost.total).toLocaleString()} left`}</span>
-              </div>
-            </>
-          ) : (
-            <p className="mt-1 text-xs opacity-80">Set a budget in Settings to track spending.</p>
-          )}
-        </div>
+        )}
       </header>
 
-      {trip.stops.length > 0 && <RouteTimeline stops={trip.stops} />}
       {trip.stops.length > 0 && (
-        <RouteMap stops={trip.stops} onSelectStop={focusStop} highlightedStopId={highlightedStopId} />
+        <div className="animate-fade-up" style={{ animationDelay: '160ms' }}>
+          <SectionLabel>The route</SectionLabel>
+          <div className="mt-4 space-y-6">
+            <RouteTimeline stops={trip.stops} />
+            <RouteMap stops={trip.stops} onSelectStop={focusStop} highlightedStopId={highlightedStopId} />
+          </div>
+        </div>
       )}
 
-      <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-        <TabsList className="grid w-full grid-cols-2 sm:grid-cols-5 sm:w-auto">
-          <TabsTrigger value="itinerary"><MapIcon className="h-4 w-4 mr-1" />Itinerary</TabsTrigger>
-          <TabsTrigger value="budget"><Wallet className="h-4 w-4 mr-1" />Budget</TabsTrigger>
-          <TabsTrigger value="packing"><ListChecks className="h-4 w-4 mr-1" />Packing</TabsTrigger>
-          <TabsTrigger value="notes"><StickyNote className="h-4 w-4 mr-1" />Notes</TabsTrigger>
-          <TabsTrigger value="settings">Settings</TabsTrigger>
-        </TabsList>
+      <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full animate-fade-up" style={{ animationDelay: '200ms' } as React.CSSProperties}>
+        <div className="border-b border-border/60">
+          <TabsList className="h-auto w-full justify-start gap-1 bg-transparent p-0 sm:w-auto">
+            <EditorialTab value="itinerary" icon={<MapIcon className="h-3.5 w-3.5" />}>Itinerary</EditorialTab>
+            <EditorialTab value="budget" icon={<Wallet className="h-3.5 w-3.5" />}>Budget</EditorialTab>
+            <EditorialTab value="packing" icon={<ListChecks className="h-3.5 w-3.5" />}>Packing</EditorialTab>
+            <EditorialTab value="notes" icon={<StickyNote className="h-3.5 w-3.5" />}>Notes</EditorialTab>
+            <EditorialTab value="settings">Settings</EditorialTab>
+          </TabsList>
+        </div>
 
-        <TabsContent value="itinerary" className="mt-6"><Itinerary trip={trip} update={update} highlightedStopId={highlightedStopId} /></TabsContent>
-        <TabsContent value="budget" className="mt-6"><BudgetView trip={trip} update={update} /></TabsContent>
-        <TabsContent value="packing" className="mt-6"><Packing trip={trip} update={update} /></TabsContent>
-        <TabsContent value="notes" className="mt-6"><Notes trip={trip} update={update} /></TabsContent>
-        <TabsContent value="settings" className="mt-6"><Settings trip={trip} update={update} onDelete={() => navigate('/app/trips')} /></TabsContent>
+        <TabsContent value="itinerary" className="mt-8 animate-fade-in"><Itinerary trip={trip} update={update} highlightedStopId={highlightedStopId} /></TabsContent>
+        <TabsContent value="budget" className="mt-8 animate-fade-in"><BudgetView trip={trip} update={update} /></TabsContent>
+        <TabsContent value="packing" className="mt-8 animate-fade-in"><Packing trip={trip} update={update} /></TabsContent>
+        <TabsContent value="notes" className="mt-8 animate-fade-in"><Notes trip={trip} update={update} /></TabsContent>
+        <TabsContent value="settings" className="mt-8 animate-fade-in"><Settings trip={trip} update={update} onDelete={() => navigate('/app/trips')} /></TabsContent>
       </Tabs>
     </div>
+  );
+}
+
+/* ───────── editorial helpers ───────── */
+
+function HeroStat({ label, value, accent, tone }: { label: string; value: string; accent?: boolean; tone?: 'success' | 'destructive' }) {
+  const valueClass =
+    tone === 'destructive' ? 'text-destructive'
+    : tone === 'success' ? 'text-success'
+    : accent ? 'text-foreground'
+    : 'text-foreground';
+  return (
+    <div className="flex flex-col">
+      <dt className="text-[10px] font-semibold uppercase tracking-[0.16em] text-muted-foreground">{label}</dt>
+      <dd className={`mt-1 font-display text-2xl font-bold tabular-nums leading-none ${valueClass}`}>{value}</dd>
+    </div>
+  );
+}
+
+function SectionLabel({ children }: { children: React.ReactNode }) {
+  return (
+    <div className="flex items-center gap-3">
+      <span className="h-px flex-none w-8 bg-border" />
+      <span className="text-[11px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">{children}</span>
+    </div>
+  );
+}
+
+function EditorialTab({ value, icon, children }: { value: string; icon?: React.ReactNode; children: React.ReactNode }) {
+  return (
+    <TabsTrigger
+      value={value}
+      className="relative h-10 rounded-none border-0 bg-transparent px-3 text-sm font-medium text-muted-foreground shadow-none transition-colors hover:text-foreground data-[state=active]:bg-transparent data-[state=active]:text-foreground data-[state=active]:shadow-none after:absolute after:inset-x-2 after:-bottom-px after:h-[2px] after:rounded-full after:bg-foreground after:scale-x-0 after:transition-transform after:duration-300 data-[state=active]:after:scale-x-100"
+    >
+      {icon}{icon && <span className="ml-1.5" />}{children}
+    </TabsTrigger>
   );
 }
 
@@ -276,11 +346,13 @@ function Itinerary({ trip, update, highlightedStopId }: { trip: Trip; update: (p
             <SortableContext items={trip.stops.map(s => s.id)} strategy={verticalListSortingStrategy}>
               <div className="space-y-4">
                 {trip.stops.map((s, i) => (
-                  <SortableStopCard
-                    key={s.id} stop={s} index={i}
-                    onRemove={removeStop} onUpdate={updateStop} onSetDuration={setDuration}
-                    highlighted={highlightedStopId === s.id}
-                  />
+                  <div key={s.id} className="animate-fade-up" style={{ animationDelay: `${i * 70}ms` }}>
+                    <SortableStopCard
+                      stop={s} index={i}
+                      onRemove={removeStop} onUpdate={updateStop} onSetDuration={setDuration}
+                      highlighted={highlightedStopId === s.id}
+                    />
+                  </div>
                 ))}
               </div>
             </SortableContext>
@@ -313,7 +385,7 @@ function SortableStopCard(props: {
       ref={setNodeRef}
       id={`stop-${stop.id}`}
       style={style}
-      className={`scroll-mt-24 rounded-2xl transition-shadow ${highlighted ? 'ring-4 ring-primary/60 shadow-glow' : ''}`}
+      className={`scroll-mt-24 rounded-3xl transition-all duration-500 ${highlighted ? 'ring-2 ring-foreground/80 ring-offset-4 ring-offset-background' : ''}`}
     >
       <StopCard {...props} dragHandle={{ ...attributes, ...listeners }} />
     </div>
@@ -337,86 +409,131 @@ function StopCard({ stop, index, onRemove, onUpdate, onSetDuration, dragHandle }
   const addActivity = (a: Activity) => onUpdate(stop.id, { activities: [...stop.activities, a] });
   const removeActivity = (aid: string) => onUpdate(stop.id, { activities: stop.activities.filter(a => a.id !== aid) });
 
-  return (
-    <Card className="overflow-hidden border-border/60 shadow-soft">
-      <div className="bg-gradient-ocean p-5 text-primary-foreground">
-        <div className="flex flex-wrap items-start justify-between gap-3">
-          <div>
-            <div className="text-xs uppercase tracking-wider opacity-80">Stop {index + 1}</div>
-            <h3 className="font-display text-2xl font-bold flex items-center gap-2"><MapPin className="h-5 w-5" /> {stop.city}, <span className="opacity-80 font-normal text-lg">{stop.country}</span></h3>
-            <div className="mt-1 flex flex-wrap items-center gap-2 text-xs opacity-90">
-              <span>{new Date(stop.startDate).toLocaleDateString()} → {new Date(stop.endDate).toLocaleDateString()} · {days} day{days > 1 ? 's' : ''}</span>
-              <WeatherBadge city={stop.city} date={stop.startDate} />
-            </div>
-          </div>
-          <div className="flex items-center gap-1">
-            <button
-              {...dragHandle}
-              type="button"
-              aria-label="Drag to reorder"
-              className="cursor-grab active:cursor-grabbing rounded-md p-2 text-primary-foreground hover:bg-white/20 touch-none"
-            >
-              <GripVertical className="h-5 w-5" />
-            </button>
-            <div className="flex items-center gap-1 rounded-md bg-white/15 px-2 py-1 text-xs">
-              <Clock className="h-3 w-3" />
-              <input
-                type="number"
-                min={1}
-                max={60}
-                value={days}
-                onChange={e => onSetDuration(stop.id, Number(e.target.value) || 1)}
-                className="w-10 bg-transparent text-center font-semibold outline-none"
-              />
-              <span>day{days > 1 ? 's' : ''}</span>
-            </div>
-            <Button size="icon" variant="ghost" className="text-primary-foreground hover:bg-white/20" onClick={() => onRemove(stop.id)}><Trash2 className="h-4 w-4" /></Button>
-          </div>
+  const startFmt = new Date(stop.startDate).toLocaleDateString(undefined, { day: 'numeric', month: 'short' });
+  const endFmt = new Date(stop.endDate).toLocaleDateString(undefined, { day: 'numeric', month: 'short' });
 
+  return (
+    <Card className="group overflow-hidden border border-border/60 bg-card shadow-[0_1px_0_0_hsl(var(--border)/0.6)] transition-all duration-500 hover:shadow-soft">
+      {/* editorial header */}
+      <div className="relative grid grid-cols-[auto_1fr_auto] gap-5 border-b border-border/60 px-6 py-6 md:px-8">
+        {/* huge index numeral */}
+        <div className="flex flex-col items-start">
+          <span className="font-display text-[11px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">Stop</span>
+          <span className="font-display text-5xl font-extrabold leading-none tabular-nums text-foreground/90 transition-colors group-hover:text-foreground md:text-6xl">
+            {String(index + 1).padStart(2, '0')}
+          </span>
+        </div>
+
+        {/* title block */}
+        <div className="min-w-0 self-end">
+          <h3 className="font-display text-3xl font-bold leading-tight tracking-tight md:text-4xl">
+            {stop.city}
+            <span className="ml-2 text-base font-normal text-muted-foreground">{stop.country}</span>
+          </h3>
+          <div className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1.5 text-xs text-muted-foreground">
+            <span className="inline-flex items-center gap-1.5 tabular-nums">
+              <Calendar className="h-3 w-3" /> {startFmt} <span className="text-border">→</span> {endFmt}
+            </span>
+            <span className="text-border">·</span>
+            <span className="tabular-nums">{days} day{days > 1 ? 's' : ''}</span>
+            <span className="text-border">·</span>
+            <span className="font-semibold tabular-nums text-foreground">${stopTotal.toLocaleString()}</span>
+            <WeatherBadge city={stop.city} date={stop.startDate} />
+          </div>
+        </div>
+
+        {/* controls */}
+        <div className="flex items-start gap-1.5 self-start">
+          <div className="flex items-center gap-1 rounded-lg border border-border bg-muted/40 px-2 py-1 text-xs">
+            <Clock className="h-3 w-3 text-muted-foreground" />
+            <input
+              type="number" min={1} max={60} value={days}
+              onChange={e => onSetDuration(stop.id, Number(e.target.value) || 1)}
+              className="w-9 bg-transparent text-center font-semibold tabular-nums outline-none"
+            />
+            <span className="text-muted-foreground">d</span>
+          </div>
+          <button
+            {...dragHandle}
+            type="button"
+            aria-label="Drag to reorder"
+            className="cursor-grab rounded-md p-2 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground active:cursor-grabbing"
+          >
+            <GripVertical className="h-4 w-4" />
+          </button>
+          <Button size="icon" variant="ghost" className="text-muted-foreground hover:text-destructive" onClick={() => onRemove(stop.id)}>
+            <Trash2 className="h-4 w-4" />
+          </Button>
         </div>
       </div>
 
-      <div className="px-5 pt-5">
+      {/* weather strip */}
+      <div className="px-6 pt-6 md:px-8">
         <WeatherForecast city={stop.city} startDate={stop.startDate} endDate={stop.endDate} />
       </div>
 
-      <div className="grid gap-4 p-5 md:grid-cols-[1fr_240px]">
-        <div className="space-y-3">
-          <div className="flex flex-wrap items-center gap-3">
-            <h4 className="font-display font-semibold">Activities</h4>
-            <ActivitySearchDialog onAdd={addActivity} trigger={<Button size="sm" variant="soft"><Plus className="h-4 w-4" /> Add activity</Button>} />
+      {/* body */}
+      <div className="grid gap-8 px-6 py-6 md:grid-cols-[1fr_260px] md:px-8 md:py-8">
+        <div className="space-y-4">
+          <div className="flex items-center justify-between gap-3 border-b border-border/60 pb-3">
+            <h4 className="font-display text-[11px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">Activities</h4>
+            <ActivitySearchDialog onAdd={addActivity} trigger={
+              <Button size="sm" variant="ghost" className="-mr-2 h-7 gap-1 text-xs"><Plus className="h-3.5 w-3.5" /> Add</Button>
+            } />
           </div>
-          {stop.activities.length === 0 && <p className="text-sm text-muted-foreground">No activities yet — add some inspiration!</p>}
-          <div className="space-y-2">
-            {stop.activities.map(a => (
-              <div key={a.id} className="flex items-center justify-between rounded-xl border border-border bg-card p-3">
-                <div className="flex items-center gap-3">
-                  <span className="grid h-9 w-9 place-items-center rounded-lg bg-accent-soft text-accent">
-                    <Clock className="h-4 w-4" />
-                  </span>
-                  <div>
-                    <div className="font-medium">{a.name}</div>
-                    <div className="text-xs text-muted-foreground">{a.category} · {a.durationHours}h · ${a.cost}</div>
+          {stop.activities.length === 0 ? (
+            <p className="py-2 text-sm text-muted-foreground">Nothing planned yet — a free day in {stop.city}.</p>
+          ) : (
+            <ul className="divide-y divide-border/60">
+              {stop.activities.map((a, ai) => (
+                <li
+                  key={a.id}
+                  className="group/row flex items-center justify-between gap-3 py-3 animate-fade-in"
+                  style={{ animationDelay: `${ai * 40}ms` }}
+                >
+                  <div className="flex min-w-0 items-center gap-3">
+                    <span className="grid h-9 w-9 flex-none place-items-center rounded-lg border border-border bg-muted/40 text-foreground/70">
+                      <Clock className="h-4 w-4" />
+                    </span>
+                    <div className="min-w-0">
+                      <div className="truncate font-medium leading-tight">{a.name}</div>
+                      <div className="mt-0.5 text-xs text-muted-foreground">
+                        <span className="capitalize">{a.category}</span>
+                        <span className="mx-1.5 text-border">·</span>
+                        <span className="tabular-nums">{a.durationHours}h</span>
+                        <span className="mx-1.5 text-border">·</span>
+                        <span className="tabular-nums">${a.cost}</span>
+                      </div>
+                    </div>
                   </div>
-                </div>
-                <div className="flex items-center gap-2">
-                  <Input type="time" value={a.time || ''} onChange={e => onUpdate(stop.id, { activities: stop.activities.map(x => x.id === a.id ? { ...x, time: e.target.value } : x) })} className="w-28" />
-                  <Button size="icon" variant="ghost" onClick={() => removeActivity(a.id)}><Trash2 className="h-4 w-4 text-destructive" /></Button>
-                </div>
-              </div>
-            ))}
-          </div>
+                  <div className="flex items-center gap-1.5">
+                    <Input
+                      type="time"
+                      value={a.time || ''}
+                      onChange={e => onUpdate(stop.id, { activities: stop.activities.map(x => x.id === a.id ? { ...x, time: e.target.value } : x) })}
+                      className="h-8 w-24 border-border/60 text-xs tabular-nums"
+                    />
+                    <Button size="icon" variant="ghost" className="h-8 w-8 opacity-0 transition-opacity group-hover/row:opacity-100" onClick={() => removeActivity(a.id)}>
+                      <Trash2 className="h-3.5 w-3.5 text-destructive" />
+                    </Button>
+                  </div>
+                </li>
+              ))}
+            </ul>
+          )}
         </div>
 
-        <div className="space-y-3 rounded-xl bg-muted/40 p-4">
-          <h4 className="font-display font-semibold text-sm">Stop costs (USD)</h4>
+        {/* cost panel */}
+        <aside className="space-y-3 rounded-2xl border border-border/60 bg-muted/30 p-5">
+          <h4 className="font-display text-[11px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">Costs · USD</h4>
           <CostInput label="Transport" value={stop.costs.transport} onChange={v => onUpdate(stop.id, { costs: { ...stop.costs, transport: v } })} />
           <CostInput label="Stay / night" value={stop.costs.stay} onChange={v => onUpdate(stop.id, { costs: { ...stop.costs, stay: v } })} />
           <CostInput label="Meals / day" value={stop.costs.meals} onChange={v => onUpdate(stop.id, { costs: { ...stop.costs, meals: v } })} />
-          <div className="border-t border-border pt-3 text-sm">
-            <div className="flex justify-between"><span className="text-muted-foreground">Stop total</span><span className="font-display font-bold text-primary">${stopTotal.toLocaleString()}</span></div>
+          <div className="mt-3 flex items-end justify-between border-t border-border/60 pt-3">
+            <span className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">Total</span>
+            <span className="font-display text-2xl font-bold tabular-nums leading-none">${stopTotal.toLocaleString()}</span>
           </div>
-        </div>
+        </aside>
       </div>
     </Card>
   );
@@ -424,9 +541,16 @@ function StopCard({ stop, index, onRemove, onUpdate, onSetDuration, dragHandle }
 
 function CostInput({ label, value, onChange }: { label: string; value: number; onChange: (v: number) => void }) {
   return (
-    <div>
+    <div className="flex items-center justify-between gap-3">
       <label className="text-xs text-muted-foreground">{label}</label>
-      <Input type="number" min={0} value={value} onChange={e => onChange(Number(e.target.value) || 0)} className="h-9" />
+      <div className="relative">
+        <span className="pointer-events-none absolute left-2 top-1/2 -translate-y-1/2 text-xs text-muted-foreground">$</span>
+        <Input
+          type="number" min={0} value={value}
+          onChange={e => onChange(Number(e.target.value) || 0)}
+          className="h-8 w-24 border-border/60 bg-background/60 pl-5 text-right text-sm tabular-nums"
+        />
+      </div>
     </div>
   );
 }
@@ -611,10 +735,16 @@ function BudgetView({ trip, update }: { trip: Trip; update: (p: Partial<Trip>) =
     <div className="space-y-6">
       {/* KPI strip */}
       <div className="grid gap-3 sm:grid-cols-4">
-        <KpiCard label="Total" value={`$${cost.total.toLocaleString()}`} accent />
-        <KpiCard label="Avg / day" value={`$${Math.round(avg).toLocaleString()}`} />
-        <KpiCard label="Stops" value={trip.stops.length.toString()} />
-        <KpiCard label="Trip length" value={`${days} day${days > 1 ? 's' : ''}`} />
+        {[
+          { label: 'Total', value: `$${cost.total.toLocaleString()}`, accent: true },
+          { label: 'Avg / day', value: `$${Math.round(avg).toLocaleString()}` },
+          { label: 'Stops', value: trip.stops.length.toString() },
+          { label: 'Trip length', value: `${days} day${days > 1 ? 's' : ''}` },
+        ].map((k, i) => (
+          <div key={k.label} className="animate-fade-up" style={{ animationDelay: `${i * 80}ms` }}>
+            <KpiCard label={k.label} value={k.value} accent={k.accent} />
+          </div>
+        ))}
       </div>
 
       <div className="grid gap-6 lg:grid-cols-2">
@@ -751,9 +881,10 @@ function BudgetView({ trip, update }: { trip: Trip; update: (p: Partial<Trip>) =
 
 function KpiCard({ label, value, accent }: { label: string; value: string; accent?: boolean }) {
   return (
-    <Card className={`p-4 ${accent ? 'bg-gradient-hero text-primary-foreground' : ''}`}>
-      <div className={`text-xs uppercase tracking-wider ${accent ? 'opacity-80' : 'text-muted-foreground'}`}>{label}</div>
-      <div className="font-display text-2xl font-bold">{value}</div>
+    <Card className={`group relative overflow-hidden border-border/60 p-5 transition-all duration-500 hover:-translate-y-0.5 hover:shadow-soft ${accent ? 'bg-foreground text-background' : ''}`}>
+      <div className={`text-[10px] font-semibold uppercase tracking-[0.18em] ${accent ? 'opacity-70' : 'text-muted-foreground'}`}>{label}</div>
+      <div className="mt-2 font-display text-3xl font-extrabold tabular-nums leading-none">{value}</div>
+      {accent && <div className="pointer-events-none absolute -right-12 -top-12 h-32 w-32 rounded-full bg-background/10 blur-2xl" />}
     </Card>
   );
 }
