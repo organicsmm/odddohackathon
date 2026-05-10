@@ -17,6 +17,7 @@ import Friends from "./pages/Friends";
 import AcceptInvite from "./pages/AcceptInvite";
 import NotFound from "./pages/NotFound.tsx";
 import Showcase from "./pages/Showcase";
+import TypographyPreview from "./pages/TypographyPreview";
 
 const queryClient = new QueryClient();
 
@@ -42,6 +43,7 @@ const App = () => (
               <Route path="profile" element={<Profile />} />
             </Route>
             <Route path="/showcase" element={<Showcase />} />
+            <Route path="/typography" element={<TypographyPreview />} />
             <Route path="/dashboard" element={<Navigate to="/app" replace />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
