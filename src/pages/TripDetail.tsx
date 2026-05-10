@@ -492,7 +492,7 @@ function StopCard({ stop, index, onRemove, onUpdate, onSetDuration, dragHandle, 
       <div className="grid gap-8 px-6 py-6 md:grid-cols-[1fr_260px] md:px-8 md:py-8">
         <div className="space-y-4">
           <div className="flex items-center justify-between gap-3 border-b border-border/60 pb-3">
-            <h4 className="font-display text-[11px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">Activities</h4>
+            <Eyebrow className="block">Activities</Eyebrow>
             <ActivitySearchDialog onAdd={addActivity} trigger={
               <Button size="sm" variant="ghost" className="-mr-2 h-7 gap-1 text-xs"><Plus className="h-3.5 w-3.5" /> Add</Button>
             } />
