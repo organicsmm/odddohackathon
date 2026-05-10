@@ -1,4 +1,4 @@
-import type { Trip, User, PackItem, Stop } from './types';
+import type { Trip, User, PackItem, Stop, Friend, TripInvite } from './types';
 import { DEFAULT_PACKING } from './catalog';
 
 const TRIPS_KEY = 'traveloop:trips';
