@@ -9,6 +9,7 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogDescription } from '@/components/ui/dialog';
 
 import { exportTripPDF, exportTripCSV } from '@/lib/export';
+import { CURRENCIES, refreshRates, type CurrencyCode } from '@/lib/currency';
 import { useAuth } from '@/contexts/AuthContext';
 import { getTrip, upsertTrip, uid, tripCost, stopDays, tripDays, resequenceStops, createInvite, revokeInvite, unshareWith } from '@/lib/store';
 import type { Trip, Stop, Activity, Note, PackItem, Friend } from '@/lib/types';
