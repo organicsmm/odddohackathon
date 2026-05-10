@@ -401,7 +401,136 @@ toast('Invite sent', {
 });`}</Snippet>
         </Section>
 
+        {/* Accessibility */}
+        <Section
+          eyebrow="08 · Accessibility"
+          title="Keyboard & focus states"
+          description="Every primitive ships with a visible focus ring (2px ring + 2px offset) using the `--ring` token. Use Tab / Shift+Tab to traverse, Space / Enter to activate, Esc to dismiss dialogs."
+        >
+          {/* Tab order */}
+          <Card variant="premium" className="space-y-4 p-6">
+            <div className="flex items-center justify-between">
+              <Eyebrow tone="primary">Tab order</Eyebrow>
+              <Muted variant="small">Press <kbd className="rounded border border-border/60 bg-muted px-1.5 py-0.5 font-mono text-[10px]">Tab</kbd> to walk through 1 → 5</Muted>
+            </div>
+            <div className="flex flex-wrap items-center gap-3">
+              <Button variant="outline" tabIndex={1} aria-label="Step 1 — outline button">1 · Outline</Button>
+              <Button variant="secondary" tabIndex={2} aria-label="Step 2 — secondary button">2 · Secondary</Button>
+              <Button variant="default" tabIndex={3} aria-label="Step 3 — default button">3 · Default</Button>
+              <Button variant="premium" tabIndex={4} aria-label="Step 4 — premium button">4 · Premium</Button>
+              <Button variant="ghost" size="icon" tabIndex={5} aria-label="Step 5 — favorite (icon-only button needs aria-label)">
+                <Heart className="h-4 w-4" />
+              </Button>
+            </div>
+            <Muted variant="small">
+              Icon-only buttons must always include <code className="rounded bg-muted px-1 py-0.5 font-mono text-[11px]">aria-label</code> so screen readers can announce intent.
+            </Muted>
+          </Card>
+
+          {/* Focus rings on every variant */}
+          <Card variant="glass" className="space-y-4 p-6">
+            <Eyebrow tone="primary">Focus rings</Eyebrow>
+            <Muted variant="small">Tab into each control — the ring uses <code className="rounded bg-muted px-1 py-0.5 font-mono text-[11px]">focus-visible:ring-2 ring-ring ring-offset-2</code>.</Muted>
+            <div className="flex flex-wrap items-center gap-3">
+              <Button variant="premium">Premium</Button>
+              <Button variant="hero">Hero</Button>
+              <Button variant="outline">Outline</Button>
+              <Button variant="ghost">Ghost</Button>
+              <Button variant="destructive">Destructive</Button>
+            </div>
+
+            <div className="grid gap-3 md:grid-cols-3">
+              {(['default', 'premium', 'glass'] as const).map((v) => (
+                <Card
+                  key={v}
+                  variant={v}
+                  tabIndex={0}
+                  role="button"
+                  aria-label={`${v} card — focusable example`}
+                  className="cursor-pointer p-4 outline-none transition-smooth focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+                >
+                  <Eyebrow tone="primary">{v}</Eyebrow>
+                  <Heading level={4} className="mt-1">Focusable card</Heading>
+                  <Muted variant="small" className="mt-2">Tab here to see the focus ring.</Muted>
+                </Card>
+              ))}
+            </div>
+
+            <div className="flex flex-wrap items-center gap-2">
+              <Badge tabIndex={0} role="button" aria-label="Filter: AI-generated" className="cursor-pointer outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background">
+                <Sparkles className="mr-1 h-3 w-3" /> AI
+              </Badge>
+              <Badge variant="gradient" tabIndex={0} role="button" aria-label="Filter: Featured" className="cursor-pointer outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background">
+                Featured
+              </Badge>
+              <Badge variant="outline" tabIndex={0} role="button" aria-label="Filter: Draft" className="cursor-pointer outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background">
+                Draft
+              </Badge>
+              <Muted variant="small">Badges are decorative by default — only add <code className="rounded bg-muted px-1 py-0.5 font-mono text-[11px]">tabIndex</code> + <code className="rounded bg-muted px-1 py-0.5 font-mono text-[11px]">role="button"</code> when they're interactive.</Muted>
+            </div>
+          </Card>
+
+          {/* Dialog a11y */}
+          <Card variant="premium" className="space-y-4 p-6">
+            <Eyebrow tone="primary">Dialog focus trap</Eyebrow>
+            <Muted variant="small">
+              Radix handles the trap automatically: <kbd className="rounded border border-border/60 bg-muted px-1.5 py-0.5 font-mono text-[10px]">Tab</kbd> cycles inside,{' '}
+              <kbd className="rounded border border-border/60 bg-muted px-1.5 py-0.5 font-mono text-[10px]">Esc</kbd> closes, and focus returns to the trigger on close.
+            </Muted>
+            <Dialog>
+              <DialogTrigger asChild>
+                <Button variant="outline" aria-label="Open accessibility demo dialog">Open a11y dialog</Button>
+              </DialogTrigger>
+              <DialogContent>
+                <DialogHeader>
+                  <DialogTitle>Accessible by default</DialogTitle>
+                  <DialogDescription>
+                    Tab through the controls below — focus stays inside until you press Esc or activate Cancel/Confirm.
+                  </DialogDescription>
+                </DialogHeader>
+                <div className="flex flex-wrap gap-2">
+                  <Button variant="ghost" aria-label="First focusable control">First</Button>
+                  <Button variant="outline" aria-label="Second focusable control">Second</Button>
+                  <Button variant="secondary" aria-label="Third focusable control">Third</Button>
+                </div>
+                <DialogFooter>
+                  <Button variant="ghost">Cancel</Button>
+                  <Button variant="premium">Confirm</Button>
+                </DialogFooter>
+              </DialogContent>
+            </Dialog>
+          </Card>
+
+          <Snippet>{`// Icon-only button — always label it
+<Button variant="ghost" size="icon" aria-label="Favorite">
+  <Heart className="h-4 w-4" />
+</Button>
+
+// Make a card / badge keyboard-activatable
+<Card
+  tabIndex={0}
+  role="button"
+  aria-label="Open trip"
+  className="focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+/>
+
+// Dialogs (Radix) trap focus + restore on close — no extra work needed
+<Dialog>
+  <DialogTrigger asChild>
+    <Button aria-label="Open settings">Open</Button>
+  </DialogTrigger>
+  <DialogContent>…</DialogContent>
+</Dialog>`}</Snippet>
+
+          <PropsTable rows={[
+            { name: 'tabIndex', type: 'number', default: '—', desc: 'Use 0 to make a non-button focusable in normal order. Avoid positive values except for short demos.' },
+            { name: 'aria-label', type: 'string', desc: 'Required on icon-only buttons and any control without visible text.' },
+            { name: 'role', type: '"button" | "link" | …', desc: 'Set when using non-semantic elements (e.g. a focusable Card or Badge).' },
+            { name: 'focus-visible:ring-*', type: 'tailwind', default: 'ring-2 ring-ring ring-offset-2', desc: 'Standard focus ring — already baked into Button, Input, and most primitives.' },
+          ]} />
+        </Section>
         <footer className="border-t border-border/60 pt-8">
+
           <Muted variant="small">
             Want to extend this system? Edit primitives in <code className="rounded bg-muted px-1 py-0.5">src/components/ui</code> and tokens in <code className="rounded bg-muted px-1 py-0.5">src/index.css</code>.
           </Muted>
