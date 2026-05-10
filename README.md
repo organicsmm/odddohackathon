@@ -4,24 +4,6 @@
 
 ---
 
-## 📸 Screenshots
-
-> Drop PNGs into `docs/screenshots/` with these filenames to populate the grid.
-
-| Landing | Dashboard |
-|---|---|
-| ![Landing](docs/screenshots/01-landing.png) | ![Dashboard](docs/screenshots/02-dashboard.png) |
-
-| Create Trip | Itinerary Builder |
-|---|---|
-| ![Create Trip](docs/screenshots/03-create-trip.png) | ![Itinerary](docs/screenshots/04-itinerary.png) |
-
-| AI Trip Generator | Admin Panel |
-|---|---|
-| ![AI Generator](docs/screenshots/05-ai-generator.png) | ![Admin](docs/screenshots/06-admin.png) |
-
----
-
 ## ✨ Vision
 
 Traveloop is a personalized, intelligent, and collaborative platform that transforms the way individuals plan and experience travel. We empower users to **dream, design, and organize trips** with ease — combining flexibility, interactivity, and beautiful design so that planning a trip feels as exciting as the trip itself.
