@@ -1,8 +1,9 @@
 import { useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
-  Sparkles, Loader2, Wand2, MapPin, Wallet, Calendar, Users, Plus, Trash2, ChevronLeft,
+  Sparkles, Loader2, MapPin, Wallet, Calendar, Users, Plus, Trash2, ChevronLeft,
   AlertCircle, CheckCircle2, Clock,
+  Mountain, Palmtree, Landmark, UtensilsCrossed, Heart, Baby, Backpack, Gem,
 } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogDescription } from '@/components/ui/dialog';
 import { Textarea } from '@/components/ui/textarea';
@@ -24,14 +25,14 @@ import {
 } from '@/lib/tripValidation';
 
 const STYLES = [
-  { id: 'adventure', label: 'Adventure', emoji: '🏔️' },
-  { id: 'relaxation', label: 'Relaxation', emoji: '🏖️' },
-  { id: 'culture', label: 'Culture', emoji: '🏛️' },
-  { id: 'food', label: 'Foodie', emoji: '🍜' },
-  { id: 'romantic', label: 'Romantic', emoji: '💕' },
-  { id: 'family', label: 'Family', emoji: '👨‍👩‍👧' },
-  { id: 'backpack', label: 'Backpacking', emoji: '🎒' },
-  { id: 'luxury', label: 'Luxury', emoji: '✨' },
+  { id: 'adventure',  label: 'Adventure',   Icon: Mountain },
+  { id: 'relaxation', label: 'Relaxation',  Icon: Palmtree },
+  { id: 'culture',    label: 'Culture',     Icon: Landmark },
+  { id: 'food',       label: 'Foodie',      Icon: UtensilsCrossed },
+  { id: 'romantic',   label: 'Romantic',    Icon: Heart },
+  { id: 'family',     label: 'Family',      Icon: Baby },
+  { id: 'backpack',   label: 'Backpacking', Icon: Backpack },
+  { id: 'luxury',     label: 'Luxury',      Icon: Gem },
 ];
 
 const QUICK_DEST = ['Italy', 'Japan', 'Thailand', 'Morocco', 'Iceland', 'Peru', 'Greece', 'Vietnam'];
