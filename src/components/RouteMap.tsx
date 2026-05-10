@@ -408,7 +408,12 @@ export default function RouteMap({ stops, onSelectStop, highlightedStopId }: { s
           const inLeg = prev ? { km: distanceKm(prev.coords, p.coords) } : null;
           const outLeg = next ? { km: distanceKm(p.coords, next.coords) } : null;
           return (
-            <div className="pointer-events-none absolute left-4 top-4 max-w-xs rounded-xl border border-border bg-card/95 p-3 shadow-elegant backdrop-blur">
+            <div
+              role="tooltip"
+              aria-live="polite"
+              id={`route-stop-tooltip-${p.stop.id}`}
+              className="pointer-events-none absolute left-4 top-4 max-w-xs rounded-xl border border-border bg-card/95 p-3 shadow-elegant backdrop-blur"
+            >
               <div className="flex items-center gap-2 text-xs text-muted-foreground">
                 <MapPin className="h-3 w-3" /> Stop {p.index + 1} of {stops.length}
               </div>
