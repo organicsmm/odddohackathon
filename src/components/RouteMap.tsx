@@ -176,7 +176,36 @@ export default function RouteMap({ stops, onSelectStop, highlightedStopId }: { s
         </div>
       </div>
 
-      <div className="relative aspect-[16/9] w-full bg-[hsl(var(--accent-soft))]">
+      <div
+        className="group relative aspect-[16/9] w-full bg-[hsl(var(--accent-soft))] outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+        tabIndex={0}
+        role="application"
+        aria-label="Route map. Use arrow keys to move between stops, Enter to select, Home and End to jump to first or last stop."
+        onKeyDown={(e) => {
+          if (plotted.length === 0) return;
+          const currentIdx = Math.max(
+            0,
+            plotted.findIndex(p => p.stop.id === highlightedStopId),
+          );
+          let nextIdx: number | null = null;
+          if (e.key === 'ArrowRight' || e.key === 'ArrowDown') nextIdx = (currentIdx + 1) % plotted.length;
+          else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') nextIdx = (currentIdx - 1 + plotted.length) % plotted.length;
+          else if (e.key === 'Home') nextIdx = 0;
+          else if (e.key === 'End') nextIdx = plotted.length - 1;
+          else if (e.key === 'Enter' || e.key === ' ') {
+            if (highlightedStopId) {
+              e.preventDefault();
+              onSelectStop?.(highlightedStopId);
+            }
+            return;
+          } else return;
+          e.preventDefault();
+          const target = plotted[nextIdx];
+          onSelectStop?.(target.stop.id);
+          // Pan toward the focused stop so it stays in view
+          setCenter(target.coords);
+        }}
+      >
         <ComposableMap
           projectionConfig={{ scale: 155 }}
           width={980}
