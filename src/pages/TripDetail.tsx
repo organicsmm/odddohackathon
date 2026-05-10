@@ -207,7 +207,10 @@ function StopCard({ stop, index, total, onMove, onRemove, onUpdate }: {
           <div>
             <div className="text-xs uppercase tracking-wider opacity-80">Stop {index + 1}</div>
             <h3 className="font-display text-2xl font-bold flex items-center gap-2"><MapPin className="h-5 w-5" /> {stop.city}, <span className="opacity-80 font-normal text-lg">{stop.country}</span></h3>
-            <div className="mt-1 text-xs opacity-90">{new Date(stop.startDate).toLocaleDateString()} → {new Date(stop.endDate).toLocaleDateString()} · {days} day{days > 1 ? 's' : ''}</div>
+            <div className="mt-1 flex flex-wrap items-center gap-2 text-xs opacity-90">
+              <span>{new Date(stop.startDate).toLocaleDateString()} → {new Date(stop.endDate).toLocaleDateString()} · {days} day{days > 1 ? 's' : ''}</span>
+              <WeatherBadge city={stop.city} date={stop.startDate} />
+            </div>
           </div>
           <div className="flex gap-1">
             <Button size="icon" variant="ghost" className="text-primary-foreground hover:bg-white/20" disabled={index === 0} onClick={() => onMove(stop.id, -1)}><ArrowUp className="h-4 w-4" /></Button>
