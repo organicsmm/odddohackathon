@@ -101,14 +101,14 @@ export async function fetchForecast(city: string, startDate: string, endDate: st
 }
 
 // Deterministic climate normal fallback for past or far-future dates.
-function climateFallback(city: string, startDate: string, endDate: string): DayForecast[] {
+function climateFallback(city: string, startDate: string, endDate: string, knownLat?: number): DayForecast[] {
   const out: DayForecast[] = [];
   const start = new Date(startDate);
   const end = new Date(endDate);
   for (let d = new Date(start); d <= end; d.setDate(d.getDate() + 1)) {
     const month = d.getMonth() + 1;
     const c = getCoords(city);
-    const lat = c ? c[1] : 30;
+    const lat = knownLat ?? (c ? c[1] : 30);
     const tropics = Math.abs(lat) < 23.5;
     const cold = lat > 55 || lat < -45;
     let base = 18;
