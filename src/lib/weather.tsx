@@ -19,6 +19,7 @@ function decodeWMO(code: number): { icon: WeatherKey; label: string } {
   return { icon: 'cloud', label: 'Cloudy' };
 }
 
+export type ForecastSource = 'forecast' | 'climate';
 export type DayForecast = {
   date: string;
   tempMax: number;
@@ -26,6 +27,7 @@ export type DayForecast = {
   precipProb: number;
   icon: WeatherKey;
   label: string;
+  source: ForecastSource;
 };
 
 // Geocoding cache so we only hit Open-Meteo's geocoding API once per unknown city per session
