@@ -1,9 +1,10 @@
 import { Link } from 'react-router-dom';
+import {
   ArrowRight, Calendar, MapPin, Wallet, Share2, ListChecks, Users, Plane, Sparkles,
   Star, Globe, Compass, Wand2, ShieldCheck, ChevronRight,
 } from 'lucide-react';
 import heroImg from '@/assets/hero-travel.jpg';
-import { Display, Eyebrow, Heading, Lead, Muted, import { Muted } from "@/components/ui/typography";
+import { Display, Eyebrow, Heading, Lead, Muted } from "@/components/ui/typography";
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Card } from '@/components/ui/card';
