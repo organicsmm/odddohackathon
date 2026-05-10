@@ -517,7 +517,7 @@ function StopCard({ stop, index, onRemove, onUpdate, onSetDuration, dragHandle, 
                         <span className="mx-1.5 text-border">·</span>
                         <span className="tabular-nums">{a.durationHours}h</span>
                         <span className="mx-1.5 text-border">·</span>
-                        <span className="tabular-nums">${a.cost}</span>
+                        <span className="tabular-nums">{formatMoney(a.cost, currency)}</span>
                       </div>
                     </div>
                   </div>
