@@ -105,6 +105,7 @@ export default function TripDetail() {
       </header>
 
       {trip.stops.length > 0 && <RouteTimeline stops={trip.stops} />}
+      {trip.stops.length > 0 && <RouteMap stops={trip.stops} />}
 
       <Tabs defaultValue="itinerary" className="w-full">
         <TabsList className="grid w-full grid-cols-2 sm:grid-cols-5 sm:w-auto">
