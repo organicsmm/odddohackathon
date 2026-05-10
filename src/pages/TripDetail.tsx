@@ -911,7 +911,7 @@ function BudgetView({ trip, update, currency }: { trip: Trip; update: (p: Partia
         <header className="flex items-center justify-between gap-3 border-b border-border/60 bg-gradient-aurora px-6 py-4">
           <div>
             <div className="text-[10px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">Per stop</div>
-            <h3 className="font-display text-lg font-bold leading-tight">Spend per stop</h3>
+            <Heading level={3} className="!text-lg leading-tight">Spend per stop</Heading>
           </div>
           <div className="hidden sm:flex items-center gap-3 text-[11px] text-muted-foreground">
             {(['Transport','Stay','Meals','Activities'] as const).map(k => (
