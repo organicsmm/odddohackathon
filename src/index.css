@@ -52,13 +52,19 @@
     --gradient-ocean: linear-gradient(135deg, hsl(200 90% 45%), hsl(180 75% 55%));
     --gradient-sunset: linear-gradient(135deg, hsl(14 90% 62%), hsl(38 92% 60%));
     --gradient-card: linear-gradient(180deg, hsl(0 0% 100%), hsl(200 30% 98%));
+    --gradient-aurora: linear-gradient(135deg, hsl(187 85% 38% / 0.12), hsl(14 90% 62% / 0.10) 60%, hsl(38 92% 60% / 0.08));
+    --gradient-subtle: linear-gradient(180deg, hsl(200 40% 99%), hsl(200 30% 96%));
+    --gradient-border: linear-gradient(135deg, hsl(187 85% 38% / 0.4), hsl(14 90% 62% / 0.4));
 
     /* Shadows */
     --shadow-soft: 0 4px 20px -8px hsl(200 40% 30% / 0.15);
     --shadow-elegant: 0 12px 40px -12px hsl(187 80% 30% / 0.25);
     --shadow-glow: 0 0 32px hsl(180 75% 55% / 0.4);
+    --shadow-premium: 0 1px 0 hsl(0 0% 100% / 0.6) inset, 0 1px 2px hsl(200 40% 30% / 0.06), 0 8px 24px -10px hsl(200 40% 30% / 0.18);
+    --shadow-ring: 0 0 0 1px hsl(var(--border)), 0 1px 0 hsl(0 0% 100% / 0.5) inset;
 
     --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-spring: all 0.45s cubic-bezier(0.22, 1, 0.36, 1);
 
     --sidebar-background: 0 0% 100%;
     --sidebar-foreground: 200 30% 12%;
@@ -97,6 +103,10 @@
     --input: 200 25% 18%;
     --ring: 180 75% 55%;
     --gradient-card: linear-gradient(180deg, hsl(200 30% 10%), hsl(200 30% 8%));
+    --gradient-aurora: linear-gradient(135deg, hsl(187 85% 60% / 0.18), hsl(14 90% 62% / 0.12) 60%, hsl(38 92% 60% / 0.08));
+    --gradient-subtle: linear-gradient(180deg, hsl(200 30% 10%), hsl(200 35% 7%));
+    --shadow-premium: 0 1px 0 hsl(0 0% 100% / 0.04) inset, 0 1px 2px hsl(0 0% 0% / 0.4), 0 8px 24px -10px hsl(0 0% 0% / 0.5);
+    --shadow-ring: 0 0 0 1px hsl(var(--border)), 0 1px 0 hsl(0 0% 100% / 0.04) inset;
     --sidebar-background: 200 35% 7%;
     --sidebar-foreground: 40 40% 96%;
     --sidebar-primary: 180 75% 55%;
@@ -110,20 +120,69 @@
 
 @layer base {
   * { @apply border-border; }
-  body { @apply bg-background text-foreground antialiased; font-feature-settings: "ss01", "cv11"; }
+  body {
+    @apply bg-background text-foreground antialiased;
+    font-feature-settings: "ss01", "cv11", "cv02", "cv03";
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+  }
   h1, h2, h3, h4 { @apply font-display tracking-tight; }
 }
 
 @layer utilities {
+  /* Backgrounds */
   .bg-gradient-hero { background: var(--gradient-hero); }
   .bg-gradient-ocean { background: var(--gradient-ocean); }
   .bg-gradient-sunset { background: var(--gradient-sunset); }
   .bg-gradient-card { background: var(--gradient-card); }
+  .bg-gradient-aurora { background: var(--gradient-aurora); }
+  .bg-gradient-subtle { background: var(--gradient-subtle); }
+
+  /* Shadows */
   .shadow-soft { box-shadow: var(--shadow-soft); }
   .shadow-elegant { box-shadow: var(--shadow-elegant); }
   .shadow-glow { box-shadow: var(--shadow-glow); }
+  .shadow-premium { box-shadow: var(--shadow-premium); }
+  .shadow-ring { box-shadow: var(--shadow-ring); }
+
+  /* Transitions */
   .transition-smooth { transition: var(--transition-smooth); }
+  .transition-spring { transition: var(--transition-spring); }
+
+  /* Text effects */
   .text-gradient { background: var(--gradient-hero); -webkit-background-clip: text; background-clip: text; color: transparent; }
+  .text-balance { text-wrap: balance; }
+  .text-pretty { text-wrap: pretty; }
+
+  /* Glass / surfaces */
+  .glass {
+    background: hsl(var(--card) / 0.65);
+    backdrop-filter: saturate(160%) blur(14px);
+    -webkit-backdrop-filter: saturate(160%) blur(14px);
+    border: 1px solid hsl(var(--border) / 0.6);
+  }
+  .surface-premium {
+    background: var(--gradient-card);
+    border: 1px solid hsl(var(--border));
+    box-shadow: var(--shadow-premium);
+  }
+
+  /* Focus ring used by premium variants */
+  .focus-ring {
+    @apply focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background;
+  }
+
+  /* Typography scale primitives */
+  .t-display { @apply font-display tracking-tight text-balance; font-size: clamp(2.5rem, 4vw + 1rem, 4.25rem); line-height: 1.05; letter-spacing: -0.02em; }
+  .t-h1 { @apply font-display tracking-tight text-balance; font-size: clamp(2rem, 2vw + 1rem, 2.75rem); line-height: 1.1; letter-spacing: -0.02em; }
+  .t-h2 { @apply font-display tracking-tight text-balance; font-size: clamp(1.5rem, 1vw + 1rem, 2rem); line-height: 1.15; letter-spacing: -0.015em; }
+  .t-h3 { @apply font-display tracking-tight; font-size: 1.375rem; line-height: 1.2; letter-spacing: -0.01em; }
+  .t-h4 { @apply font-display tracking-tight; font-size: 1.125rem; line-height: 1.25; }
+  .t-lead { @apply text-pretty text-muted-foreground; font-size: 1.125rem; line-height: 1.6; }
+  .t-body { font-size: 0.9375rem; line-height: 1.6; }
+  .t-small { @apply text-muted-foreground; font-size: 0.8125rem; line-height: 1.5; }
+  .t-eyebrow { @apply uppercase tracking-[0.14em] text-xs font-semibold text-muted-foreground; }
 }
 
 @media print {
