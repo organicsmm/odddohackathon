@@ -233,13 +233,20 @@
     line-height: 1.4;
   }
   .t-lead {
-    @apply text-pretty text-muted-foreground;
+    @apply text-pretty text-muted-foreground leading-relaxed;
     font-size: clamp(0.9375rem, 0.3vw + 0.85rem, 1.0625rem);
-    line-height: 1.6;
   }
-  .t-body { font-size: 0.9375rem; line-height: 1.6; }
-  .t-small { @apply text-muted-foreground; font-size: 0.8125rem; line-height: 1.5; }
-  .t-eyebrow { @apply uppercase tracking-[0.08em] text-[11px] font-semibold text-muted-foreground; }
+  .t-body {
+    @apply text-pretty leading-relaxed;
+    font-size: 0.9375rem;
+  }
+  .t-small {
+    @apply text-muted-foreground text-pretty leading-normal;
+    font-size: 0.8125rem;
+  }
+  .t-eyebrow {
+    @apply uppercase tracking-[0.08em] text-[11px] font-semibold text-muted-foreground leading-none;
+  }
 }
 
 @media print {
