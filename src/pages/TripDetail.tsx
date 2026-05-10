@@ -780,7 +780,7 @@ function BudgetView({ trip, update, currency }: { trip: Trip; update: (p: Partia
                     </Pie>
                     <RTooltip
                       contentStyle={{ background: 'hsl(var(--card))', border: '1px solid hsl(var(--border))', borderRadius: 8, fontSize: 12 }}
-                      formatter={(v: number) => `$${v.toLocaleString()}`}
+                      formatter={(v: number) => formatMoney(v, currency)}
                     />
                   </PieChart>
                 </ResponsiveContainer>
