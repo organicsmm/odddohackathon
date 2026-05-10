@@ -4,6 +4,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { logout } from '@/lib/store';
 import { Button } from '@/components/ui/button';
 import { useEffect } from 'react';
+import BuildStatusBadge from '@/components/dev/BuildStatusBadge';
 
 const links = [
   { to: '/app', label: 'Home', icon: LayoutDashboard, end: true },
