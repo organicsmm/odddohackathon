@@ -6,6 +6,7 @@ import { findInvite, acceptInvite } from '@/lib/store';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { toast } from 'sonner';
+import { Heading, Lead, Eyebrow, Text } from '@/components/ui/typography';
 
 export default function AcceptInvite() {
   const { token } = useParams();
