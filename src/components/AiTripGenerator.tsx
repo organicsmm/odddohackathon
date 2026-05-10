@@ -173,7 +173,7 @@ function FormStep(props: {
   const { destination, setDestination, budget, setBudget, days, setDays, travelers, setTravelers, style, setStyle, extra, setExtra, busy, generate } = props;
   return (
     <div className="space-y-6">
-      <Field
+      <FormField
         icon={<MapPin className="h-3.5 w-3.5" />}
         label="Destination"
         hint="City, country, or region"
@@ -198,7 +198,7 @@ function FormStep(props: {
         </div>
       </FormField>
 
-      <Field
+      <FormField
         icon={<Wallet className="h-3.5 w-3.5" />}
         label="Total budget"
         hint="USD, all-in"
