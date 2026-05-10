@@ -1,8 +1,9 @@
-import { useState } from 'react';
+import { createContext, useContext, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { toast } from 'sonner';
 import {
   Sparkles, Plane, Star, Heart, Plus, ArrowRight, Trash2, Code2, SlidersHorizontal,
+  Search, X,
 } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
