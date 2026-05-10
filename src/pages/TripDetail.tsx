@@ -805,14 +805,17 @@ function BudgetView({ trip, update, currency }: { trip: Trip; update: (p: Partia
           <div className="mt-4 space-y-2">
             <Label htmlFor="budget">Trip budget (USD)</Label>
             <Input id="budget" type="number" min={0} value={trip.budget ?? ''} onChange={e => update({ budget: e.target.value ? Number(e.target.value) : undefined })} placeholder="Set a budget" />
+            {trip.budget ? (
+              <p className="text-[11px] text-muted-foreground tabular-nums">≈ {formatMoney(trip.budget, currency)} in {currency}</p>
+            ) : null}
           </div>
           {trip.budget ? (
             <div className="mt-4 space-y-2">
               <Progress value={Math.min(100, (cost.total / trip.budget) * 100)} />
               {cost.total > trip.budget ? (
-                <p className="text-sm text-destructive font-medium">⚠ Over budget by ${(cost.total - trip.budget).toLocaleString()}</p>
+                <p className="text-sm text-destructive font-medium">⚠ Over budget by {formatMoney(cost.total - trip.budget, currency)}</p>
               ) : (
-                <p className="text-sm text-success font-medium">✓ ${(trip.budget - cost.total).toLocaleString()} remaining</p>
+                <p className="text-sm text-success font-medium">✓ {formatMoney(trip.budget - cost.total, currency)} remaining</p>
               )}
             </div>
           ) : (
