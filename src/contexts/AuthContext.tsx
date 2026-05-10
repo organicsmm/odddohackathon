@@ -61,12 +61,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, []);
 
   useEffect(() => {
-    // Listener FIRST
     const { data: sub } = supabase.auth.onAuthStateChange((_event, sess) => {
       setSession(sess);
       const u = toAppUser(sess?.user);
       setUser(u);
-      // Defer DB call to avoid deadlock
+      setSessionEmail(u?.email || null);
       if (sess?.user?.id) {
         setTimeout(() => checkAdmin(sess.user.id), 0);
       } else {
@@ -76,7 +75,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     supabase.auth.getSession().then(({ data: { session: sess } }) => {
       setSession(sess);
-      setUser(toAppUser(sess?.user));
+      const u = toAppUser(sess?.user);
+      setUser(u);
+      setSessionEmail(u?.email || null);
       if (sess?.user?.id) checkAdmin(sess.user.id);
       setLoading(false);
     });
@@ -86,6 +87,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const signOut = useCallback(async () => {
     await supabase.auth.signOut();
+    setSessionEmail(null);
     setSession(null);
     setUser(null);
     setIsAdmin(false);
