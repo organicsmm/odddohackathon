@@ -16,10 +16,11 @@ import { supabase } from '@/integrations/supabase/client';
 import { newTrip, upsertTrip, uid, tripDays as computeTripDays, stopDays } from '@/lib/store';
 import { useAuth } from '@/contexts/AuthContext';
 import { toast } from 'sonner';
-import type { Trip, Stop, Activity } from '@/lib/types';
+import type { Trip } from '@/lib/types';
 import {
   coerceAiTrip, validateDraft, ACTIVITY_CATEGORIES,
   type TripDraft, type FieldErrors, type ActivityCategory,
+  type DraftStop, type DraftActivity,
 } from '@/lib/tripValidation';
 
 const STYLES = [
