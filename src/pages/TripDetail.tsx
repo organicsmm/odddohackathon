@@ -1,6 +1,6 @@
 import { useNavigate, useParams } from 'react-router-dom';
 import { useEffect, useMemo, useState } from 'react';
-import { Muted } from "@/components/ui/typography";
+import { Display, Eyebrow, Heading, Lead, Muted } from "@/components/ui/typography";
 import {
   Calendar, MapPin, Plus, Trash2, Share2, Globe, Lock, GripVertical,
   Wallet, ListChecks, StickyNote, MapIcon, ChevronLeft, Clock, Download,
@@ -15,7 +15,6 @@ import { useAuth } from '@/contexts/AuthContext';
 import { getTrip, upsertTrip, uid, tripCost, stopDays, tripDays, resequenceStops, createInvite, revokeInvite, unshareWith } from '@/lib/store';
 import type { Trip, Stop, Activity, Note, PackItem, Friend } from '@/lib/types';
 import { Button } from '@/components/ui/button';
-import { Display, Heading, Lead, Eyebrow } from '@/components/ui/typography';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';

@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Muted } from "@/components/ui/typography";
+import { Eyebrow, Heading, Muted, Text } from "@/components/ui/typography";
 import { useAuth } from '@/contexts/AuthContext';
 import { updateUser, deleteAccount, logout, loadTrips } from '@/lib/store';
 import { CITIES } from '@/lib/catalog';
@@ -12,8 +12,6 @@ import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { toast } from 'sonner';
 import { Trash2, Heart, MapPin } from 'lucide-react';
-import { Heading, Eyebrow, Text, Muted } from '@/components/ui/typography';
-
 export default function Profile() {
   const { user, refresh } = useAuth();
   const navigate = useNavigate();

@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Muted } from "@/components/ui/typography";
+import { Eyebrow, Heading, Lead, Muted } from "@/components/ui/typography";
 import { UserPlus, Trash2, Users, MapPinned, Mail } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { addFriend, removeFriend, tripsSharedWithMe, loadTrips } from '@/lib/store';
@@ -10,7 +10,6 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Heading, Lead, Eyebrow } from '@/components/ui/typography';
 import { toast } from 'sonner';
 
 export default function Friends() {

@@ -1,14 +1,12 @@
 import { useEffect, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
-import { Muted } from "@/components/ui/typography";
+import { Eyebrow, Heading, Lead, Muted, Text } from "@/components/ui/typography";
 import { Plane, Check, X, Lock } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { findInvite, acceptInvite } from '@/lib/store';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { toast } from 'sonner';
-import { Heading, Lead, Eyebrow, Text } from '@/components/ui/typography';
-
 export default function AcceptInvite() {
   const { token } = useParams();
   const navigate = useNavigate();
