@@ -1,7 +1,6 @@
 import { Link, NavLink, Outlet, useNavigate } from 'react-router-dom';
-import { Plane, LayoutDashboard, MapPinned, Plus, User as UserIcon, LogOut, Users } from 'lucide-react';
+import { Plane, LayoutDashboard, MapPinned, Plus, User as UserIcon, LogOut, Users, Shield } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
-import { logout } from '@/lib/store';
 import { Button } from '@/components/ui/button';
 import { useEffect } from 'react';
 import BuildStatusBadge from '@/components/dev/BuildStatusBadge';
@@ -15,7 +14,7 @@ const links = [
 ];
 
 export default function AppLayout() {
-  const { user } = useAuth();
+  const { user, isAdmin, signOut } = useAuth();
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -69,7 +68,12 @@ export default function AppLayout() {
                 {user.name?.split(' ')[0] || user.email?.split('@')[0]}
               </span>
             </div>
-            <Button variant="ghost" size="icon" onClick={() => { logout(); navigate('/login'); }} aria-label="Log out">
+            {isAdmin && (
+              <Button asChild variant="outline" size="sm" className="hidden sm:inline-flex">
+                <Link to="/admin"><Shield className="h-4 w-4" /> Admin</Link>
+              </Button>
+            )}
+            <Button variant="ghost" size="icon" onClick={async () => { await signOut(); navigate('/login'); }} aria-label="Log out">
               <LogOut className="h-4 w-4" />
             </Button>
           </div>

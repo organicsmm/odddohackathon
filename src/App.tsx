@@ -18,6 +18,11 @@ import AcceptInvite from "./pages/AcceptInvite";
 import NotFound from "./pages/NotFound.tsx";
 import Showcase from "./pages/Showcase";
 import TypographyPreview from "./pages/TypographyPreview";
+import AdminLayout from "./layouts/AdminLayout";
+import AdminOverview from "./pages/admin/AdminOverview";
+import AdminUsers from "./pages/admin/AdminUsers";
+import AdminTrips from "./pages/admin/AdminTrips";
+import AdminSettings from "./pages/admin/AdminSettings";
 
 const queryClient = new QueryClient();
 
@@ -41,6 +46,12 @@ const App = () => (
               <Route path="new" element={<CreateTrip />} />
               <Route path="friends" element={<Friends />} />
               <Route path="profile" element={<Profile />} />
+            </Route>
+            <Route path="/admin" element={<AdminLayout />}>
+              <Route index element={<AdminOverview />} />
+              <Route path="users" element={<AdminUsers />} />
+              <Route path="trips" element={<AdminTrips />} />
+              <Route path="settings" element={<AdminSettings />} />
             </Route>
             <Route path="/showcase" element={<Showcase />} />
             <Route path="/typography" element={<TypographyPreview />} />
