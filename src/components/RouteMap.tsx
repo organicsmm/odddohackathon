@@ -575,7 +575,7 @@ export default function RouteMap({ stops, onSelectStop, highlightedStopId }: { s
                     ?
                   </span>
                 </span>
-                <span className="text-foreground/80">Approx. — best-effort match</span>
+                <span className="text-foreground/80">Approx. — best-effort match <span className="ml-1 rounded-full bg-warning/15 px-1.5 py-0.5 font-mono text-[9px] font-semibold text-warning-foreground">±50–250 km</span></span>
               </li>
             </ul>
           </div>
