@@ -98,6 +98,16 @@ export default function RouteMap({ stops, onSelectStop, highlightedStopId }: { s
   }, [stops, resolved]);
 
   const missing = stops.length - plotted.length;
+  const failedCities = useMemo(
+    () => stops.map(s => s.city).filter(c => c.trim().toLowerCase() in failed),
+    [stops, failed],
+  );
+  const isLocating = pendingCount > 0;
+  const subtitle = isLocating
+    ? `${plotted.length} plotted · locating ${pendingCount} more…`
+    : missing > 0
+      ? `${plotted.length} plotted · ${missing} couldn't be located`
+      : `${plotted.length} stops plotted`;
 
   // Auto-fit center on plotted stops
   const fitView = () => {
