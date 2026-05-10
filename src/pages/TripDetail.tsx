@@ -763,47 +763,94 @@ function BudgetView({ trip, update, currency }: { trip: Trip; update: (p: Partia
       </div>
 
       <div className="grid gap-6 lg:grid-cols-2">
-        {/* Pie / category breakdown */}
-        <Card className="p-6">
-          <h3 className="font-display text-xl font-bold">Cost by category</h3>
+        {/* Pie / category breakdown — editorial card */}
+        <Card variant="premium" className="overflow-hidden">
+          <header className="flex items-center justify-between gap-3 border-b border-border/60 bg-gradient-aurora px-6 py-4">
+            <div>
+              <div className="text-[10px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">Composition</div>
+              <h3 className="font-display text-lg font-bold leading-tight">Cost by category</h3>
+            </div>
+            <span className="rounded-full bg-card px-2.5 py-1 text-[11px] font-semibold tabular-nums shadow-ring">
+              {formatMoney(cost.total, currency)}
+            </span>
+          </header>
+          <div className="p-6">
           {pieData.length === 0 ? (
-            <p className="mt-4 text-sm text-muted-foreground">Add stops and activities to see your breakdown.</p>
+            <div className="flex flex-col items-center gap-2 py-10 text-center">
+              <span className="grid h-12 w-12 place-items-center rounded-full bg-muted/60 text-muted-foreground">
+                <Wallet className="h-5 w-5" />
+              </span>
+              <p className="text-sm font-medium">No costs yet</p>
+              <p className="max-w-[34ch] text-xs text-muted-foreground">Add stops and activities to see your breakdown come to life.</p>
+            </div>
           ) : (
-            <div className="mt-4 grid gap-4 sm:grid-cols-[200px_1fr] items-center">
-              <div className="h-[200px] w-full">
+            <div className="grid gap-6 sm:grid-cols-[200px_1fr] items-center">
+              <div className="relative h-[200px] w-full">
                 <ResponsiveContainer width="100%" height="100%">
                   <PieChart>
-                    <Pie data={pieData} dataKey="value" nameKey="name" innerRadius={55} outerRadius={85} paddingAngle={2} stroke="hsl(var(--background))">
+                    <Pie data={pieData} dataKey="value" nameKey="name" innerRadius={62} outerRadius={88} paddingAngle={3} stroke="hsl(var(--background))" strokeWidth={2}>
                       {pieData.map(entry => (
                         <Cell key={entry.name} fill={COLORS[entry.name as keyof typeof COLORS]} />
                       ))}
                     </Pie>
                     <RTooltip
-                      contentStyle={{ background: 'hsl(var(--card))', border: '1px solid hsl(var(--border))', borderRadius: 8, fontSize: 12 }}
+                      contentStyle={{ background: 'hsl(var(--card))', border: '1px solid hsl(var(--border))', borderRadius: 10, fontSize: 12, boxShadow: 'var(--shadow-elegant)' }}
                       formatter={(v: number) => formatMoney(v, currency)}
                     />
                   </PieChart>
                 </ResponsiveContainer>
+                <div className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center">
+                  <div className="text-[9px] uppercase tracking-wider text-muted-foreground">Total</div>
+                  <div className="font-display text-base font-bold tabular-nums leading-none">{formatMoney(cost.total, currency)}</div>
+                </div>
               </div>
-              <ul className="space-y-2">
-                {pieData.map(i => (
-                  <li key={i.name} className="flex items-center gap-3 text-sm">
-                    <span className="h-3 w-3 rounded-full" style={{ background: COLORS[i.name as keyof typeof COLORS] }} />
-                    <span className="flex-1">{i.name}</span>
-                    <span className="font-medium">{formatMoney(i.value, currency)}</span>
-                    <span className="w-12 text-right text-muted-foreground">{Math.round((i.value / total) * 100)}%</span>
-                  </li>
-                ))}
+              <ul className="space-y-2.5">
+                {pieData.map(i => {
+                  const pct = (i.value / total) * 100;
+                  return (
+                    <li key={i.name} className="space-y-1">
+                      <div className="flex items-center gap-2 text-sm">
+                        <span className="h-2.5 w-2.5 rounded-full ring-2 ring-background" style={{ background: COLORS[i.name as keyof typeof COLORS] }} />
+                        <span className="flex-1 font-medium">{i.name}</span>
+                        <span className="tabular-nums">{formatMoney(i.value, currency)}</span>
+                        <span className="w-10 text-right text-xs text-muted-foreground tabular-nums">{Math.round(pct)}%</span>
+                      </div>
+                      <div className="h-1 w-full overflow-hidden rounded-full bg-muted">
+                        <div
+                          className="h-full rounded-full transition-all duration-700 ease-out"
+                          style={{ width: `${pct}%`, background: COLORS[i.name as keyof typeof COLORS] }}
+                        />
+                      </div>
+                    </li>
+                  );
+                })}
               </ul>
             </div>
           )}
+          </div>
         </Card>
 
-        {/* Budget tracker */}
-        <Card className="p-6">
-          <h3 className="font-display text-xl font-bold">Budget tracker</h3>
-          <div className="mt-4 space-y-2">
-            <Label htmlFor="budget">Trip budget (USD)</Label>
+        {/* Budget tracker — editorial card */}
+        <Card variant="premium" className="overflow-hidden">
+          <header className="flex items-center justify-between gap-3 border-b border-border/60 bg-gradient-aurora px-6 py-4">
+            <div>
+              <div className="text-[10px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">Targets</div>
+              <h3 className="font-display text-lg font-bold leading-tight">Budget tracker</h3>
+            </div>
+            {trip.budget ? (
+              <span
+                className={`rounded-full px-2.5 py-1 text-[11px] font-semibold tabular-nums shadow-ring ${
+                  cost.total > trip.budget ? 'bg-destructive/10 text-destructive' : 'bg-success/10 text-success'
+                }`}
+              >
+                {cost.total > trip.budget ? 'Over' : 'On track'}
+              </span>
+            ) : null}
+          </header>
+
+          <div className="p-6">
+          <div className="space-y-2">
+            <Label htmlFor="budget" className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Trip budget (USD)</Label>
             <Input id="budget" type="number" min={0} value={trip.budget ?? ''} onChange={e => update({ budget: e.target.value ? Number(e.target.value) : undefined })} placeholder="Set a budget" />
             {trip.budget ? (
               <p className="text-[11px] text-muted-foreground tabular-nums">≈ {formatMoney(trip.budget, currency)} in {currency}</p>
@@ -811,12 +858,22 @@ function BudgetView({ trip, update, currency }: { trip: Trip; update: (p: Partia
           </div>
           {trip.budget ? (
             <div className="mt-4 space-y-2">
-              <Progress value={Math.min(100, (cost.total / trip.budget) * 100)} />
-              {cost.total > trip.budget ? (
-                <p className="text-sm text-destructive font-medium">⚠ Over budget by {formatMoney(cost.total - trip.budget, currency)}</p>
-              ) : (
-                <p className="text-sm text-success font-medium">✓ {formatMoney(trip.budget - cost.total, currency)} remaining</p>
-              )}
+              <div className="relative h-2.5 w-full overflow-hidden rounded-full bg-muted">
+                <div
+                  className={`h-full rounded-full transition-all duration-700 ease-out ${
+                    cost.total > trip.budget ? 'bg-destructive' : 'bg-gradient-ocean'
+                  }`}
+                  style={{ width: `${Math.min(100, (cost.total / trip.budget) * 100)}%` }}
+                />
+              </div>
+              <div className="flex items-center justify-between text-xs">
+                <span className="tabular-nums text-muted-foreground">{Math.round(Math.min(100, (cost.total / trip.budget) * 100))}% used</span>
+                {cost.total > trip.budget ? (
+                  <span className="font-semibold text-destructive tabular-nums">Over by {formatMoney(cost.total - trip.budget, currency)}</span>
+                ) : (
+                  <span className="font-semibold text-success tabular-nums">{formatMoney(trip.budget - cost.total, currency)} remaining</span>
+                )}
+              </div>
             </div>
           ) : (
             <p className="mt-3 text-xs text-muted-foreground">Set a target to track your spending.</p>
@@ -844,24 +901,45 @@ function BudgetView({ trip, update, currency }: { trip: Trip; update: (p: Partia
               />
             ))}
           </div>
+          </div>
         </Card>
       </div>
 
-      {/* Per-stop stacked bar */}
-      <Card className="p-6">
-        <h3 className="font-display text-xl font-bold">Spend per stop</h3>
+      {/* Per-stop stacked bar — editorial card */}
+      <Card variant="premium" className="overflow-hidden">
+        <header className="flex items-center justify-between gap-3 border-b border-border/60 bg-gradient-aurora px-6 py-4">
+          <div>
+            <div className="text-[10px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">Per stop</div>
+            <h3 className="font-display text-lg font-bold leading-tight">Spend per stop</h3>
+          </div>
+          <div className="hidden sm:flex items-center gap-3 text-[11px] text-muted-foreground">
+            {(['Transport','Stay','Meals','Activities'] as const).map(k => (
+              <span key={k} className="inline-flex items-center gap-1.5">
+                <span className="h-2 w-2 rounded-full" style={{ background: COLORS[k] }} />{k}
+              </span>
+            ))}
+          </div>
+        </header>
+        <div className="p-6">
         {barData.length === 0 ? (
-          <p className="mt-4 text-sm text-muted-foreground">Add stops to compare per-city spending.</p>
+          <div className="flex flex-col items-center gap-2 py-10 text-center">
+            <span className="grid h-12 w-12 place-items-center rounded-full bg-muted/60 text-muted-foreground">
+              <MapPin className="h-5 w-5" />
+            </span>
+            <p className="text-sm font-medium">No stops yet</p>
+            <p className="max-w-[34ch] text-xs text-muted-foreground">Add stops to compare per-city spending side by side.</p>
+          </div>
         ) : (
           <>
-            <div className="mt-4 h-[280px] w-full">
+            <div className="mt-2 h-[280px] w-full">
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart data={barData} margin={{ top: 8, right: 8, bottom: 4, left: -12 }}>
                   <CartesianGrid stroke="hsl(var(--border))" strokeDasharray="3 3" vertical={false} />
                   <XAxis dataKey="city" stroke="hsl(var(--muted-foreground))" fontSize={12} />
                   <YAxis stroke="hsl(var(--muted-foreground))" fontSize={12} tickFormatter={(v) => formatMoney(v, currency)} />
                   <RTooltip
-                    contentStyle={{ background: 'hsl(var(--card))', border: '1px solid hsl(var(--border))', borderRadius: 8, fontSize: 12 }}
+                    cursor={{ fill: 'hsl(var(--muted) / 0.4)' }}
+                    contentStyle={{ background: 'hsl(var(--card))', border: '1px solid hsl(var(--border))', borderRadius: 10, fontSize: 12, boxShadow: 'var(--shadow-elegant)' }}
                     formatter={(v: number) => formatMoney(Number(v), currency)}
                   />
                   <Legend wrapperStyle={{ fontSize: 12 }} />
@@ -872,42 +950,45 @@ function BudgetView({ trip, update, currency }: { trip: Trip; update: (p: Partia
                 </BarChart>
               </ResponsiveContainer>
             </div>
-            <div className="mt-4 overflow-x-auto">
+            <div className="mt-4 overflow-x-auto rounded-xl border border-border/60">
               <table className="w-full text-sm">
-                <thead>
-                  <tr className="text-xs uppercase tracking-wider text-muted-foreground">
-                    <th className="py-2 text-left">Stop</th>
-                    <th className="py-2 text-right">Transport</th>
-                    <th className="py-2 text-right">Stay</th>
-                    <th className="py-2 text-right">Meals</th>
-                    <th className="py-2 text-right">Activities</th>
-                    <th className="py-2 text-right">Total</th>
+                <thead className="bg-muted/40">
+                  <tr className="text-[10px] uppercase tracking-[0.14em] text-muted-foreground">
+                    <th className="px-3 py-2.5 text-left font-semibold">Stop</th>
+                    <th className="px-3 py-2.5 text-right font-semibold">Transport</th>
+                    <th className="px-3 py-2.5 text-right font-semibold">Stay</th>
+                    <th className="px-3 py-2.5 text-right font-semibold">Meals</th>
+                    <th className="px-3 py-2.5 text-right font-semibold">Activities</th>
+                    <th className="px-3 py-2.5 text-right font-semibold">Total</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-border">
+                <tbody className="divide-y divide-border/60">
                   {barData.map(r => (
-                    <tr key={r.city}>
-                      <td className="py-2 font-medium flex items-center gap-2"><MapPin className="h-3 w-3 text-primary" />{r.city}</td>
-                      <td className="py-2 text-right tabular-nums">{formatMoney(r.Transport, currency)}</td>
-                      <td className="py-2 text-right tabular-nums">{formatMoney(r.Stay, currency)}</td>
-                      <td className="py-2 text-right tabular-nums">{formatMoney(r.Meals, currency)}</td>
-                      <td className="py-2 text-right tabular-nums">{formatMoney(r.Activities, currency)}</td>
-                      <td className="py-2 text-right font-semibold tabular-nums">{formatMoney(r.total, currency)}</td>
+                    <tr key={r.city} className="transition-colors hover:bg-muted/30">
+                      <td className="px-3 py-2.5 font-medium">
+                        <span className="inline-flex items-center gap-2"><MapPin className="h-3 w-3 text-primary" />{r.city}</span>
+                      </td>
+                      <td className="px-3 py-2.5 text-right tabular-nums">{formatMoney(r.Transport, currency)}</td>
+                      <td className="px-3 py-2.5 text-right tabular-nums">{formatMoney(r.Stay, currency)}</td>
+                      <td className="px-3 py-2.5 text-right tabular-nums">{formatMoney(r.Meals, currency)}</td>
+                      <td className="px-3 py-2.5 text-right tabular-nums">{formatMoney(r.Activities, currency)}</td>
+                      <td className="px-3 py-2.5 text-right font-semibold tabular-nums">{formatMoney(r.total, currency)}</td>
                     </tr>
                   ))}
-                  <tr className="border-t-2 border-border">
-                    <td className="py-2 font-semibold">Total</td>
-                    <td className="py-2 text-right font-semibold tabular-nums">{formatMoney(cost.transport, currency)}</td>
-                    <td className="py-2 text-right font-semibold tabular-nums">{formatMoney(cost.stay, currency)}</td>
-                    <td className="py-2 text-right font-semibold tabular-nums">{formatMoney(cost.meals, currency)}</td>
-                    <td className="py-2 text-right font-semibold tabular-nums">{formatMoney(cost.activities, currency)}</td>
-                    <td className="py-2 text-right font-bold text-primary tabular-nums">{formatMoney(cost.total, currency)}</td>
+                  <tr className="border-t-2 border-border bg-muted/30">
+                    <td className="px-3 py-2.5 font-semibold">Total</td>
+                    <td className="px-3 py-2.5 text-right font-semibold tabular-nums">{formatMoney(cost.transport, currency)}</td>
+                    <td className="px-3 py-2.5 text-right font-semibold tabular-nums">{formatMoney(cost.stay, currency)}</td>
+                    <td className="px-3 py-2.5 text-right font-semibold tabular-nums">{formatMoney(cost.meals, currency)}</td>
+                    <td className="px-3 py-2.5 text-right font-semibold tabular-nums">{formatMoney(cost.activities, currency)}</td>
+                    <td className="px-3 py-2.5 text-right font-bold text-primary tabular-nums">{formatMoney(cost.total, currency)}</td>
                   </tr>
                 </tbody>
               </table>
             </div>
           </>
         )}
+        </div>
       </Card>
     </div>
   );
