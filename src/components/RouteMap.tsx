@@ -467,6 +467,13 @@ export default function RouteMap({ stops, onSelectStop, highlightedStopId }: { s
                   <span aria-hidden="true" className={`h-1.5 w-1.5 rounded-full ${p.confidence === 'exact' ? 'bg-success' : 'bg-warning'}`} />
                   {p.confidence === 'exact' ? 'Exact' : 'Approx.'}
                 </span>
+                <span
+                  className="inline-flex items-center rounded-full bg-muted/60 px-1.5 py-0.5 font-mono font-semibold tabular-nums text-foreground/80"
+                  aria-label={`Estimated accuracy radius ${fmtRadius(accuracyRadiusKm(p))}`}
+                  title="Estimated accuracy radius — true location likely within this distance"
+                >
+                  {fmtRadius(accuracyRadiusKm(p))}
+                </span>
                 <span className="text-muted-foreground">
                   {p.source === 'builtin' ? 'built-in' : 'geocoded'}
                   {p.matchedName && p.matchedName.toLowerCase() !== p.stop.city.toLowerCase() && (
