@@ -15,7 +15,7 @@ import { cn } from "@/lib/utils";
  *   <Text variant="small" muted>helper</Text>
  */
 
-const textVariants = cva("", {
+const textVariants = cva("text-pretty", {
   variants: {
     variant: {
       display: "t-display",
