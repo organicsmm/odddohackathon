@@ -348,6 +348,31 @@ export default function RouteMap({ stops, onSelectStop, highlightedStopId }: { s
               <div className="mt-1 text-xs text-primary font-medium">
                 {p.stop.activities.length} activit{p.stop.activities.length === 1 ? 'y' : 'ies'}
               </div>
+              <div className="mt-1.5 flex items-center gap-1.5 text-[10px]">
+                <span
+                  className={`inline-flex items-center gap-1 rounded-full px-1.5 py-0.5 font-semibold uppercase tracking-wider ${
+                    p.confidence === 'exact'
+                      ? 'bg-success/10 text-success'
+                      : 'bg-warning/15 text-warning-foreground'
+                  }`}
+                  title={
+                    p.source === 'builtin'
+                      ? 'Pinpointed from built-in city database'
+                      : p.confidence === 'exact'
+                        ? `Geocoder match: ${p.matchedName ?? p.stop.city}${p.country ? ', ' + p.country : ''}`
+                        : `Best-effort match: ${p.matchedName ?? '—'}${p.country ? ', ' + p.country : ''}. Verify the marker.`
+                  }
+                >
+                  <span className={`h-1.5 w-1.5 rounded-full ${p.confidence === 'exact' ? 'bg-success' : 'bg-warning'}`} />
+                  {p.confidence === 'exact' ? 'Exact' : 'Approx.'}
+                </span>
+                <span className="text-muted-foreground">
+                  {p.source === 'builtin' ? 'built-in' : 'geocoded'}
+                  {p.matchedName && p.matchedName.toLowerCase() !== p.stop.city.toLowerCase() && (
+                    <> · matched “{p.matchedName}”</>
+                  )}
+                </span>
+              </div>
               {(inLeg || outLeg) && (
                 <div className="mt-2 space-y-0.5 border-t border-border/60 pt-2 text-xs">
                   {inLeg && (() => {
