@@ -494,6 +494,8 @@ function Showcase() {
         </div>
       </header>
 
+      <FilterBar query={query} setQuery={setQuery} category={category} setCategory={setCategory} visibleIds={visibleIds} />
+
       <main className="container space-y-14 py-14">
         {/* Typography */}
         <Section
