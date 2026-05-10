@@ -71,6 +71,32 @@ function fmtRadius(km: number): string {
   return `±${Math.round(km / 10) * 10} km`;
 }
 
+// Persist legend / map toggle preferences across reloads
+const PREF_KEY = 'routemap.prefs.v1';
+type RouteMapPrefs = { showNumbers: boolean; dashedPaths: boolean; highlightEnds: boolean };
+function readPref<K extends keyof RouteMapPrefs>(key: K, fallback: RouteMapPrefs[K]): RouteMapPrefs[K] {
+  if (typeof window === 'undefined') return fallback;
+  try {
+    const raw = window.localStorage.getItem(PREF_KEY);
+    if (!raw) return fallback;
+    const parsed = JSON.parse(raw) as Partial<RouteMapPrefs>;
+    const v = parsed?.[key];
+    return typeof v === 'boolean' ? (v as RouteMapPrefs[K]) : fallback;
+  } catch {
+    return fallback;
+  }
+}
+function writePref<K extends keyof RouteMapPrefs>(key: K, value: RouteMapPrefs[K]): void {
+  if (typeof window === 'undefined') return;
+  try {
+    const raw = window.localStorage.getItem(PREF_KEY);
+    const prev = raw ? (JSON.parse(raw) as Partial<RouteMapPrefs>) : {};
+    window.localStorage.setItem(PREF_KEY, JSON.stringify({ ...prev, [key]: value }));
+  } catch {
+    /* ignore quota / disabled storage */
+  }
+}
+
 
 export default function RouteMap({ stops, onSelectStop, highlightedStopId }: { stops: Stop[]; onSelectStop?: (id: string) => void; highlightedStopId?: string | null }) {
   const [hover, setHover] = useState<string | null>(null);
