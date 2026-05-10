@@ -20,6 +20,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import CitySearchDialog from '@/components/CitySearchDialog';
 import ActivitySearchDialog from '@/components/ActivitySearchDialog';
 import RouteTimeline from '@/components/RouteTimeline';
+import RouteMap from '@/components/RouteMap';
 import { WeatherBadge } from '@/lib/weather';
 import { toast } from 'sonner';
 import {
@@ -104,6 +105,7 @@ export default function TripDetail() {
       </header>
 
       {trip.stops.length > 0 && <RouteTimeline stops={trip.stops} />}
+      {trip.stops.length > 0 && <RouteMap stops={trip.stops} />}
 
       <Tabs defaultValue="itinerary" className="w-full">
         <TabsList className="grid w-full grid-cols-2 sm:grid-cols-5 sm:w-auto">
