@@ -706,7 +706,7 @@ function CalendarView({ trip }: { trip: Trip }) {
 
 /* ------------------- BUDGET ------------------- */
 
-function BudgetView({ trip, update }: { trip: Trip; update: (p: Partial<Trip>) => void }) {
+function BudgetView({ trip, update, currency }: { trip: Trip; update: (p: Partial<Trip>) => void; currency: CurrencyCode }) {
   const cost = tripCost(trip);
   const days = tripDays(trip);
   const avg = days > 0 ? cost.total / days : 0;
