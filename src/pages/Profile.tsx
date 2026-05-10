@@ -95,7 +95,7 @@ export default function Profile() {
           <div className="text-sm opacity-90">saved destinations</div>
         </Card>
         <Card variant="glass" className="p-6">
-          <h3 className="font-display font-bold">Account</h3>
+          <Heading level={4} weight="bold">Account</Heading>
           <Button variant="outline" className="mt-3 w-full" onClick={() => { logout(); navigate('/'); }}>Log out</Button>
           <Button variant="destructive" className="mt-2 w-full" onClick={onDeleteAccount}><Trash2 className="h-4 w-4" /> Delete account</Button>
         </Card>
