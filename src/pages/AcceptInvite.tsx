@@ -85,7 +85,7 @@ export default function AcceptInvite() {
         <Lock className="mx-auto h-10 w-10 text-primary" />
         <Heading level={2} className="mt-3" weight="bold">Private trip invitation</Heading>
         <p className="mt-1 text-muted-foreground">{trip.ownerEmail} invited you to view</p>
-        <p className="mt-1 font-display text-xl font-semibold">"{trip.name}"</p>
+        <Heading level={3} className="mt-1" weight="semibold">"{trip.name}"</Heading>
         <p className="mt-2 text-sm text-muted-foreground">{trip.stops.length} stops · {new Date(trip.startDate).toLocaleDateString()} → {new Date(trip.endDate).toLocaleDateString()}</p>
         <Button variant="premium" size="lg" className="mt-6" onClick={accept} disabled={status === 'accepting'}>
           <Check className="h-4 w-4" /> Accept and view
