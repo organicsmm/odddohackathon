@@ -9,6 +9,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { Heading, Lead, Eyebrow } from '@/components/ui/typography';
 import { toast } from 'sonner';
 
 export default function Friends() {
@@ -60,13 +61,14 @@ export default function Friends() {
   return (
     <div className="space-y-8">
       <header>
-        <h1 className="font-display text-3xl font-extrabold md:text-4xl">Friends</h1>
-        <p className="mt-1 text-muted-foreground">Build your travel circle and share trips privately via invite links.</p>
+        <Eyebrow tone="primary">Travel circle</Eyebrow>
+        <Heading level={1} className="mt-1" weight="bold">Friends</Heading>
+        <Lead muted className="mt-1">Build your travel circle and share trips privately via invite links.</Lead>
       </header>
 
       <div className="grid gap-6 lg:grid-cols-[360px_1fr]">
         <Card variant="premium" className="h-fit p-6">
-          <h2 className="font-display text-lg font-bold flex items-center gap-2"><UserPlus className="h-5 w-5 text-primary" /> Add a friend</h2>
+          <Heading level={3} weight="bold" className="flex items-center gap-2"><UserPlus className="h-5 w-5 text-primary" /> Add a friend</Heading>
           <form onSubmit={handleAdd} className="mt-4 space-y-3">
             <div>
               <Label htmlFor="f-email">Email</Label>
@@ -82,7 +84,7 @@ export default function Friends() {
 
         <div className="space-y-6">
           <Card variant="glass" className="p-6">
-            <h2 className="font-display text-lg font-bold flex items-center gap-2"><Users className="h-5 w-5 text-primary" /> Your friends ({friends.length})</h2>
+            <Heading level={3} weight="bold" className="flex items-center gap-2"><Users className="h-5 w-5 text-primary" /> Your friends ({friends.length})</Heading>
             {friends.length === 0 ? (
               <p className="mt-3 text-sm text-muted-foreground">No friends yet. Add one to start sharing trips privately.</p>
             ) : (
@@ -103,7 +105,7 @@ export default function Friends() {
           </Card>
 
           <Card variant="glass" className="p-6">
-            <h2 className="font-display text-lg font-bold flex items-center gap-2"><MapPinned className="h-5 w-5 text-primary" /> Shared with you</h2>
+            <Heading level={3} weight="bold" className="flex items-center gap-2"><MapPinned className="h-5 w-5 text-primary" /> Shared with you</Heading>
             {sharedIn.length === 0 ? (
               <p className="mt-3 text-sm text-muted-foreground">Nothing yet. Open an invite link from a friend to see their trip here.</p>
             ) : (
@@ -124,7 +126,7 @@ export default function Friends() {
           </Card>
 
           <Card variant="glass" className="p-6">
-            <h2 className="font-display text-lg font-bold flex items-center gap-2"><MapPinned className="h-5 w-5 text-primary" /> Trips you're sharing</h2>
+            <Heading level={3} weight="bold" className="flex items-center gap-2"><MapPinned className="h-5 w-5 text-primary" /> Trips you're sharing</Heading>
             {sharedOut.length === 0 ? (
               <p className="mt-3 text-sm text-muted-foreground">You haven't privately shared any trips yet. Open a trip and use "Share privately".</p>
             ) : (

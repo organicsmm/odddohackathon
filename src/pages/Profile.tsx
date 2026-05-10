@@ -11,6 +11,7 @@ import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { toast } from 'sonner';
 import { Trash2, Heart, MapPin } from 'lucide-react';
+import { Heading, Eyebrow, Text, Muted } from '@/components/ui/typography';
 
 export default function Profile() {
   const { user, refresh } = useAuth();
@@ -40,7 +41,7 @@ export default function Profile() {
   return (
     <div className="grid gap-6 lg:grid-cols-[1fr_320px]">
       <Card variant="premium" className="p-6">
-        <h2 className="font-display text-2xl font-bold tracking-tight">Profile</h2>
+        <Heading level={2} weight="bold">Profile</Heading>
         <div className="mt-4 grid gap-4">
           <div><Label>Email</Label><Input value={user.email} disabled /></div>
           <div><Label>Name</Label><Input value={name} onChange={e => setName(e.target.value)} /></div>
@@ -59,7 +60,7 @@ export default function Profile() {
         </div>
 
         <div className="mt-8">
-          <h3 className="font-display text-lg font-bold flex items-center gap-2"><Heart className="h-4 w-4 text-accent" /> Saved destinations</h3>
+          <Heading level={3} weight="bold" className="flex items-center gap-2"><Heart className="h-4 w-4 text-accent" /> Saved destinations</Heading>
           {user.saved.length === 0 && <p className="mt-2 text-sm text-muted-foreground">Save destinations to inspire your next trip.</p>}
           <div className="mt-3 flex flex-wrap gap-2">
             {user.saved.map(city => (
@@ -87,14 +88,14 @@ export default function Profile() {
 
       <div className="space-y-4">
         <Card variant="aurora" className="p-6 text-primary-foreground">
-          <div className="text-xs uppercase tracking-wider opacity-90">Your travel stats</div>
+          <Eyebrow className="opacity-90">Your travel stats</Eyebrow>
           <div className="mt-2 font-display text-4xl font-extrabold tabular-nums">{tripCount}</div>
           <div className="text-sm opacity-90">trips planned</div>
           <div className="mt-3 font-display text-3xl font-bold tabular-nums">{user.saved.length}</div>
           <div className="text-sm opacity-90">saved destinations</div>
         </Card>
         <Card variant="glass" className="p-6">
-          <h3 className="font-display font-bold">Account</h3>
+          <Heading level={4} weight="bold">Account</Heading>
           <Button variant="outline" className="mt-3 w-full" onClick={() => { logout(); navigate('/'); }}>Log out</Button>
           <Button variant="destructive" className="mt-2 w-full" onClick={onDeleteAccount}><Trash2 className="h-4 w-4" /> Delete account</Button>
         </Card>

@@ -14,6 +14,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { getTrip, upsertTrip, uid, tripCost, stopDays, tripDays, resequenceStops, createInvite, revokeInvite, unshareWith } from '@/lib/store';
 import type { Trip, Stop, Activity, Note, PackItem, Friend } from '@/lib/types';
 import { Button } from '@/components/ui/button';
+import { Display, Heading, Lead, Eyebrow } from '@/components/ui/typography';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
@@ -105,12 +106,12 @@ export default function TripDetail() {
           <span className="tabular-nums">{new Date(trip.endDate).toLocaleDateString(undefined, { day: 'numeric', month: 'short', year: 'numeric' })}</span>
         </div>
 
-        <h1 className="mt-3 font-display text-5xl font-extrabold leading-[1.02] tracking-tight md:text-7xl">
+        <Display as="h1" className="mt-3" weight="bold">
           {trip.name}
-        </h1>
+        </Display>
 
         {trip.description && (
-          <p className="mt-4 max-w-2xl text-lg leading-relaxed text-muted-foreground">{trip.description}</p>
+          <Lead className="mt-4 max-w-2xl" muted>{trip.description}</Lead>
         )}
 
         {/* meta strip + actions */}
