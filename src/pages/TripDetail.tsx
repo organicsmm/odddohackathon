@@ -271,7 +271,7 @@ function EditorialTab({ value, icon, children }: { value: string; icon?: React.R
 
 /* ------------------- ITINERARY ------------------- */
 
-function Itinerary({ trip, update, highlightedStopId }: { trip: Trip; update: (p: Partial<Trip> | ((t: Trip) => Trip)) => void; highlightedStopId?: string | null }) {
+function Itinerary({ trip, update, highlightedStopId, currency }: { trip: Trip; update: (p: Partial<Trip> | ((t: Trip) => Trip)) => void; highlightedStopId?: string | null; currency: CurrencyCode }) {
   const [view, setView] = useState<'list' | 'calendar'>('list');
 
   const addStop = (p: { city: string; country: string; startDate: string; endDate: string }) => {
