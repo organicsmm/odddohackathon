@@ -227,11 +227,14 @@ export default function RouteMap({ stops, onSelectStop, highlightedStopId }: { s
               const isEnd = p.index === stops.length - 1;
               const fill = isSelected
                 ? 'hsl(var(--accent))'
-                : isStart
-                  ? 'hsl(var(--accent))'
-                  : isEnd
-                    ? 'hsl(var(--primary))'
+                : highlightEnds && isStart
+                  ? 'hsl(var(--success))'
+                  : highlightEnds && isEnd
+                    ? 'hsl(var(--accent))'
                     : 'hsl(var(--primary))';
+              const labelText = showNumbers
+                ? `${p.index + 1}. ${p.stop.city}`
+                : p.stop.city;
               return (
                 <Marker
                   key={p.stop.id}
@@ -261,7 +264,7 @@ export default function RouteMap({ stops, onSelectStop, highlightedStopId }: { s
                       strokeLinejoin: 'round',
                     }}
                   >
-                    {p.index + 1}. {p.stop.city}
+                    {labelText}
                   </text>
                 </Marker>
               );
