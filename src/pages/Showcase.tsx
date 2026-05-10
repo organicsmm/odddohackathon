@@ -485,6 +485,7 @@ function Showcase() {
       <main className="container space-y-14 py-14">
         {/* Typography */}
         <Section
+          id="typography"
           eyebrow="01 · Typography"
           title="A single, harmonious scale"
           description="All headings and body text route through the typography primitives so spacing, line-height, and gradients stay consistent."
@@ -519,6 +520,7 @@ function Showcase() {
 
         {/* Buttons */}
         <Section
+          id="buttons"
           eyebrow="02 · Buttons"
           title="Premium, hero, glass and the essentials"
           description="Pick a variant by intent. `premium` for the single most important CTA on the screen, `hero` for marketing, `glass` for layered surfaces."
@@ -556,6 +558,7 @@ function Showcase() {
 
         {/* Cards */}
         <Section
+          id="cards"
           eyebrow="03 · Cards"
           title="Surfaces with personality"
           description="Use `premium` for editorial feature cards, `aurora` for branded highlights, `glass` for floating panels, and `default` for neutral content."
@@ -597,6 +600,7 @@ function Showcase() {
 
         {/* Badges */}
         <Section
+          id="badges"
           eyebrow="04 · Badges"
           title="Tiny chips, big signal"
           description="Use sparingly to label state, role, or category. `gradient` and `glass` are the premium variants; the others mirror shadcn defaults."
@@ -621,6 +625,7 @@ function Showcase() {
 
         {/* Modals */}
         <Section
+          id="modals"
           eyebrow="05 · Modals"
           title="Dialogs that match the surfaces"
           description="The default `DialogContent` already feels premium. For richer flows, layer in `bg-gradient-card backdrop-blur-xl` and an Eyebrow + Display title."
@@ -699,6 +704,7 @@ function Showcase() {
 
         {/* Color tokens */}
         <Section
+          id="tokens"
           eyebrow="06 · Tokens"
           title="Semantic color tokens"
           description="Always reference these via Tailwind classes (e.g. `bg-primary`, `text-muted-foreground`) — never hardcode hex values."
@@ -716,6 +722,7 @@ function Showcase() {
         </Section>
 
         <Section
+          id="toasts"
           eyebrow="07 · Toasts"
           title="Notifications that match the system"
           description="All app feedback flows through `sonner`. The toaster is themed with our gradient-card surface, semantic accent strip, and design-token icons."
@@ -764,6 +771,7 @@ toast('Invite sent', {
 
         {/* Accessibility */}
         <Section
+          id="accessibility"
           eyebrow="08 · Accessibility"
           title="Keyboard & focus states"
           description="Every primitive ships with a visible focus ring (2px ring + 2px offset) using the `--ring` token. Use Tab / Shift+Tab to traverse, Space / Enter to activate, Esc to dismiss dialogs."
@@ -893,6 +901,7 @@ toast('Invite sent', {
 
         {/* Playground */}
         <Section
+          id="playground"
           eyebrow="09 · Playground"
           title="Interactive props playground"
           description="Tweak props on the left, see the live component and generated JSX update instantly. Great for designing variants without leaving the page."
