@@ -3,7 +3,7 @@ import {
   ArrowRight, Calendar, MapPin, Wallet, Share2, ListChecks, Users, Plane, Sparkles,
   Star, Globe, Compass, Wand2, ShieldCheck, ChevronRight,
 } from 'lucide-react';
-import heroImg from '@/assets/hero-travel.jpg';
+import ImageGallery from '@/components/ui/image-gallery';
 import { Display, Eyebrow, Heading, Lead, Muted } from "@/components/ui/typography";
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -102,23 +102,16 @@ export default function Landing() {
             </div>
           </div>
 
-          {/* Hero image card */}
+          {/* Hero gallery */}
           <div className="relative animate-scale-in">
             <div aria-hidden className="absolute -inset-8 rounded-[2.5rem] bg-gradient-hero opacity-30 blur-3xl" />
-            <div className="relative overflow-hidden rounded-[2rem] surface-premium">
-              <img
-                src={heroImg}
-                alt="Aerial coastal landscape with turquoise water"
-                width={1600}
-                height={900}
-                className="aspect-[5/4] w-full object-cover"
-                loading="eager"
-              />
+            <div className="relative rounded-[2rem] surface-premium p-4 md:p-5">
+              <ImageGallery showHeader={false} />
               {/* Floating glass cards */}
-              <div className="absolute left-4 top-4 glass rounded-xl px-3 py-2 text-xs font-medium shadow-soft animate-float">
+              <div className="absolute left-6 top-6 glass rounded-xl px-3 py-2 text-xs font-medium shadow-soft animate-float z-10">
                 <div className="flex items-center gap-1.5"><Globe className="h-3.5 w-3.5 text-primary" /> 7-day Greek Isles</div>
               </div>
-              <div className="absolute -bottom-5 -left-5 hidden md:block animate-float" style={{ animationDelay: '0.6s' }}>
+              <div className="absolute -bottom-5 -left-5 hidden md:block animate-float z-10" style={{ animationDelay: '0.6s' }}>
                 <Card variant="glass" className="p-3 min-w-[200px]">
                   <Eyebrow>Next stop</Eyebrow>
                   <div className="mt-1 font-display font-bold leading-tight">Santorini → Athens</div>
@@ -127,7 +120,7 @@ export default function Landing() {
                   </div>
                 </Card>
               </div>
-              <div className="absolute -top-4 -right-4 hidden md:block animate-float" style={{ animationDelay: '1.2s' }}>
+              <div className="absolute -top-4 -right-4 hidden md:block animate-float z-10" style={{ animationDelay: '1.2s' }}>
                 <Card variant="glass" className="p-3 min-w-[180px]">
                   <Eyebrow>Weather</Eyebrow>
                   <div className="mt-1 flex items-center gap-2">
