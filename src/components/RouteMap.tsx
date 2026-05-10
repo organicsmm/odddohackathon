@@ -282,9 +282,27 @@ export default function RouteMap({ stops, onSelectStop, highlightedStopId }: { s
                     <animate attributeName="r" values="8;16;8" dur="2.4s" repeatCount="indefinite" />
                     <animate attributeName="fill-opacity" values="0.25;0;0.25" dur="2.4s" repeatCount="indefinite" />
                   </circle>
-                  <circle r={isSelected ? 7.5 : 5.5} fill={fill} stroke="white" strokeWidth={1.8} />
+                  {/* dashed outer = approximate location, solid = exact */}
+                  <circle
+                    r={isSelected ? 7.5 : 5.5}
+                    fill={fill}
+                    stroke="white"
+                    strokeWidth={1.8}
+                    strokeDasharray={p.confidence === 'approximate' ? '2 1.5' : undefined}
+                  />
                   {isSelected && (
                     <circle r={11} fill="none" stroke={ringColor} strokeWidth={2} strokeDasharray="3 2" />
+                  )}
+                  {/* tiny "?" badge for approximate */}
+                  {p.confidence === 'approximate' && (
+                    <g transform="translate(6,-6)">
+                      <circle r={4} fill="hsl(var(--warning))" stroke="white" strokeWidth={1} />
+                      <text
+                        textAnchor="middle"
+                        y={1.5}
+                        style={{ fontSize: 6, fontWeight: 700, fill: 'white', fontFamily: 'inherit' }}
+                      >?</text>
+                    </g>
                   )}
                   <text
                     textAnchor="middle"
