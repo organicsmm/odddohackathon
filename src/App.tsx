@@ -16,6 +16,7 @@ import SharedTrip from "./pages/SharedTrip";
 import Friends from "./pages/Friends";
 import AcceptInvite from "./pages/AcceptInvite";
 import NotFound from "./pages/NotFound.tsx";
+import Showcase from "./pages/Showcase";
 
 const queryClient = new QueryClient();
 
@@ -40,6 +41,7 @@ const App = () => (
               <Route path="friends" element={<Friends />} />
               <Route path="profile" element={<Profile />} />
             </Route>
+            <Route path="/showcase" element={<Showcase />} />
             <Route path="/dashboard" element={<Navigate to="/app" replace />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
