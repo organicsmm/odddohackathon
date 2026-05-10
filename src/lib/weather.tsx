@@ -19,6 +19,7 @@ function decodeWMO(code: number): { icon: WeatherKey; label: string } {
   return { icon: 'cloud', label: 'Cloudy' };
 }
 
+export type ForecastSource = 'forecast' | 'climate';
 export type DayForecast = {
   date: string;
   tempMax: number;
@@ -26,6 +27,7 @@ export type DayForecast = {
   precipProb: number;
   icon: WeatherKey;
   label: string;
+  source: ForecastSource;
 };
 
 // Geocoding cache so we only hit Open-Meteo's geocoding API once per unknown city per session
@@ -93,6 +95,7 @@ export async function fetchForecast(city: string, startDate: string, endDate: st
         precipProb: Math.round(data.daily.precipitation_probability_max[i] ?? 0),
         icon: dec.icon,
         label: dec.label,
+        source: 'forecast',
       };
     });
   } catch {
@@ -129,6 +132,7 @@ function climateFallback(city: string, startDate: string, endDate: string, known
       tempMax, tempMin,
       precipProb: seed * 10,
       icon, label,
+      source: 'climate',
     });
   }
   return out;
@@ -152,11 +156,24 @@ export function WeatherBadge({ city, date }: { city: string; date: string }) {
     );
   }
   const Icon = ICONS[w.icon];
+  const isLive = w.source === 'forecast';
   return (
-    <span className="inline-flex items-center gap-1.5 rounded-full bg-white/20 px-2.5 py-1 text-xs backdrop-blur">
+    <span
+      className="inline-flex items-center gap-1.5 rounded-full bg-white/20 px-2.5 py-1 text-xs backdrop-blur"
+      title={isLive ? 'Live forecast from Open-Meteo' : 'Climate average — date is outside the 16-day forecast window'}
+    >
       <Icon className="h-3.5 w-3.5" />
       <span className="font-medium">{w.tempMax}°C</span>
       <span className="opacity-80">{w.label}</span>
+      <span
+        className={`ml-0.5 inline-flex items-center gap-1 rounded-full px-1.5 py-px text-[9px] font-semibold uppercase tracking-wider ${
+          isLive ? 'bg-emerald-400/30 text-emerald-50' : 'bg-amber-400/30 text-amber-50'
+        }`}
+        aria-label={isLive ? 'Live forecast' : 'Climate average'}
+      >
+        <span className={`h-1 w-1 rounded-full ${isLive ? 'bg-emerald-300' : 'bg-amber-300'}`} />
+        {isLive ? 'Live' : 'Avg'}
+      </span>
     </span>
   );
 }
