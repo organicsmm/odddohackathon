@@ -2,104 +2,126 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Definition of the design system. All colors, gradients, fonts, etc should be defined here. 
-All colors MUST be HSL.
+/* Traveloop Design System
+   Inspired by tropical journeys: ocean teal, sunset coral, sandy cream.
+   All colors HSL.
 */
 
 @layer base {
   :root {
-    --background: 0 0% 100%;
-    --foreground: 222.2 84% 4.9%;
+    --background: 40 40% 98%;
+    --foreground: 200 30% 12%;
 
     --card: 0 0% 100%;
-    --card-foreground: 222.2 84% 4.9%;
+    --card-foreground: 200 30% 12%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 222.2 84% 4.9%;
+    --popover-foreground: 200 30% 12%;
 
-    --primary: 222.2 47.4% 11.2%;
-    --primary-foreground: 210 40% 98%;
+    --primary: 187 85% 38%;
+    --primary-foreground: 40 40% 98%;
+    --primary-glow: 180 75% 55%;
 
-    --secondary: 210 40% 96.1%;
-    --secondary-foreground: 222.2 47.4% 11.2%;
+    --secondary: 35 80% 92%;
+    --secondary-foreground: 200 30% 12%;
 
-    --muted: 210 40% 96.1%;
-    --muted-foreground: 215.4 16.3% 46.9%;
+    --muted: 200 20% 95%;
+    --muted-foreground: 200 12% 42%;
 
-    --accent: 210 40% 96.1%;
-    --accent-foreground: 222.2 47.4% 11.2%;
+    --accent: 14 90% 62%;
+    --accent-foreground: 40 40% 98%;
+    --accent-soft: 14 95% 94%;
 
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
+    --success: 152 60% 42%;
+    --success-foreground: 0 0% 100%;
 
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
-    --ring: 222.2 84% 4.9%;
+    --warning: 38 92% 52%;
+    --warning-foreground: 200 30% 12%;
 
-    --radius: 0.5rem;
+    --destructive: 0 75% 55%;
+    --destructive-foreground: 40 40% 98%;
 
-    --sidebar-background: 0 0% 98%;
+    --border: 200 20% 88%;
+    --input: 200 20% 90%;
+    --ring: 187 85% 38%;
 
-    --sidebar-foreground: 240 5.3% 26.1%;
+    --radius: 0.85rem;
 
-    --sidebar-primary: 240 5.9% 10%;
+    /* Gradients */
+    --gradient-hero: linear-gradient(135deg, hsl(187 85% 38%) 0%, hsl(180 75% 55%) 50%, hsl(14 90% 62%) 100%);
+    --gradient-ocean: linear-gradient(135deg, hsl(200 90% 45%), hsl(180 75% 55%));
+    --gradient-sunset: linear-gradient(135deg, hsl(14 90% 62%), hsl(38 92% 60%));
+    --gradient-card: linear-gradient(180deg, hsl(0 0% 100%), hsl(200 30% 98%));
 
-    --sidebar-primary-foreground: 0 0% 98%;
+    /* Shadows */
+    --shadow-soft: 0 4px 20px -8px hsl(200 40% 30% / 0.15);
+    --shadow-elegant: 0 12px 40px -12px hsl(187 80% 30% / 0.25);
+    --shadow-glow: 0 0 32px hsl(180 75% 55% / 0.4);
 
-    --sidebar-accent: 240 4.8% 95.9%;
+    --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 
-    --sidebar-accent-foreground: 240 5.9% 10%;
-
-    --sidebar-border: 220 13% 91%;
-
-    --sidebar-ring: 217.2 91.2% 59.8%;
+    --sidebar-background: 0 0% 100%;
+    --sidebar-foreground: 200 30% 12%;
+    --sidebar-primary: 187 85% 38%;
+    --sidebar-primary-foreground: 40 40% 98%;
+    --sidebar-accent: 200 20% 95%;
+    --sidebar-accent-foreground: 200 30% 12%;
+    --sidebar-border: 200 20% 88%;
+    --sidebar-ring: 187 85% 38%;
   }
 
   .dark {
-    --background: 222.2 84% 4.9%;
-    --foreground: 210 40% 98%;
-
-    --card: 222.2 84% 4.9%;
-    --card-foreground: 210 40% 98%;
-
-    --popover: 222.2 84% 4.9%;
-    --popover-foreground: 210 40% 98%;
-
-    --primary: 210 40% 98%;
-    --primary-foreground: 222.2 47.4% 11.2%;
-
-    --secondary: 217.2 32.6% 17.5%;
-    --secondary-foreground: 210 40% 98%;
-
-    --muted: 217.2 32.6% 17.5%;
-    --muted-foreground: 215 20.2% 65.1%;
-
-    --accent: 217.2 32.6% 17.5%;
-    --accent-foreground: 210 40% 98%;
-
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 210 40% 98%;
-
-    --border: 217.2 32.6% 17.5%;
-    --input: 217.2 32.6% 17.5%;
-    --ring: 212.7 26.8% 83.9%;
-    --sidebar-background: 240 5.9% 10%;
-    --sidebar-foreground: 240 4.8% 95.9%;
-    --sidebar-primary: 224.3 76.3% 48%;
-    --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 240 3.7% 15.9%;
-    --sidebar-accent-foreground: 240 4.8% 95.9%;
-    --sidebar-border: 240 3.7% 15.9%;
-    --sidebar-ring: 217.2 91.2% 59.8%;
+    --background: 200 35% 7%;
+    --foreground: 40 40% 96%;
+    --card: 200 30% 10%;
+    --card-foreground: 40 40% 96%;
+    --popover: 200 30% 10%;
+    --popover-foreground: 40 40% 96%;
+    --primary: 180 75% 55%;
+    --primary-foreground: 200 35% 7%;
+    --primary-glow: 187 85% 60%;
+    --secondary: 200 25% 15%;
+    --secondary-foreground: 40 40% 96%;
+    --muted: 200 25% 15%;
+    --muted-foreground: 200 15% 65%;
+    --accent: 14 90% 62%;
+    --accent-foreground: 40 40% 98%;
+    --accent-soft: 14 30% 18%;
+    --success: 152 60% 50%;
+    --success-foreground: 0 0% 100%;
+    --warning: 38 92% 60%;
+    --warning-foreground: 200 30% 12%;
+    --destructive: 0 70% 50%;
+    --destructive-foreground: 40 40% 96%;
+    --border: 200 25% 18%;
+    --input: 200 25% 18%;
+    --ring: 180 75% 55%;
+    --gradient-card: linear-gradient(180deg, hsl(200 30% 10%), hsl(200 30% 8%));
+    --sidebar-background: 200 35% 7%;
+    --sidebar-foreground: 40 40% 96%;
+    --sidebar-primary: 180 75% 55%;
+    --sidebar-primary-foreground: 200 35% 7%;
+    --sidebar-accent: 200 25% 15%;
+    --sidebar-accent-foreground: 40 40% 96%;
+    --sidebar-border: 200 25% 18%;
+    --sidebar-ring: 180 75% 55%;
   }
 }
 
 @layer base {
-  * {
-    @apply border-border;
-  }
+  * { @apply border-border; }
+  body { @apply bg-background text-foreground antialiased; font-feature-settings: "ss01", "cv11"; }
+  h1, h2, h3, h4 { @apply font-display tracking-tight; }
+}
 
-  body {
-    @apply bg-background text-foreground;
-  }
+@layer utilities {
+  .bg-gradient-hero { background: var(--gradient-hero); }
+  .bg-gradient-ocean { background: var(--gradient-ocean); }
+  .bg-gradient-sunset { background: var(--gradient-sunset); }
+  .bg-gradient-card { background: var(--gradient-card); }
+  .shadow-soft { box-shadow: var(--shadow-soft); }
+  .shadow-elegant { box-shadow: var(--shadow-elegant); }
+  .shadow-glow { box-shadow: var(--shadow-glow); }
+  .transition-smooth { transition: var(--transition-smooth); }
+  .text-gradient { background: var(--gradient-hero); -webkit-background-clip: text; background-clip: text; color: transparent; }
 }
