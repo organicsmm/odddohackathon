@@ -172,66 +172,113 @@ function FormStep(props: {
 }) {
   const { destination, setDestination, budget, setBudget, days, setDays, travelers, setTravelers, style, setStyle, extra, setExtra, busy, generate } = props;
   return (
-    <div className="space-y-5 pt-2">
-      <div className="space-y-2">
-        <Label className="flex items-center gap-2 text-sm font-semibold"><MapPin className="h-4 w-4 text-primary" /> Destination</Label>
-        <Input value={destination} onChange={e => setDestination(e.target.value)} placeholder="e.g. Italy, Tokyo + Kyoto..." disabled={busy} maxLength={120} />
-        <div className="flex flex-wrap gap-1.5">
+    <div className="space-y-6">
+      <Field
+        icon={<MapPin className="h-3.5 w-3.5" />}
+        label="Destination"
+        hint="City, country, or region"
+      >
+        <Input
+          value={destination}
+          onChange={e => setDestination(e.target.value)}
+          placeholder="Italy · Tokyo + Kyoto · Southeast Asia"
+          disabled={busy}
+          maxLength={120}
+          className="h-11"
+        />
+        <div className="flex flex-wrap gap-1.5 pt-1">
           {QUICK_DEST.map(d => (
-            <button key={d} type="button" disabled={busy} onClick={() => setDestination(d)}
-              className="rounded-full bg-muted px-3 py-1 text-xs hover:bg-primary/10 hover:text-primary transition-smooth disabled:opacity-50">
+            <button
+              key={d} type="button" disabled={busy} onClick={() => setDestination(d)}
+              className="rounded-full border border-border bg-background px-3 py-1 text-xs text-muted-foreground transition-smooth hover:border-primary/40 hover:text-foreground disabled:opacity-50"
+            >
               {d}
             </button>
           ))}
         </div>
-      </div>
+      </Field>
 
-      <div className="space-y-2">
-        <div className="flex items-center justify-between">
-          <Label className="flex items-center gap-2 text-sm font-semibold"><Wallet className="h-4 w-4 text-primary" /> Total budget (USD)</Label>
-          <span className="font-display text-lg font-bold text-primary">${budget.toLocaleString()}</span>
-        </div>
+      <Field
+        icon={<Wallet className="h-3.5 w-3.5" />}
+        label="Total budget"
+        hint="USD, all-in"
+        right={<span className="font-display text-xl font-bold tabular-nums">${budget.toLocaleString()}</span>}
+      >
         <Slider value={[budget]} onValueChange={v => setBudget(v[0])} min={500} max={15000} step={250} disabled={busy} />
-        <div className="flex justify-between text-xs text-muted-foreground"><span>$500 budget</span><span>$15k luxury</span></div>
+        <div className="flex justify-between text-[11px] text-muted-foreground">
+          <span>$500 · lean</span><span>$15,000 · luxury</span>
+        </div>
+      </Field>
+
+      <div className="grid grid-cols-2 gap-5">
+        <Field icon={<Calendar className="h-3.5 w-3.5" />} label="Days">
+          <Input type="number" min={2} max={30} value={days}
+            onChange={e => setDays(Math.max(2, Math.min(30, Number(e.target.value) || 7)))}
+            disabled={busy} className="h-11 tabular-nums" />
+        </Field>
+        <Field icon={<Users className="h-3.5 w-3.5" />} label="Travelers">
+          <Input type="number" min={1} max={20} value={travelers}
+            onChange={e => setTravelers(Math.max(1, Math.min(20, Number(e.target.value) || 1)))}
+            disabled={busy} className="h-11 tabular-nums" />
+        </Field>
       </div>
 
-      <div className="grid grid-cols-2 gap-4">
-        <div className="space-y-2">
-          <Label className="flex items-center gap-2 text-sm font-semibold"><Calendar className="h-4 w-4 text-primary" /> Days</Label>
-          <Input type="number" min={2} max={30} value={days} onChange={e => setDays(Math.max(2, Math.min(30, Number(e.target.value) || 7)))} disabled={busy} />
-        </div>
-        <div className="space-y-2">
-          <Label className="flex items-center gap-2 text-sm font-semibold"><Users className="h-4 w-4 text-primary" /> Travelers</Label>
-          <Input type="number" min={1} max={20} value={travelers} onChange={e => setTravelers(Math.max(1, Math.min(20, Number(e.target.value) || 1)))} disabled={busy} />
-        </div>
-      </div>
-
-      <div className="space-y-2">
-        <Label className="text-sm font-semibold">Trip style</Label>
+      <Field label="Trip style">
         <div className="grid grid-cols-4 gap-2">
-          {STYLES.map(s => (
-            <button key={s.id} type="button" disabled={busy} onClick={() => setStyle(s.id)}
-              className={`flex flex-col items-center gap-1 rounded-xl border-2 p-2 text-xs transition-smooth disabled:opacity-50 ${
-                style === s.id ? 'border-primary bg-primary/10 text-primary font-semibold' : 'border-border hover:border-primary/40 hover:bg-muted'
-              }`}>
-              <span className="text-xl">{s.emoji}</span>
-              {s.label}
-            </button>
-          ))}
+          {STYLES.map(s => {
+            const active = style === s.id;
+            const Icon = s.Icon;
+            return (
+              <button
+                key={s.id} type="button" disabled={busy} onClick={() => setStyle(s.id)}
+                className={`group flex flex-col items-center gap-1.5 rounded-xl border p-3 text-xs transition-smooth disabled:opacity-50 ${
+                  active
+                    ? 'border-primary bg-primary/[0.06] text-foreground shadow-sm'
+                    : 'border-border bg-background text-muted-foreground hover:border-primary/30 hover:text-foreground'
+                }`}
+              >
+                <Icon className={`h-4 w-4 ${active ? 'text-primary' : ''}`} strokeWidth={1.75} />
+                <span className={active ? 'font-semibold' : 'font-medium'}>{s.label}</span>
+              </button>
+            );
+          })}
         </div>
-      </div>
+      </Field>
 
-      <div className="space-y-2">
-        <Label className="text-sm font-semibold">Anything else? <span className="text-muted-foreground font-normal">(optional)</span></Label>
-        <Textarea value={extra} onChange={e => setExtra(e.target.value.slice(0, 500))} placeholder="e.g. vegetarian food, avoid flights..." rows={2} disabled={busy} maxLength={500} />
-      </div>
+      <Field label="Notes" hint="Optional">
+        <Textarea value={extra} onChange={e => setExtra(e.target.value.slice(0, 500))}
+          placeholder="Vegetarian food, avoid flights, must include diving…"
+          rows={2} disabled={busy} maxLength={500} className="resize-none" />
+      </Field>
 
-      <Button variant="hero" size="lg" className="w-full" onClick={generate} disabled={busy}>
-        {busy
-          ? <><Loader2 className="h-4 w-4 animate-spin" /> Crafting your itinerary...</>
-          : <><Sparkles className="h-4 w-4" /> Generate & review</>}
-      </Button>
-      <p className="text-center text-xs text-muted-foreground">You'll be able to review and edit everything before saving.</p>
+      <div className="flex flex-col-reverse gap-2 border-t border-border/60 pt-5 sm:flex-row sm:items-center sm:justify-between">
+        <p className="text-xs text-muted-foreground">
+          You'll review and edit everything before it's saved.
+        </p>
+        <Button variant="hero" size="lg" onClick={generate} disabled={busy} className="sm:min-w-[200px]">
+          {busy
+            ? <><Loader2 className="h-4 w-4 animate-spin" /> Drafting itinerary…</>
+            : <><Sparkles className="h-4 w-4" /> Draft itinerary</>}
+        </Button>
+      </div>
+    </div>
+  );
+}
+
+function Field({
+  icon, label, hint, right, children,
+}: { icon?: React.ReactNode; label: string; hint?: string; right?: React.ReactNode; children: React.ReactNode }) {
+  return (
+    <div className="space-y-2">
+      <div className="flex items-end justify-between gap-2">
+        <Label className="flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
+          {icon}
+          {label}
+          {hint && <span className="ml-1 text-[10px] font-normal normal-case tracking-normal text-muted-foreground/70">· {hint}</span>}
+        </Label>
+        {right}
+      </div>
+      {children}
     </div>
   );
 }
