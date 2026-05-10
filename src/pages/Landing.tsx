@@ -113,11 +113,6 @@ export default function Landing() {
             </div>
           </div>
         </div>
-
-        {/* Cinematic travel marquee — lower hero */}
-        <div className="relative pb-16 md:pb-20">
-          <TravelMarquee />
-        </div>
       </section>
 
       {/* Marquee of destinations */}
