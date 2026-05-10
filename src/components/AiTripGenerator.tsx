@@ -112,12 +112,12 @@ export default function AiTripGenerator({ trigger }: { trigger?: React.ReactNode
     <Dialog open={open} onOpenChange={close}>
       <DialogTrigger asChild>
         {trigger || (
-          <Button variant="hero" size="lg">
+          <Button variant="premium" size="lg">
             <Sparkles className="h-4 w-4" /> Generate with AI
           </Button>
         )}
       </DialogTrigger>
-      <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto p-0">
+      <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto p-0 border-border/60 bg-gradient-card backdrop-blur-xl">
         <DialogHeader className="border-b border-border/60 px-8 pt-7 pb-5">
           <div className="flex items-center justify-between">
             <div className="text-[10px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
@@ -255,7 +255,7 @@ function FormStep(props: {
         <p className="text-xs text-muted-foreground">
           You'll review and edit everything before it's saved.
         </p>
-        <Button variant="hero" size="lg" onClick={generate} disabled={busy} className="sm:min-w-[200px]">
+        <Button variant="premium" size="lg" onClick={generate} disabled={busy} className="sm:min-w-[200px]">
           {busy
             ? <><Loader2 className="h-4 w-4 animate-spin" /> Drafting itinerary…</>
             : <><Sparkles className="h-4 w-4" /> Draft itinerary</>}
@@ -343,7 +343,7 @@ function ReviewStep({
   return (
     <div className="space-y-5 pt-2">
       {/* Trip header */}
-      <Card className="p-4 space-y-3">
+      <Card variant="glass" className="p-4 space-y-3">
         <div className="grid gap-3 sm:grid-cols-2">
           <Field label="Trip name" error={errors['name']}>
             <Input value={draft.name} maxLength={100} onChange={e => onChange({ ...draft, name: e.target.value })} />
@@ -402,7 +402,7 @@ function ReviewStep({
         <div className="flex flex-wrap gap-2">
           <Button variant="ghost" onClick={onBack}><ChevronLeft className="h-4 w-4" /> Back</Button>
           <Button variant="outline" onClick={onRegenerate}><Sparkles className="h-4 w-4" /> Regenerate</Button>
-          <Button variant="hero" className="ml-auto" onClick={onSave} disabled={errCount > 0}>
+          <Button variant="premium" className="ml-auto" onClick={onSave} disabled={errCount > 0}>
             <CheckCircle2 className="h-4 w-4" /> Save trip
           </Button>
         </div>
@@ -434,7 +434,7 @@ function StopEditor({
   });
 
   return (
-    <Card className="p-4">
+    <Card variant="premium" className="p-4">
       <div className="flex items-start justify-between gap-2">
         <div className="text-xs uppercase tracking-wider text-muted-foreground">Stop {index + 1}</div>
         <Button size="icon" variant="ghost" onClick={onRemove} aria-label="Remove stop"><Trash2 className="h-4 w-4 text-destructive" /></Button>

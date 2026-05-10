@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
 import { toast } from 'sonner';
 
 export default function Friends() {
@@ -64,7 +65,7 @@ export default function Friends() {
       </header>
 
       <div className="grid gap-6 lg:grid-cols-[360px_1fr]">
-        <Card className="h-fit p-6">
+        <Card variant="premium" className="h-fit p-6">
           <h2 className="font-display text-lg font-bold flex items-center gap-2"><UserPlus className="h-5 w-5 text-primary" /> Add a friend</h2>
           <form onSubmit={handleAdd} className="mt-4 space-y-3">
             <div>
@@ -75,12 +76,12 @@ export default function Friends() {
               <Label htmlFor="f-name">Display name (optional)</Label>
               <Input id="f-name" value={name} onChange={e => setName(e.target.value)} placeholder="Alex" />
             </div>
-            <Button type="submit" variant="hero" className="w-full"><UserPlus className="h-4 w-4" /> Add friend</Button>
+            <Button type="submit" variant="premium" className="w-full"><UserPlus className="h-4 w-4" /> Add friend</Button>
           </form>
         </Card>
 
         <div className="space-y-6">
-          <Card className="p-6">
+          <Card variant="glass" className="p-6">
             <h2 className="font-display text-lg font-bold flex items-center gap-2"><Users className="h-5 w-5 text-primary" /> Your friends ({friends.length})</h2>
             {friends.length === 0 ? (
               <p className="mt-3 text-sm text-muted-foreground">No friends yet. Add one to start sharing trips privately.</p>
@@ -101,7 +102,7 @@ export default function Friends() {
             )}
           </Card>
 
-          <Card className="p-6">
+          <Card variant="glass" className="p-6">
             <h2 className="font-display text-lg font-bold flex items-center gap-2"><MapPinned className="h-5 w-5 text-primary" /> Shared with you</h2>
             {sharedIn.length === 0 ? (
               <p className="mt-3 text-sm text-muted-foreground">Nothing yet. Open an invite link from a friend to see their trip here.</p>
@@ -109,12 +110,12 @@ export default function Friends() {
               <ul className="mt-4 space-y-2">
                 {sharedIn.map(t => (
                   <li key={t.id}>
-                    <Link to={`/share/${t.shareId}`} className="flex items-center justify-between rounded-lg border border-border bg-muted/30 p-3 transition-smooth hover:bg-muted">
+                    <Link to={`/share/${t.shareId}`} className="flex items-center justify-between rounded-lg border border-border bg-muted/30 p-3 transition-smooth hover:bg-muted hover:border-primary/40">
                       <div>
                         <div className="font-medium">{t.name}</div>
                         <div className="text-xs text-muted-foreground">From {t.ownerEmail} · {t.stops.length} stops</div>
                       </div>
-                      <span className="text-xs text-primary">View →</span>
+                      <span className="text-xs font-medium text-primary">View →</span>
                     </Link>
                   </li>
                 ))}
@@ -122,7 +123,7 @@ export default function Friends() {
             )}
           </Card>
 
-          <Card className="p-6">
+          <Card variant="glass" className="p-6">
             <h2 className="font-display text-lg font-bold flex items-center gap-2"><MapPinned className="h-5 w-5 text-primary" /> Trips you're sharing</h2>
             {sharedOut.length === 0 ? (
               <p className="mt-3 text-sm text-muted-foreground">You haven't privately shared any trips yet. Open a trip and use "Share privately".</p>
@@ -132,11 +133,11 @@ export default function Friends() {
                   <li key={t.id} className="rounded-lg border border-border bg-muted/30 p-3">
                     <div className="flex items-center justify-between">
                       <Link to={`/app/trips/${t.id}`} className="font-medium hover:underline">{t.name}</Link>
-                      <span className="text-xs text-muted-foreground">{(t.sharedWith || []).length} viewer(s)</span>
+                      <Badge variant="secondary" className="text-xs">{(t.sharedWith || []).length} viewer(s)</Badge>
                     </div>
                     <div className="mt-1 flex flex-wrap gap-1 text-xs text-muted-foreground">
                       {(t.sharedWith || []).map(e => (
-                        <span key={e} className="rounded-full bg-background px-2 py-0.5 border border-border">{e}</span>
+                        <Badge key={e} variant="outline" className="font-normal">{e}</Badge>
                       ))}
                     </div>
                   </li>

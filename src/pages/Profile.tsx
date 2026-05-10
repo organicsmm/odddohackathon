@@ -4,6 +4,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { updateUser, deleteAccount, logout, loadTrips } from '@/lib/store';
 import { CITIES } from '@/lib/catalog';
 import { Card } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
@@ -38,8 +39,8 @@ export default function Profile() {
 
   return (
     <div className="grid gap-6 lg:grid-cols-[1fr_320px]">
-      <Card className="p-6">
-        <h2 className="font-display text-2xl font-bold">Profile</h2>
+      <Card variant="premium" className="p-6">
+        <h2 className="font-display text-2xl font-bold tracking-tight">Profile</h2>
         <div className="mt-4 grid gap-4">
           <div><Label>Email</Label><Input value={user.email} disabled /></div>
           <div><Label>Name</Label><Input value={name} onChange={e => setName(e.target.value)} /></div>
@@ -54,7 +55,7 @@ export default function Profile() {
               </SelectContent>
             </Select>
           </div>
-          <Button variant="hero" onClick={save} className="self-start">Save changes</Button>
+          <Button variant="premium" onClick={save} className="self-start">Save changes</Button>
         </div>
 
         <div className="mt-8">
@@ -62,9 +63,9 @@ export default function Profile() {
           {user.saved.length === 0 && <p className="mt-2 text-sm text-muted-foreground">Save destinations to inspire your next trip.</p>}
           <div className="mt-3 flex flex-wrap gap-2">
             {user.saved.map(city => (
-              <button key={city} onClick={() => toggleSaved(city)} className="inline-flex items-center gap-1 rounded-full bg-primary/10 px-3 py-1 text-sm text-primary hover:bg-primary/20">
+              <Badge key={city} variant="glass" className="cursor-pointer gap-1 px-3 py-1 hover:bg-primary/15" onClick={() => toggleSaved(city)}>
                 <MapPin className="h-3 w-3" /> {city} ×
-              </button>
+              </Badge>
             ))}
           </div>
           <details className="mt-4">
@@ -85,14 +86,14 @@ export default function Profile() {
       </Card>
 
       <div className="space-y-4">
-        <Card className="bg-gradient-ocean text-primary-foreground p-6">
-          <div className="text-xs uppercase opacity-80">Your travel stats</div>
-          <div className="mt-2 font-display text-4xl font-extrabold">{tripCount}</div>
+        <Card variant="aurora" className="p-6 text-primary-foreground">
+          <div className="text-xs uppercase tracking-wider opacity-90">Your travel stats</div>
+          <div className="mt-2 font-display text-4xl font-extrabold tabular-nums">{tripCount}</div>
           <div className="text-sm opacity-90">trips planned</div>
-          <div className="mt-3 text-3xl font-display font-bold">{user.saved.length}</div>
+          <div className="mt-3 font-display text-3xl font-bold tabular-nums">{user.saved.length}</div>
           <div className="text-sm opacity-90">saved destinations</div>
         </Card>
-        <Card className="p-6">
+        <Card variant="glass" className="p-6">
           <h3 className="font-display font-bold">Account</h3>
           <Button variant="outline" className="mt-3 w-full" onClick={() => { logout(); navigate('/'); }}>Log out</Button>
           <Button variant="destructive" className="mt-2 w-full" onClick={onDeleteAccount}><Trash2 className="h-4 w-4" /> Delete account</Button>
