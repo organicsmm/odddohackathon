@@ -41,7 +41,34 @@ export const tripDraftSchema = z.object({
   stops: z.array(stopSchema).min(1, 'Add at least one stop'),
 });
 
-export type TripDraft = z.infer<typeof tripDraftSchema>;
+// Manual type (zod inference can flip fields to optional in some versions).
+export type DraftActivity = {
+  id: string;
+  name: string;
+  category: ActivityCategory;
+  cost: number;
+  durationHours: number;
+  time?: string;
+  description?: string;
+};
+export type DraftStop = {
+  id: string;
+  city: string;
+  country: string;
+  startDate: string;
+  endDate: string;
+  notes?: string;
+  activities: DraftActivity[];
+  costs: { transport: number; stay: number; meals: number };
+};
+export type TripDraft = {
+  name: string;
+  description?: string;
+  startDate: string;
+  endDate: string;
+  budget?: number;
+  stops: DraftStop[];
+};
 
 export type FieldErrors = Record<string, string>;
 
