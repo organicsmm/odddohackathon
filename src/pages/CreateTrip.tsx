@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { z } from 'zod';
 import { upsertTrip, newTrip } from '@/lib/store';
 import { useAuth } from '@/contexts/AuthContext';
+import { getRate } from '@/lib/currency';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
