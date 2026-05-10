@@ -26,43 +26,38 @@ export default function Dashboard() {
   const recommended = useMemo(() => CITIES.slice().sort(() => Math.random() - 0.5).slice(0, 6), []);
 
   return (
-    <div className="space-y-12">
-      {/* Welcome — premium aurora hero */}
-      <section className="relative overflow-hidden rounded-3xl shadow-elegant">
-        <div aria-hidden className="absolute inset-0 bg-gradient-hero" />
-        <div aria-hidden className="absolute -top-32 -right-20 h-80 w-80 rounded-full bg-white/15 blur-3xl" />
-        <div aria-hidden className="absolute -bottom-32 -left-20 h-80 w-80 rounded-full bg-white/10 blur-3xl" />
-        <div className="relative p-8 md:p-12 text-primary-foreground">
-          <div className="flex flex-wrap items-end justify-between gap-6">
-            <div>
-              <Eyebrow className="!text-primary-foreground/80">Welcome back</Eyebrow>
-              <Display gradient={false} className="mt-2 !text-primary-foreground">
-                {user?.name?.split(' ')[0] || 'Traveler'} <span className="inline-block animate-float">✈️</span>
-              </Display>
-              <Lead className="mt-3 !text-primary-foreground/90 max-w-lg">
-                Where will the next chapter take you? Build a brand new itinerary or pick up an existing trip.
-              </Lead>
-            </div>
-            <div className="flex flex-wrap gap-3">
-              <AiTripGenerator
-                trigger={
-                  <Button size="lg" variant="glass" className="!bg-white !text-foreground hover:!bg-white/90">
-                    <Sparkles className="h-4 w-4" /> Generate with AI
-                  </Button>
-                }
-              />
-              <Button asChild size="lg" variant="glass" className="!bg-white/15 !text-primary-foreground border-white/20 hover:!bg-white/25">
-                <Link to="/app/new"><Plus className="h-4 w-4" /> Manual trip</Link>
-              </Button>
-            </div>
+    <div className="space-y-10">
+      {/* Welcome — clean header */}
+      <section className="rounded-xl border border-border bg-card p-6 md:p-8 shadow-soft">
+        <div className="flex flex-wrap items-end justify-between gap-6">
+          <div>
+            <Eyebrow>Welcome back</Eyebrow>
+            <Heading level={1} className="mt-2">
+              {user?.name?.split(' ')[0] || 'Traveler'}
+            </Heading>
+            <Lead className="mt-2 max-w-lg">
+              Where will the next chapter take you? Build a new itinerary or pick up an existing trip.
+            </Lead>
           </div>
+          <div className="flex flex-wrap gap-2">
+            <AiTripGenerator
+              trigger={
+                <Button size="default">
+                  <Sparkles className="h-4 w-4" /> Generate with AI
+                </Button>
+              }
+            />
+            <Button asChild size="default" variant="outline">
+              <Link to="/app/new"><Plus className="h-4 w-4" /> New trip</Link>
+            </Button>
+          </div>
+        </div>
 
-          {/* Stats */}
-          <div className="mt-10 grid gap-4 sm:grid-cols-3">
-            <Stat icon={MapPin} label="Trips planned" value={trips.length.toString()} />
-            <Stat icon={Calendar} label="Upcoming" value={upcoming.length.toString()} />
-            <Stat icon={Wallet} label="Total budget" value={`$${totalSpend.toLocaleString()}`} />
-          </div>
+        {/* Stats */}
+        <div className="mt-8 grid gap-px overflow-hidden rounded-lg border border-border bg-border sm:grid-cols-3">
+          <Stat icon={MapPin} label="Trips planned" value={trips.length.toString()} />
+          <Stat icon={Calendar} label="Upcoming" value={upcoming.length.toString()} />
+          <Stat icon={Wallet} label="Total budget" value={`$${totalSpend.toLocaleString()}`} />
         </div>
       </section>
 
@@ -120,58 +115,36 @@ export default function Dashboard() {
         )}
       </section>
 
-      {/* Recommendations — luxury */}
+      {/* Recommendations — clean tiles */}
       <section>
         <SectionHeader title="Recommended for you" eyebrow="Inspiration" icon={Compass} />
-        <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-6">
-          {recommended.map((c, i) => {
-            const palettes = [
-              'from-[#0f2027] via-[#203a43] to-[#2c5364]',
-              'from-[#1a1a2e] via-[#16213e] to-[#0f3460]',
-              'from-[#3a1c71] via-[#d76d77] to-[#ffaf7b]',
-              'from-[#0b486b] via-[#3b8686] to-[#79bd9a]',
-              'from-[#232526] via-[#414345] to-[#5b6467]',
-              'from-[#42275a] via-[#734b6d] to-[#bdb76b]',
-            ];
-            const grad = palettes[i % palettes.length];
-            return (
-              <Card
-                key={c.city}
-                variant="premium"
-                className="group relative overflow-hidden p-0 border-white/10 transition-spring hover:-translate-y-1.5 hover:shadow-elegant animate-fade-up cursor-pointer"
-                style={{ animationDelay: `${i * 50}ms` }}
-              >
-                <div className={`relative aspect-[3/4] bg-gradient-to-br ${grad} p-4 text-white`}>
-                  {/* shimmer */}
-                  <div aria-hidden className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_left,rgba(255,255,255,0.35),transparent_55%)]" />
-                  <div aria-hidden className="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom_right,rgba(0,0,0,0.45),transparent_60%)]" />
-                  <div aria-hidden className="absolute -inset-x-10 -top-1/2 h-full rotate-12 bg-gradient-to-r from-transparent via-white/15 to-transparent translate-x-[-150%] group-hover:translate-x-[150%] transition-transform duration-1000" />
-                  {/* gold hairline frame */}
-                  <div aria-hidden className="absolute inset-2 rounded-[14px] ring-1 ring-white/15" />
-                  <div aria-hidden className="absolute inset-2 rounded-[14px] ring-1 ring-[hsl(45_85%_70%/0.35)] mix-blend-overlay" />
-
-                  <div className="relative flex items-center gap-1.5 text-[9px] font-semibold uppercase tracking-[0.22em] text-white/85">
-                    <span className="h-px w-4 bg-[hsl(45_85%_70%)]" />
-                    {c.region}
-                  </div>
-
-                  <div className="absolute bottom-4 left-4 right-4">
-                    <div className="font-display text-xl font-bold leading-tight drop-shadow-lg">{c.city}</div>
-                    <div className="mt-0.5 flex items-center gap-1.5 text-[10px] uppercase tracking-[0.18em] text-white/80">
-                      <MapPin className="h-2.5 w-2.5" /> {c.country}
-                    </div>
+        <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6">
+          {recommended.map((c, i) => (
+            <Card
+              key={c.city}
+              className="group relative overflow-hidden p-0 transition-smooth hover:border-foreground/20 hover:shadow-soft cursor-pointer animate-fade-up"
+              style={{ animationDelay: `${i * 40}ms` }}
+            >
+              <div className="relative aspect-[3/4] bg-secondary p-4">
+                <div className="text-[10px] font-semibold uppercase tracking-[0.12em] text-muted-foreground">
+                  {c.region}
+                </div>
+                <div className="absolute bottom-4 left-4 right-4">
+                  <div className="text-base font-semibold tracking-tight text-foreground">{c.city}</div>
+                  <div className="mt-0.5 flex items-center gap-1 text-[11px] text-muted-foreground">
+                    <MapPin className="h-3 w-3" /> {c.country}
                   </div>
                 </div>
-              </Card>
-            );
-          })}
+              </div>
+            </Card>
+          ))}
         </div>
       </section>
 
-      {/* Templates — luxury */}
+      {/* Templates — clean cards */}
       <section>
         <SectionHeader title="Start from a template" eyebrow="Curated journeys" icon={Wand2} />
-        <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           {TEMPLATES.map((t, i) => (
             <button
               key={t.id}
@@ -185,37 +158,29 @@ export default function Dashboard() {
                 navigate(`/app/trips/${trip.id}`);
               }}
               className="text-left animate-fade-up"
-              style={{ animationDelay: `${i * 60}ms` }}
+              style={{ animationDelay: `${i * 50}ms` }}
             >
-              <Card variant="premium" className="group relative h-full overflow-hidden p-6 border-white/10 transition-spring hover:-translate-y-1.5 hover:shadow-elegant">
-                {/* luxe backdrop */}
-                <div aria-hidden className="absolute inset-0 bg-gradient-to-br from-background via-background to-primary/5" />
-                <div aria-hidden className="absolute -top-16 -right-16 h-40 w-40 rounded-full bg-primary/10 blur-3xl transition-opacity duration-500 group-hover:opacity-150" />
-                <div aria-hidden className="absolute inset-x-6 top-0 h-px bg-gradient-to-r from-transparent via-[hsl(45_85%_70%/0.6)] to-transparent" />
+              <Card className="group relative h-full p-5 transition-smooth hover:border-foreground/20 hover:shadow-soft">
+                <div className="flex items-start justify-between">
+                  <span className="grid h-11 w-11 place-items-center rounded-lg bg-secondary text-2xl">
+                    {t.emoji}
+                  </span>
+                  <span className="grid h-7 w-7 place-items-center rounded-full text-muted-foreground transition-smooth group-hover:bg-secondary group-hover:text-foreground">
+                    <ChevronRight className="h-4 w-4" />
+                  </span>
+                </div>
 
-                <div className="relative">
-                  <div className="flex items-start justify-between">
-                    <span className="grid h-14 w-14 place-items-center rounded-2xl bg-gradient-to-br from-white to-primary/10 text-3xl shadow-ring ring-1 ring-border/60">
-                      {t.emoji}
-                    </span>
-                    <span className="grid h-8 w-8 place-items-center rounded-full bg-card ring-1 ring-border/70 text-muted-foreground transition-spring group-hover:bg-primary group-hover:text-primary-foreground group-hover:ring-primary">
-                      <ChevronRight className="h-4 w-4" />
-                    </span>
-                  </div>
+                <Heading level={3} className="mt-4 !text-base">{t.title}</Heading>
+                <Muted className="mt-1 text-sm line-clamp-2">{t.tagline}</Muted>
 
-                  <Eyebrow className="mt-5 !text-[10px]">Signature route</Eyebrow>
-                  <Heading level={3} className="mt-1 !text-xl tracking-tight">{t.title}</Heading>
-                  <Muted className="mt-1 text-sm line-clamp-2">{t.tagline}</Muted>
-
-                  <div className="mt-5 flex items-center justify-between border-t border-border/60 pt-4 text-xs">
-                    <span className="inline-flex items-center gap-1.5 text-muted-foreground">
-                      <Calendar className="h-3.5 w-3.5" /> {t.days} days
-                    </span>
-                    <span className="inline-flex items-center gap-1 font-display font-bold tabular-nums text-primary">
-                      <span className="text-[10px] font-semibold uppercase tracking-[0.14em] text-muted-foreground">from</span>
-                      ${t.estimate.toLocaleString()}
-                    </span>
-                  </div>
+                <div className="mt-5 flex items-center justify-between border-t border-border pt-3 text-xs">
+                  <span className="inline-flex items-center gap-1.5 text-muted-foreground">
+                    <Calendar className="h-3.5 w-3.5" /> {t.days} days
+                  </span>
+                  <span className="font-medium tabular-nums text-foreground">
+                    <span className="mr-1 text-muted-foreground">from</span>
+                    ${t.estimate.toLocaleString()}
+                  </span>
                 </div>
               </Card>
             </button>
@@ -228,22 +193,22 @@ export default function Dashboard() {
 
 function Stat({ icon: Icon, label, value }: { icon: React.ComponentType<{ className?: string }>; label: string; value: string }) {
   return (
-    <div className="rounded-2xl bg-white/15 p-4 backdrop-blur-md ring-1 ring-white/15">
-      <div className="flex items-center gap-2 text-[10px] font-semibold uppercase tracking-[0.16em] opacity-80">
+    <div className="bg-card p-5">
+      <div className="flex items-center gap-2 text-[11px] font-medium uppercase tracking-[0.08em] text-muted-foreground">
         <Icon className="h-3.5 w-3.5" /> {label}
       </div>
-      <div className="mt-1.5 font-display text-3xl font-extrabold tabular-nums">{value}</div>
+      <div className="mt-2 text-2xl font-semibold tabular-nums tracking-tight text-foreground">{value}</div>
     </div>
   );
 }
 
 function SectionHeader({ title, eyebrow, link, icon: Icon }: { title: string; eyebrow?: string; link?: string; icon?: React.ComponentType<{ className?: string }> }) {
   return (
-    <div className="mb-5 flex items-end justify-between">
+    <div className="mb-4 flex items-end justify-between">
       <div>
         {eyebrow && <Eyebrow>{eyebrow}</Eyebrow>}
-        <Heading level={2} className="mt-1 !text-2xl flex items-center gap-2">
-          {Icon && <Icon className="h-5 w-5 text-accent" />}
+        <Heading level={2} className="mt-1 !text-xl flex items-center gap-2">
+          {Icon && <Icon className="h-5 w-5 text-muted-foreground" />}
           {title}
         </Heading>
       </div>
@@ -254,13 +219,13 @@ function SectionHeader({ title, eyebrow, link, icon: Icon }: { title: string; ey
 
 function EmptyState() {
   return (
-    <Card variant="aurora" className="p-10 text-center">
-      <span className="mx-auto mb-3 grid h-14 w-14 place-items-center rounded-2xl bg-card shadow-ring">
-        <Compass className="h-6 w-6 text-primary" />
+    <Card className="p-10 text-center">
+      <span className="mx-auto mb-3 grid h-12 w-12 place-items-center rounded-lg bg-secondary">
+        <Compass className="h-5 w-5 text-muted-foreground" />
       </span>
-      <Heading level={3} className="!text-xl">No upcoming trips yet</Heading>
+      <Heading level={3} className="!text-lg">No upcoming trips yet</Heading>
       <Muted className="mt-1">Create your first trip to start planning.</Muted>
-      <Button asChild variant="premium" className="mt-5"><Link to="/app/new"><Plus className="h-4 w-4" /> Create your first trip</Link></Button>
+      <Button asChild className="mt-5"><Link to="/app/new"><Plus className="h-4 w-4" /> Create your first trip</Link></Button>
     </Card>
   );
 }

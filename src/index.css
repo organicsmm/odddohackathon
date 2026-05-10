@@ -2,119 +2,141 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Traveloop Design System
-   Inspired by tropical journeys: ocean teal, sunset coral, sandy cream.
-   All colors HSL.
-*/
+/* Traveloop Design System — Professional, restrained.
+   Slate neutrals + a single blue accent. All colors HSL.
+   Stripe / Linear / Notion-inspired. */
 
 @layer base {
   :root {
-    --background: 40 40% 98%;
-    --foreground: 200 30% 12%;
+    /* Surfaces */
+    --background: 210 40% 98%;       /* #F8FAFC */
+    --foreground: 222 47% 11%;       /* #0F172A */
 
     --card: 0 0% 100%;
-    --card-foreground: 200 30% 12%;
+    --card-foreground: 222 47% 11%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 200 30% 12%;
+    --popover-foreground: 222 47% 11%;
 
-    --primary: 187 85% 38%;
-    --primary-foreground: 40 40% 98%;
-    --primary-glow: 180 75% 55%;
+    /* Brand — single blue accent */
+    --primary: 221 83% 53%;          /* #2563EB */
+    --primary-foreground: 0 0% 100%;
+    --primary-glow: 217 91% 60%;     /* used sparingly */
 
-    --secondary: 35 80% 92%;
-    --secondary-foreground: 200 30% 12%;
+    --secondary: 210 40% 96%;        /* slate-100 */
+    --secondary-foreground: 222 47% 11%;
 
-    --muted: 200 20% 95%;
-    --muted-foreground: 200 12% 42%;
+    --muted: 210 40% 96%;
+    --muted-foreground: 215 16% 47%; /* #64748B-ish, close to slate-500 */
 
-    --accent: 14 90% 62%;
-    --accent-foreground: 40 40% 98%;
-    --accent-soft: 14 95% 94%;
+    /* "Accent" kept as a mild slate, not a second brand color */
+    --accent: 210 40% 96%;
+    --accent-foreground: 222 47% 11%;
+    --accent-soft: 214 32% 95%;
 
-    --success: 152 60% 42%;
+    --success: 142 71% 38%;
     --success-foreground: 0 0% 100%;
 
-    --warning: 38 92% 52%;
-    --warning-foreground: 200 30% 12%;
+    --warning: 38 92% 45%;
+    --warning-foreground: 0 0% 100%;
 
-    --destructive: 0 75% 55%;
-    --destructive-foreground: 40 40% 98%;
+    --destructive: 0 72% 51%;
+    --destructive-foreground: 0 0% 100%;
 
-    --border: 200 20% 88%;
-    --input: 200 20% 90%;
-    --ring: 187 85% 38%;
+    --border: 214 32% 91%;           /* #E2E8F0 */
+    --input: 214 32% 91%;
+    --ring: 221 83% 53%;
 
-    --radius: 0.85rem;
+    --radius: 0.625rem;              /* 10px — tight, product-grade */
 
-    /* Gradients */
-    --gradient-hero: linear-gradient(135deg, hsl(187 85% 38%) 0%, hsl(180 75% 55%) 50%, hsl(14 90% 62%) 100%);
-    --gradient-ocean: linear-gradient(135deg, hsl(200 90% 45%), hsl(180 75% 55%));
-    --gradient-sunset: linear-gradient(135deg, hsl(14 90% 62%), hsl(38 92% 60%));
-    --gradient-card: linear-gradient(180deg, hsl(0 0% 100%), hsl(200 30% 98%));
-    --gradient-aurora: linear-gradient(135deg, hsl(187 85% 38% / 0.12), hsl(14 90% 62% / 0.10) 60%, hsl(38 92% 60% / 0.08));
-    --gradient-subtle: linear-gradient(180deg, hsl(200 40% 99%), hsl(200 30% 96%));
-    --gradient-border: linear-gradient(135deg, hsl(187 85% 38% / 0.4), hsl(14 90% 62% / 0.4));
+    /* "Gradients" — kept as tokens so existing utility names still work,
+       but rendered as flat/near-flat surfaces. No more aurora/sunset. */
+    --gradient-hero: linear-gradient(180deg, hsl(222 47% 11%), hsl(222 47% 9%));
+    --gradient-ocean: linear-gradient(180deg, hsl(221 83% 53%), hsl(221 83% 48%));
+    --gradient-sunset: linear-gradient(180deg, hsl(222 47% 11%), hsl(222 47% 9%));
+    --gradient-card: hsl(var(--card));
+    --gradient-aurora: hsl(var(--secondary));
+    --gradient-subtle: linear-gradient(180deg, hsl(210 40% 99%), hsl(210 40% 97%));
+    --gradient-border: hsl(var(--border));
 
-    /* Shadows */
-    --shadow-soft: 0 4px 20px -8px hsl(200 40% 30% / 0.15);
-    --shadow-elegant: 0 12px 40px -12px hsl(187 80% 30% / 0.25);
-    --shadow-glow: 0 0 32px hsl(180 75% 55% / 0.4);
-    --shadow-premium: 0 1px 0 hsl(0 0% 100% / 0.6) inset, 0 1px 2px hsl(200 40% 30% / 0.06), 0 8px 24px -10px hsl(200 40% 30% / 0.18);
-    --shadow-ring: 0 0 0 1px hsl(var(--border)), 0 1px 0 hsl(0 0% 100% / 0.5) inset;
+    /* Shadows — soft, single-layer, slate-tinted */
+    --shadow-soft:    0 1px 2px hsl(222 47% 11% / 0.04), 0 1px 3px hsl(222 47% 11% / 0.04);
+    --shadow-elegant: 0 4px 12px -4px hsl(222 47% 11% / 0.08), 0 2px 4px -2px hsl(222 47% 11% / 0.04);
+    --shadow-glow:    0 0 0 4px hsl(221 83% 53% / 0.12);
+    --shadow-premium: 0 1px 2px hsl(222 47% 11% / 0.05), 0 4px 16px -8px hsl(222 47% 11% / 0.08);
+    --shadow-ring:    0 0 0 1px hsl(var(--border));
 
-    --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    --transition-spring: all 0.45s cubic-bezier(0.22, 1, 0.36, 1);
+    --transition-smooth: all 0.18s cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-spring: all 0.22s cubic-bezier(0.4, 0, 0.2, 1);
 
+    /* Sidebar — same neutral palette */
     --sidebar-background: 0 0% 100%;
-    --sidebar-foreground: 200 30% 12%;
-    --sidebar-primary: 187 85% 38%;
-    --sidebar-primary-foreground: 40 40% 98%;
-    --sidebar-accent: 200 20% 95%;
-    --sidebar-accent-foreground: 200 30% 12%;
-    --sidebar-border: 200 20% 88%;
-    --sidebar-ring: 187 85% 38%;
+    --sidebar-foreground: 222 47% 11%;
+    --sidebar-primary: 221 83% 53%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 210 40% 96%;
+    --sidebar-accent-foreground: 222 47% 11%;
+    --sidebar-border: 214 32% 91%;
+    --sidebar-ring: 221 83% 53%;
   }
 
   .dark {
-    --background: 200 35% 7%;
-    --foreground: 40 40% 96%;
-    --card: 200 30% 10%;
-    --card-foreground: 40 40% 96%;
-    --popover: 200 30% 10%;
-    --popover-foreground: 40 40% 96%;
-    --primary: 180 75% 55%;
-    --primary-foreground: 200 35% 7%;
-    --primary-glow: 187 85% 60%;
-    --secondary: 200 25% 15%;
-    --secondary-foreground: 40 40% 96%;
-    --muted: 200 25% 15%;
-    --muted-foreground: 200 15% 65%;
-    --accent: 14 90% 62%;
-    --accent-foreground: 40 40% 98%;
-    --accent-soft: 14 30% 18%;
-    --success: 152 60% 50%;
+    --background: 222 47% 6%;
+    --foreground: 210 40% 96%;
+
+    --card: 222 47% 9%;
+    --card-foreground: 210 40% 96%;
+
+    --popover: 222 47% 9%;
+    --popover-foreground: 210 40% 96%;
+
+    --primary: 217 91% 60%;
+    --primary-foreground: 222 47% 6%;
+    --primary-glow: 217 91% 65%;
+
+    --secondary: 217 33% 14%;
+    --secondary-foreground: 210 40% 96%;
+
+    --muted: 217 33% 14%;
+    --muted-foreground: 215 20% 65%;
+
+    --accent: 217 33% 14%;
+    --accent-foreground: 210 40% 96%;
+    --accent-soft: 217 33% 16%;
+
+    --success: 142 70% 45%;
     --success-foreground: 0 0% 100%;
-    --warning: 38 92% 60%;
-    --warning-foreground: 200 30% 12%;
+    --warning: 38 92% 55%;
+    --warning-foreground: 0 0% 100%;
     --destructive: 0 70% 50%;
-    --destructive-foreground: 40 40% 96%;
-    --border: 200 25% 18%;
-    --input: 200 25% 18%;
-    --ring: 180 75% 55%;
-    --gradient-card: linear-gradient(180deg, hsl(200 30% 10%), hsl(200 30% 8%));
-    --gradient-aurora: linear-gradient(135deg, hsl(187 85% 60% / 0.18), hsl(14 90% 62% / 0.12) 60%, hsl(38 92% 60% / 0.08));
-    --gradient-subtle: linear-gradient(180deg, hsl(200 30% 10%), hsl(200 35% 7%));
-    --shadow-premium: 0 1px 0 hsl(0 0% 100% / 0.04) inset, 0 1px 2px hsl(0 0% 0% / 0.4), 0 8px 24px -10px hsl(0 0% 0% / 0.5);
-    --shadow-ring: 0 0 0 1px hsl(var(--border)), 0 1px 0 hsl(0 0% 100% / 0.04) inset;
-    --sidebar-background: 200 35% 7%;
-    --sidebar-foreground: 40 40% 96%;
-    --sidebar-primary: 180 75% 55%;
-    --sidebar-primary-foreground: 200 35% 7%;
-    --sidebar-accent: 200 25% 15%;
-    --sidebar-accent-foreground: 40 40% 96%;
-    --sidebar-border: 200 25% 18%;
-    --sidebar-ring: 180 75% 55%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 217 33% 18%;
+    --input: 217 33% 18%;
+    --ring: 217 91% 60%;
+
+    --gradient-hero: linear-gradient(180deg, hsl(222 47% 9%), hsl(222 47% 6%));
+    --gradient-ocean: linear-gradient(180deg, hsl(217 91% 60%), hsl(217 91% 55%));
+    --gradient-sunset: linear-gradient(180deg, hsl(222 47% 9%), hsl(222 47% 6%));
+    --gradient-card: hsl(var(--card));
+    --gradient-aurora: hsl(var(--secondary));
+    --gradient-subtle: linear-gradient(180deg, hsl(222 47% 9%), hsl(222 47% 7%));
+    --gradient-border: hsl(var(--border));
+
+    --shadow-soft:    0 1px 2px hsl(0 0% 0% / 0.3), 0 1px 3px hsl(0 0% 0% / 0.2);
+    --shadow-elegant: 0 4px 12px -4px hsl(0 0% 0% / 0.4), 0 2px 4px -2px hsl(0 0% 0% / 0.3);
+    --shadow-glow:    0 0 0 4px hsl(217 91% 60% / 0.18);
+    --shadow-premium: 0 1px 2px hsl(0 0% 0% / 0.3), 0 4px 16px -8px hsl(0 0% 0% / 0.4);
+    --shadow-ring:    0 0 0 1px hsl(var(--border));
+
+    --sidebar-background: 222 47% 7%;
+    --sidebar-foreground: 210 40% 96%;
+    --sidebar-primary: 217 91% 60%;
+    --sidebar-primary-foreground: 222 47% 6%;
+    --sidebar-accent: 217 33% 14%;
+    --sidebar-accent-foreground: 210 40% 96%;
+    --sidebar-border: 217 33% 18%;
+    --sidebar-ring: 217 91% 60%;
   }
 }
 
@@ -122,16 +144,24 @@
   * { @apply border-border; }
   body {
     @apply bg-background text-foreground antialiased;
-    font-feature-settings: "ss01", "cv11", "cv02", "cv03";
+    font-feature-settings: "cv11", "ss01", "ss03";
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     text-rendering: optimizeLegibility;
   }
-  h1, h2, h3, h4 { @apply font-display tracking-tight; }
+  /* Headings inherit the body font (Inter) for a unified, product-grade look.
+     Typography primitives still set tracking/weight; this just ensures any
+     stray <h*> tag without a primitive looks consistent. */
+  h1, h2, h3, h4, h5, h6 { @apply tracking-tight font-semibold; }
+
+  /* Subtler default focus ring everywhere */
+  :focus-visible {
+    outline: none;
+  }
 }
 
 @layer utilities {
-  /* Backgrounds */
+  /* Backgrounds — gradient utilities map to the new restrained tokens */
   .bg-gradient-hero { background: var(--gradient-hero); }
   .bg-gradient-ocean { background: var(--gradient-ocean); }
   .bg-gradient-sunset { background: var(--gradient-sunset); }
@@ -150,68 +180,66 @@
   .transition-smooth { transition: var(--transition-smooth); }
   .transition-spring { transition: var(--transition-spring); }
 
-  /* Text effects */
-  .text-gradient { background: var(--gradient-hero); -webkit-background-clip: text; background-clip: text; color: transparent; }
+  /* Text utilities — text-gradient now resolves to plain foreground */
+  .text-gradient { color: hsl(var(--foreground)); background: none; -webkit-background-clip: unset; background-clip: unset; }
   .text-balance { text-wrap: balance; }
   .text-pretty { text-wrap: pretty; }
 
-  /* Glass / surfaces */
+  /* Surfaces */
   .glass {
-    background: hsl(var(--card) / 0.65);
-    backdrop-filter: saturate(160%) blur(14px);
-    -webkit-backdrop-filter: saturate(160%) blur(14px);
-    border: 1px solid hsl(var(--border) / 0.6);
+    background: hsl(var(--card) / 0.85);
+    backdrop-filter: saturate(140%) blur(10px);
+    -webkit-backdrop-filter: saturate(140%) blur(10px);
+    border: 1px solid hsl(var(--border));
   }
   .surface-premium {
-    background: var(--gradient-card);
+    background: hsl(var(--card));
     border: 1px solid hsl(var(--border));
-    box-shadow: var(--shadow-premium);
+    box-shadow: var(--shadow-soft);
   }
 
-  /* Focus ring used by premium variants */
   .focus-ring {
     @apply focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background;
   }
 
-  /* Typography scale primitives — fluid, weight-locked so they look identical
-     regardless of which tag (`h1`, `h2`, `div`, …) the primitive renders as. */
+  /* Typography scale — Inter, restrained, product-grade */
   .t-display {
-    @apply font-display font-extrabold tracking-tight text-balance;
-    font-size: clamp(2.25rem, 5.5vw + 0.5rem, 4.5rem);
-    line-height: 1.08;
+    @apply tracking-tight text-balance font-bold;
+    font-size: clamp(2rem, 3.5vw + 0.75rem, 3.5rem);
+    line-height: 1.1;
     letter-spacing: -0.025em;
   }
   .t-h1 {
-    @apply font-display font-bold tracking-tight text-balance;
-    font-size: clamp(1.875rem, 3vw + 0.75rem, 3rem);
-    line-height: 1.12;
+    @apply tracking-tight text-balance font-semibold;
+    font-size: clamp(1.625rem, 2vw + 0.85rem, 2.25rem);
+    line-height: 1.2;
     letter-spacing: -0.02em;
   }
   .t-h2 {
-    @apply font-display font-bold tracking-tight text-balance;
-    font-size: clamp(1.5rem, 1.5vw + 0.85rem, 2.125rem);
-    line-height: 1.18;
+    @apply tracking-tight text-balance font-semibold;
+    font-size: clamp(1.375rem, 1vw + 0.85rem, 1.75rem);
+    line-height: 1.25;
     letter-spacing: -0.015em;
   }
   .t-h3 {
-    @apply font-display font-bold tracking-tight;
-    font-size: clamp(1.25rem, 0.6vw + 1.05rem, 1.5rem);
-    line-height: 1.25;
+    @apply tracking-tight font-semibold;
+    font-size: clamp(1.125rem, 0.4vw + 1rem, 1.25rem);
+    line-height: 1.35;
     letter-spacing: -0.01em;
   }
   .t-h4 {
-    @apply font-display font-semibold tracking-tight;
-    font-size: clamp(1rem, 0.3vw + 0.95rem, 1.125rem);
-    line-height: 1.3;
+    @apply tracking-tight font-semibold;
+    font-size: 0.9375rem;
+    line-height: 1.4;
   }
   .t-lead {
     @apply text-pretty text-muted-foreground;
-    font-size: clamp(1rem, 0.4vw + 0.9rem, 1.1875rem);
+    font-size: clamp(0.9375rem, 0.3vw + 0.85rem, 1.0625rem);
     line-height: 1.6;
   }
   .t-body { font-size: 0.9375rem; line-height: 1.6; }
   .t-small { @apply text-muted-foreground; font-size: 0.8125rem; line-height: 1.5; }
-  .t-eyebrow { @apply uppercase tracking-[0.14em] text-xs font-semibold text-muted-foreground; }
+  .t-eyebrow { @apply uppercase tracking-[0.08em] text-[11px] font-semibold text-muted-foreground; }
 }
 
 @media print {
@@ -225,4 +253,13 @@
   }
   .shadow-soft, .shadow-elegant, .shadow-glow { box-shadow: none !important; }
   [data-state="inactive"] { display: block !important; }
+}
+
+/* Reduced-motion — kill remaining decorative loops */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
 }
