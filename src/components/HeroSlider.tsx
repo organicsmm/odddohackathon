@@ -41,8 +41,8 @@ export function HeroSlider({ slides, intervalMs = 5000, children, className }: H
             className="h-full w-full object-cover"
             loading={i === 0 ? "eager" : "lazy"}
           />
-          <div className="absolute inset-0 bg-gradient-to-r from-background/85 via-background/40 to-transparent" />
-          <div className="absolute inset-0 bg-gradient-to-t from-background/70 via-transparent to-transparent" />
+          <div className="absolute inset-0 bg-background/55" />
+          <div className="absolute inset-0 bg-gradient-to-t from-background/80 via-background/20 to-background/40" />
         </div>
       ))}
 
