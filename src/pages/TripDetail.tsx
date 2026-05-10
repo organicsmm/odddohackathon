@@ -1094,7 +1094,7 @@ function Packing({ trip, update }: { trip: Trip; update: (p: Partial<Trip> | ((t
     <div className="grid gap-6 lg:grid-cols-[1fr_320px]">
       <Card className="p-6">
         <div className="flex items-center justify-between">
-          <h3 className="font-display text-xl font-bold">Packing checklist</h3>
+          <Heading level={3} className="!text-xl">Packing checklist</Heading>
           <span className="text-sm text-muted-foreground">{packed} / {total} packed</span>
         </div>
         <Progress value={total ? (packed / total) * 100 : 0} className="mt-3" />
