@@ -25,6 +25,7 @@ import { Switch } from '@/components/ui/switch';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import CitySearchDialog from '@/components/CitySearchDialog';
+import TripSuggestions from '@/components/TripSuggestions';
 import ActivitySearchDialog from '@/components/ActivitySearchDialog';
 import RouteTimeline from '@/components/RouteTimeline';
 import RouteMap from '@/components/RouteMap';
