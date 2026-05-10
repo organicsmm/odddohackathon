@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Eyebrow, Heading, Muted, Text } from "@/components/ui/typography";
 import { useAuth } from '@/contexts/AuthContext';
-import { updateUser, deleteAccount, logout, loadTrips } from '@/lib/store';
+import { updateUser, deleteAccount, loadTrips } from '@/lib/store';
 import { CITIES } from '@/lib/catalog';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -13,7 +13,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { toast } from 'sonner';
 import { Trash2, Heart, MapPin } from 'lucide-react';
 export default function Profile() {
-  const { user, refresh } = useAuth();
+  const { user, refresh, signOut } = useAuth();
   const navigate = useNavigate();
   const [name, setName] = useState(user?.name || '');
   const [language, setLanguage] = useState<'en' | 'hi' | 'es'>(user?.language || 'en');
@@ -95,7 +95,7 @@ export default function Profile() {
         </Card>
         <Card variant="glass" className="p-6">
           <Heading level={4} weight="bold">Account</Heading>
-          <Button variant="outline" className="mt-3 w-full" onClick={() => { logout(); navigate('/'); }}>Log out</Button>
+          <Button variant="outline" className="mt-3 w-full" onClick={async () => { await signOut(); navigate('/'); }}>Log out</Button>
           <Button variant="destructive" className="mt-2 w-full" onClick={onDeleteAccount}><Trash2 className="h-4 w-4" /> Delete account</Button>
         </Card>
       </div>
