@@ -1101,7 +1101,7 @@ function Packing({ trip, update }: { trip: Trip; update: (p: Partial<Trip> | ((t
         <div className="mt-6 space-y-6">
           {Object.entries(grouped).map(([category, items]) => (
             <div key={category}>
-              <h4 className="font-display font-semibold capitalize text-sm text-muted-foreground mb-2">{category}</h4>
+              <Heading level={4} className="!text-sm capitalize !text-muted-foreground mb-2">{category}</Heading>
               <ul className="space-y-1">
                 {items.map(p => (
                   <li key={p.id} className="flex items-center gap-3 rounded-lg px-2 py-1 hover:bg-muted/50">
