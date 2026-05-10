@@ -1,6 +1,6 @@
 import { useParams, Link } from 'react-router-dom';
 import { Calendar, MapPin, Plane, Copy, Twitter, Facebook } from 'lucide-react';
-import { getTripByShare, tripCost, tripDays, stopDays, newTrip, upsertTrip } from '@/lib/store';
+import { getTripByShareForViewer, tripCost, tripDays, stopDays, newTrip, upsertTrip } from '@/lib/store';
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
 import { useNavigate } from 'react-router-dom';
