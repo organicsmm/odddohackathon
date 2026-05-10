@@ -529,7 +529,7 @@ toast('Invite sent', {
             { name: 'focus-visible:ring-*', type: 'tailwind', default: 'ring-2 ring-ring ring-offset-2', desc: 'Standard focus ring — already baked into Button, Input, and most primitives.' },
           ]} />
         </Section>
-
+        <footer className="border-t border-border/60 pt-8">
 
           <Muted variant="small">
             Want to extend this system? Edit primitives in <code className="rounded bg-muted px-1 py-0.5">src/components/ui</code> and tokens in <code className="rounded bg-muted px-1 py-0.5">src/index.css</code>.
