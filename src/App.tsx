@@ -43,6 +43,7 @@ const App = () => (
               <Route path="profile" element={<Profile />} />
             </Route>
             <Route path="/showcase" element={<Showcase />} />
+            <Route path="/typography" element={<TypographyPreview />} />
             <Route path="/dashboard" element={<Navigate to="/app" replace />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
