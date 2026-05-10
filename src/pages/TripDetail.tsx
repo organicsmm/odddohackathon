@@ -70,6 +70,7 @@ export default function TripDetail() {
               navigator.clipboard.writeText(url);
               toast.success('Share link copied!');
             }}><Share2 className="h-4 w-4" /> Copy link</Button>
+            <Button variant="secondary" onClick={() => window.print()}><Printer className="h-4 w-4" /> Print</Button>
           </div>
         </div>
 
