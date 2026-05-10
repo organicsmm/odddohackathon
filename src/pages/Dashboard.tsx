@@ -120,34 +120,58 @@ export default function Dashboard() {
         )}
       </section>
 
-      {/* Recommendations */}
+      {/* Recommendations — luxury */}
       <section>
         <SectionHeader title="Recommended for you" eyebrow="Inspiration" icon={Compass} />
-        <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6">
-          {recommended.map((c, i) => (
-            <Card
-              key={c.city}
-              variant="premium"
-              className="group overflow-hidden p-0 transition-spring hover:-translate-y-1 hover:shadow-elegant animate-fade-up"
-              style={{ animationDelay: `${i * 50}ms` }}
-            >
-              <div className="relative aspect-[4/5] bg-gradient-ocean p-4 text-primary-foreground">
-                <div aria-hidden className="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,rgba(255,255,255,0.25),transparent_60%)]" />
-                <div className="relative text-[10px] uppercase tracking-[0.16em] opacity-80">{c.region}</div>
-                <div className="absolute bottom-3 left-3 right-3">
-                  <div className="font-display text-lg font-bold leading-tight drop-shadow">{c.city}</div>
-                  <div className="text-[10px] opacity-90">{c.country}</div>
+        <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-6">
+          {recommended.map((c, i) => {
+            const palettes = [
+              'from-[#0f2027] via-[#203a43] to-[#2c5364]',
+              'from-[#1a1a2e] via-[#16213e] to-[#0f3460]',
+              'from-[#3a1c71] via-[#d76d77] to-[#ffaf7b]',
+              'from-[#0b486b] via-[#3b8686] to-[#79bd9a]',
+              'from-[#232526] via-[#414345] to-[#5b6467]',
+              'from-[#42275a] via-[#734b6d] to-[#bdb76b]',
+            ];
+            const grad = palettes[i % palettes.length];
+            return (
+              <Card
+                key={c.city}
+                variant="premium"
+                className="group relative overflow-hidden p-0 border-white/10 transition-spring hover:-translate-y-1.5 hover:shadow-elegant animate-fade-up cursor-pointer"
+                style={{ animationDelay: `${i * 50}ms` }}
+              >
+                <div className={`relative aspect-[3/4] bg-gradient-to-br ${grad} p-4 text-white`}>
+                  {/* shimmer */}
+                  <div aria-hidden className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_left,rgba(255,255,255,0.35),transparent_55%)]" />
+                  <div aria-hidden className="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom_right,rgba(0,0,0,0.45),transparent_60%)]" />
+                  <div aria-hidden className="absolute -inset-x-10 -top-1/2 h-full rotate-12 bg-gradient-to-r from-transparent via-white/15 to-transparent translate-x-[-150%] group-hover:translate-x-[150%] transition-transform duration-1000" />
+                  {/* gold hairline frame */}
+                  <div aria-hidden className="absolute inset-2 rounded-[14px] ring-1 ring-white/15" />
+                  <div aria-hidden className="absolute inset-2 rounded-[14px] ring-1 ring-[hsl(45_85%_70%/0.35)] mix-blend-overlay" />
+
+                  <div className="relative flex items-center gap-1.5 text-[9px] font-semibold uppercase tracking-[0.22em] text-white/85">
+                    <span className="h-px w-4 bg-[hsl(45_85%_70%)]" />
+                    {c.region}
+                  </div>
+
+                  <div className="absolute bottom-4 left-4 right-4">
+                    <div className="font-display text-xl font-bold leading-tight drop-shadow-lg">{c.city}</div>
+                    <div className="mt-0.5 flex items-center gap-1.5 text-[10px] uppercase tracking-[0.18em] text-white/80">
+                      <MapPin className="h-2.5 w-2.5" /> {c.country}
+                    </div>
+                  </div>
                 </div>
-              </div>
-            </Card>
-          ))}
+              </Card>
+            );
+          })}
         </div>
       </section>
 
-      {/* Templates */}
+      {/* Templates — luxury */}
       <section>
-        <SectionHeader title="Start from a template" eyebrow="Quick start" icon={Wand2} />
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        <SectionHeader title="Start from a template" eyebrow="Curated journeys" icon={Wand2} />
+        <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
           {TEMPLATES.map((t, i) => (
             <button
               key={t.id}
@@ -163,16 +187,35 @@ export default function Dashboard() {
               className="text-left animate-fade-up"
               style={{ animationDelay: `${i * 60}ms` }}
             >
-              <Card variant="premium" className="group h-full p-5 transition-spring hover:-translate-y-1 hover:shadow-elegant">
-                <div className="flex items-start justify-between">
-                  <span className="text-3xl drop-shadow-sm">{t.emoji}</span>
-                  <ChevronRight className="h-4 w-4 text-muted-foreground transition-spring group-hover:translate-x-1 group-hover:text-primary" />
-                </div>
-                <h3 className="mt-2 font-display text-lg font-bold">{t.title}</h3>
-                <Muted className="text-sm">{t.tagline}</Muted>
-                <div className="mt-3 flex items-center justify-between border-t border-border/60 pt-3 text-xs">
-                  <span className="text-muted-foreground inline-flex items-center gap-1"><Calendar className="h-3 w-3" /> {t.days} days</span>
-                  <span className="font-semibold text-primary tabular-nums">~${t.estimate}</span>
+              <Card variant="premium" className="group relative h-full overflow-hidden p-6 border-white/10 transition-spring hover:-translate-y-1.5 hover:shadow-elegant">
+                {/* luxe backdrop */}
+                <div aria-hidden className="absolute inset-0 bg-gradient-to-br from-background via-background to-primary/5" />
+                <div aria-hidden className="absolute -top-16 -right-16 h-40 w-40 rounded-full bg-primary/10 blur-3xl transition-opacity duration-500 group-hover:opacity-150" />
+                <div aria-hidden className="absolute inset-x-6 top-0 h-px bg-gradient-to-r from-transparent via-[hsl(45_85%_70%/0.6)] to-transparent" />
+
+                <div className="relative">
+                  <div className="flex items-start justify-between">
+                    <span className="grid h-14 w-14 place-items-center rounded-2xl bg-gradient-to-br from-white to-primary/10 text-3xl shadow-ring ring-1 ring-border/60">
+                      {t.emoji}
+                    </span>
+                    <span className="grid h-8 w-8 place-items-center rounded-full bg-card ring-1 ring-border/70 text-muted-foreground transition-spring group-hover:bg-primary group-hover:text-primary-foreground group-hover:ring-primary">
+                      <ChevronRight className="h-4 w-4" />
+                    </span>
+                  </div>
+
+                  <Eyebrow className="mt-5 !text-[10px]">Signature route</Eyebrow>
+                  <h3 className="mt-1 font-display text-xl font-bold tracking-tight">{t.title}</h3>
+                  <Muted className="mt-1 text-sm line-clamp-2">{t.tagline}</Muted>
+
+                  <div className="mt-5 flex items-center justify-between border-t border-border/60 pt-4 text-xs">
+                    <span className="inline-flex items-center gap-1.5 text-muted-foreground">
+                      <Calendar className="h-3.5 w-3.5" /> {t.days} days
+                    </span>
+                    <span className="inline-flex items-center gap-1 font-display font-bold tabular-nums text-primary">
+                      <span className="text-[10px] font-semibold uppercase tracking-[0.14em] text-muted-foreground">from</span>
+                      ${t.estimate.toLocaleString()}
+                    </span>
+                  </div>
                 </div>
               </Card>
             </button>
