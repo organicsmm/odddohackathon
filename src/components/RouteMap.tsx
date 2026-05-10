@@ -240,13 +240,15 @@ export default function RouteMap({ stops, onSelectStop, highlightedStopId }: { s
               const isSelected = highlightedStopId === p.stop.id;
               const isStart = p.index === 0;
               const isEnd = p.index === stops.length - 1;
-              const fill = isSelected
-                ? 'hsl(var(--accent))'
-                : highlightEnds && isStart
-                  ? 'hsl(var(--success))'
-                  : highlightEnds && isEnd
-                    ? 'hsl(var(--accent))'
-                    : 'hsl(var(--primary))';
+              // Color priority: start/end highlight defines base color; selection adds a ring overlay.
+              // This avoids the prior conflict where selected and end both used --accent.
+              const baseFill = highlightEnds && isStart
+                ? 'hsl(var(--success))'
+                : highlightEnds && isEnd
+                  ? 'hsl(var(--accent))'
+                  : 'hsl(var(--primary))';
+              const fill = baseFill;
+              const ringColor = 'hsl(var(--ring))';
               const labelText = showNumbers
                 ? `${p.index + 1}. ${p.stop.city}`
                 : p.stop.city;
@@ -264,7 +266,10 @@ export default function RouteMap({ stops, onSelectStop, highlightedStopId }: { s
                     <animate attributeName="r" values="8;16;8" dur="2.4s" repeatCount="indefinite" />
                     <animate attributeName="fill-opacity" values="0.25;0;0.25" dur="2.4s" repeatCount="indefinite" />
                   </circle>
-                  <circle r={isSelected ? 7.5 : 5.5} fill={fill} stroke="white" strokeWidth={isSelected ? 2.5 : 1.8} />
+                  <circle r={isSelected ? 7.5 : 5.5} fill={fill} stroke="white" strokeWidth={1.8} />
+                  {isSelected && (
+                    <circle r={11} fill="none" stroke={ringColor} strokeWidth={2} strokeDasharray="3 2" />
+                  )}
                   <text
                     textAnchor="middle"
                     y={-12}
