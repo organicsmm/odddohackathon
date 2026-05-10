@@ -662,7 +662,7 @@ function CalendarView({ trip, currency }: { trip: Trip; currency: CurrencyCode }
                   <div className="flex items-center gap-2">
                     <WeatherBadge city={d.stop.city} date={d.date} />
                     <span className="text-xs font-medium text-muted-foreground">
-                      ~${Math.round(d.dailyCost)}
+                      ~{formatMoney(d.dailyCost, currency)}
                     </span>
                   </div>
                 </div>
