@@ -83,7 +83,7 @@ export default function TripDetail() {
   const overBudget = trip.budget && cost.total > trip.budget;
 
   const budgetPct = trip.budget ? Math.min(100, (cost.total / trip.budget) * 100) : 0;
-  const fmtUsd = (n: number) => `$${Math.round(n).toLocaleString()}`;
+  const fmtMoney = (n: number) => formatMoney(n, displayCurrency);
 
   return (
     <div className="space-y-10 pb-12">
