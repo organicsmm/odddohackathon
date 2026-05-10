@@ -26,43 +26,38 @@ export default function Dashboard() {
   const recommended = useMemo(() => CITIES.slice().sort(() => Math.random() - 0.5).slice(0, 6), []);
 
   return (
-    <div className="space-y-12">
-      {/* Welcome — premium aurora hero */}
-      <section className="relative overflow-hidden rounded-3xl shadow-elegant">
-        <div aria-hidden className="absolute inset-0 bg-gradient-hero" />
-        <div aria-hidden className="absolute -top-32 -right-20 h-80 w-80 rounded-full bg-white/15 blur-3xl" />
-        <div aria-hidden className="absolute -bottom-32 -left-20 h-80 w-80 rounded-full bg-white/10 blur-3xl" />
-        <div className="relative p-8 md:p-12 text-primary-foreground">
-          <div className="flex flex-wrap items-end justify-between gap-6">
-            <div>
-              <Eyebrow className="!text-primary-foreground/80">Welcome back</Eyebrow>
-              <Display gradient={false} className="mt-2 !text-primary-foreground">
-                {user?.name?.split(' ')[0] || 'Traveler'} <span className="inline-block animate-float">✈️</span>
-              </Display>
-              <Lead className="mt-3 !text-primary-foreground/90 max-w-lg">
-                Where will the next chapter take you? Build a brand new itinerary or pick up an existing trip.
-              </Lead>
-            </div>
-            <div className="flex flex-wrap gap-3">
-              <AiTripGenerator
-                trigger={
-                  <Button size="lg" variant="glass" className="!bg-white !text-foreground hover:!bg-white/90">
-                    <Sparkles className="h-4 w-4" /> Generate with AI
-                  </Button>
-                }
-              />
-              <Button asChild size="lg" variant="glass" className="!bg-white/15 !text-primary-foreground border-white/20 hover:!bg-white/25">
-                <Link to="/app/new"><Plus className="h-4 w-4" /> Manual trip</Link>
-              </Button>
-            </div>
+    <div className="space-y-10">
+      {/* Welcome — clean header */}
+      <section className="rounded-xl border border-border bg-card p-6 md:p-8 shadow-soft">
+        <div className="flex flex-wrap items-end justify-between gap-6">
+          <div>
+            <Eyebrow>Welcome back</Eyebrow>
+            <Heading level={1} className="mt-2">
+              {user?.name?.split(' ')[0] || 'Traveler'}
+            </Heading>
+            <Lead className="mt-2 max-w-lg">
+              Where will the next chapter take you? Build a new itinerary or pick up an existing trip.
+            </Lead>
           </div>
+          <div className="flex flex-wrap gap-2">
+            <AiTripGenerator
+              trigger={
+                <Button size="default">
+                  <Sparkles className="h-4 w-4" /> Generate with AI
+                </Button>
+              }
+            />
+            <Button asChild size="default" variant="outline">
+              <Link to="/app/new"><Plus className="h-4 w-4" /> New trip</Link>
+            </Button>
+          </div>
+        </div>
 
-          {/* Stats */}
-          <div className="mt-10 grid gap-4 sm:grid-cols-3">
-            <Stat icon={MapPin} label="Trips planned" value={trips.length.toString()} />
-            <Stat icon={Calendar} label="Upcoming" value={upcoming.length.toString()} />
-            <Stat icon={Wallet} label="Total budget" value={`$${totalSpend.toLocaleString()}`} />
-          </div>
+        {/* Stats */}
+        <div className="mt-8 grid gap-px overflow-hidden rounded-lg border border-border bg-border sm:grid-cols-3">
+          <Stat icon={MapPin} label="Trips planned" value={trips.length.toString()} />
+          <Stat icon={Calendar} label="Upcoming" value={upcoming.length.toString()} />
+          <Stat icon={Wallet} label="Total budget" value={`$${totalSpend.toLocaleString()}`} />
         </div>
       </section>
 
