@@ -591,7 +591,7 @@ export default function RouteMap({ stops, onSelectStop, highlightedStopId }: { s
             </li>
           </ul>
           <div className="mt-1.5 border-t border-border/60 pt-1.5">
-            <h3 id="legend-confidence-heading" className="mb-1 font-semibold uppercase tracking-wider text-muted-foreground">Confidence</h3>
+            <Eyebrow id="legend-confidence-heading" className="mb-1 block">Confidence</Eyebrow>
             <ul
               className="flex flex-wrap items-center gap-x-3 gap-y-1"
               role="list"
