@@ -79,9 +79,13 @@ export default function RouteMap({ stops, onSelectStop, highlightedStopId }: { s
   const [resolved, setResolved] = useState<Record<string, GeoResult>>({});
   const [failed, setFailed] = useState<Record<string, true>>({});
   const [pendingCount, setPendingCount] = useState(0);
-  const [showNumbers, setShowNumbers] = useState(true);
-  const [dashedPaths, setDashedPaths] = useState(true);
-  const [highlightEnds, setHighlightEnds] = useState(true);
+  const [showNumbers, setShowNumbers] = useState<boolean>(() => readPref('showNumbers', true));
+  const [dashedPaths, setDashedPaths] = useState<boolean>(() => readPref('dashedPaths', true));
+  const [highlightEnds, setHighlightEnds] = useState<boolean>(() => readPref('highlightEnds', true));
+
+  useEffect(() => { writePref('showNumbers', showNumbers); }, [showNumbers]);
+  useEffect(() => { writePref('dashedPaths', dashedPaths); }, [dashedPaths]);
+  useEffect(() => { writePref('highlightEnds', highlightEnds); }, [highlightEnds]);
 
   const lookupMeta = (city: string): GeoResult | null => {
     const builtin = getCoords(city);
