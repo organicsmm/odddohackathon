@@ -41,7 +41,7 @@ export default function Profile() {
   return (
     <div className="grid gap-6 lg:grid-cols-[1fr_320px]">
       <Card variant="premium" className="p-6">
-        <h2 className="font-display text-2xl font-bold tracking-tight">Profile</h2>
+        <Heading level={2} weight="bold">Profile</Heading>
         <div className="mt-4 grid gap-4">
           <div><Label>Email</Label><Input value={user.email} disabled /></div>
           <div><Label>Name</Label><Input value={name} onChange={e => setName(e.target.value)} /></div>
