@@ -3,6 +3,7 @@ import { useEffect } from "react";
 import { Plane, ArrowLeft } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Display, Lead, Muted } from "@/components/ui/typography";
 
 const NotFound = () => {
   const location = useLocation();
