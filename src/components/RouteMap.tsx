@@ -4,6 +4,7 @@ import { Plane, MapPin, ZoomIn, ZoomOut, Maximize2, Hash, Route, Flag } from 'lu
 import type { Stop } from '@/lib/types';
 import { getCoords, geocodeCityMeta, type GeoConfidence, type GeoResult } from '@/lib/coords';
 import { Button } from '@/components/ui/button';
+import { Heading, Eyebrow } from '@/components/ui/typography';
 
 // Public world topology (110m countries)
 const GEO_URL = 'https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json';
