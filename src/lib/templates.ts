@@ -177,6 +177,8 @@ export const TEMPLATES: TripTemplate[] = [
     tagline: 'Delhi · Agra · Jaipur',
     days: 6,
     estimate: 950,
+    cover: cover('1599661046289-e31897846e41'),
+    countries: ['India'],
     build: () => ({
       name: 'Golden Triangle India',
       description: '6 days through Delhi, Agra and Jaipur — palaces, monuments and street food.',
