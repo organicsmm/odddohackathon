@@ -1,5 +1,6 @@
 import { Link, useNavigate } from 'react-router-dom';
 import { useState } from 'react';
+import { Muted } from "@/components/ui/typography";
 import { z } from 'zod';
 import { Plane, ShieldCheck, Sparkles, ArrowRight } from 'lucide-react';
 import heroImg from '@/assets/hero-travel.jpg';
@@ -154,13 +155,13 @@ export default function Auth({ mode }: { mode: 'login' | 'signup' }) {
               Continue with email link
             </Button>
 
-            <p className="mt-6 text-center text-sm text-muted-foreground">
+            <Muted className="mt-6 text-center text-sm">
               {mode === 'login' ? (
                 <>New to Traveloop? <Link to="/signup" className="font-semibold text-primary hover:underline">Sign up</Link></>
               ) : (
                 <>Already have an account? <Link to="/login" className="font-semibold text-primary hover:underline">Log in</Link></>
               )}
-            </p>
+            </Muted>
           </Card>
 
           <Muted className="mt-6 text-center text-xs">

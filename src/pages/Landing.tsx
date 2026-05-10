@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom';
 import {
+import { Muted } from "@/components/ui/typography";
   ArrowRight, Calendar, MapPin, Wallet, Share2, ListChecks, Users, Plane, Sparkles,
   Star, Globe, Compass, Wand2, ShieldCheck, ChevronRight,
 } from 'lucide-react';
@@ -276,7 +277,7 @@ export default function Landing() {
                     {d.city}
                   </Link>
                 </Heading>
-                <p className="mt-1 text-sm text-muted-foreground italic">"{d.kicker}."</p>
+                <Muted className="mt-1 text-sm italic">"{d.kicker}."</Muted>
                 <div className="mt-3 flex items-center justify-between text-xs">
                   <span className="text-muted-foreground">From <span className="font-display text-base font-bold tabular-nums text-foreground">${d.price.toLocaleString()}</span> <span className="text-muted-foreground/80">/ person</span></span>
                   <Link to={cta} className="inline-flex items-center gap-1 font-semibold text-foreground hover:text-primary transition-smooth">

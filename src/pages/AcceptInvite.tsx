@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
+import { Muted } from "@/components/ui/typography";
 import { Plane, Check, X, Lock } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { findInvite, acceptInvite } from '@/lib/store';
@@ -27,7 +28,7 @@ export default function AcceptInvite() {
         <Card variant="premium" className="p-8 text-center">
           <X className="mx-auto h-10 w-10 text-destructive" />
           <Heading level={2} className="mt-3" weight="bold">Invite not found</Heading>
-          <p className="mt-2 text-sm text-muted-foreground">This invite link is invalid or has been revoked.</p>
+          <Muted className="mt-2 text-sm">This invite link is invalid or has been revoked.</Muted>
           <Button asChild variant="premium" className="mt-6"><Link to="/">Go home</Link></Button>
         </Card>
       </Shell>
@@ -42,7 +43,7 @@ export default function AcceptInvite() {
         <Card variant="aurora" className="p-8 text-center">
           <Lock className="mx-auto h-10 w-10 text-primary" />
           <Heading level={2} className="mt-3" weight="bold">You're invited to "{trip.name}"</Heading>
-          <p className="mt-2 text-sm text-muted-foreground">Sign in or create an account to view this private trip.</p>
+          <Muted className="mt-2 text-sm">Sign in or create an account to view this private trip.</Muted>
           <div className="mt-6 flex justify-center gap-2">
             <Button asChild variant="premium"><Link to="/login">Log in</Link></Button>
             <Button asChild variant="glass"><Link to="/signup">Sign up</Link></Button>
@@ -84,9 +85,9 @@ export default function AcceptInvite() {
       <Card variant="aurora" className="p-8 text-center">
         <Lock className="mx-auto h-10 w-10 text-primary" />
         <Heading level={2} className="mt-3" weight="bold">Private trip invitation</Heading>
-        <p className="mt-1 text-muted-foreground">{trip.ownerEmail} invited you to view</p>
+        <Muted className="mt-1">{trip.ownerEmail} invited you to view</Muted>
         <Heading level={3} className="mt-1" weight="semibold">"{trip.name}"</Heading>
-        <p className="mt-2 text-sm text-muted-foreground">{trip.stops.length} stops · {new Date(trip.startDate).toLocaleDateString()} → {new Date(trip.endDate).toLocaleDateString()}</p>
+        <Muted className="mt-2 text-sm">{trip.stops.length} stops · {new Date(trip.startDate).toLocaleDateString()} → {new Date(trip.endDate).toLocaleDateString()}</Muted>
         <Button variant="premium" size="lg" className="mt-6" onClick={accept} disabled={status === 'accepting'}>
           <Check className="h-4 w-4" /> Accept and view
         </Button>
