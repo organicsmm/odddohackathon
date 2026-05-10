@@ -1,8 +1,8 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { ComposableMap, Geographies, Geography, Marker, Line, ZoomableGroup } from 'react-simple-maps';
 import { Plane, MapPin, ZoomIn, ZoomOut, Maximize2 } from 'lucide-react';
 import type { Stop } from '@/lib/types';
-import { getCoords } from '@/lib/coords';
+import { getCoords, geocodeCity } from '@/lib/coords';
 import { Button } from '@/components/ui/button';
 
 // Public world topology (110m countries)
@@ -14,15 +14,42 @@ export default function RouteMap({ stops, onSelectStop, highlightedStopId }: { s
   const [hover, setHover] = useState<string | null>(null);
   const [zoom, setZoom] = useState(1);
   const [center, setCenter] = useState<[number, number]>([0, 20]);
+  const [resolved, setResolved] = useState<Record<string, [number, number]>>({});
+
+  const lookup = (city: string): [number, number] | null =>
+    getCoords(city) ?? resolved[city.trim().toLowerCase()] ?? null;
+
+  // Async-resolve any cities not in the built-in list
+  useEffect(() => {
+    let cancelled = false;
+    const missingCities = stops
+      .map(s => s.city)
+      .filter(c => !getCoords(c) && !(c.trim().toLowerCase() in resolved));
+    if (missingCities.length === 0) return;
+
+    (async () => {
+      const updates: Record<string, [number, number]> = {};
+      for (const city of missingCities) {
+        const c = await geocodeCity(city);
+        if (c) updates[city.trim().toLowerCase()] = c;
+      }
+      if (!cancelled && Object.keys(updates).length) {
+        setResolved(prev => ({ ...prev, ...updates }));
+      }
+    })();
+
+    return () => { cancelled = true; };
+  }, [stops, resolved]);
 
   const plotted: PlottedStop[] = useMemo(() => {
     return stops
       .map((s, i) => {
-        const c = getCoords(s.city);
+        const c = lookup(s.city);
         return c ? { stop: s, coords: c, index: i } : null;
       })
       .filter((x): x is PlottedStop => x !== null);
-  }, [stops]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [stops, resolved]);
 
   const missing = stops.length - plotted.length;
 
