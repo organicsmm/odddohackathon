@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { ComposableMap, Geographies, Geography, Marker, Line, ZoomableGroup } from 'react-simple-maps';
-import { Plane, MapPin, ZoomIn, ZoomOut, Maximize2 } from 'lucide-react';
+import { Plane, MapPin, ZoomIn, ZoomOut, Maximize2, Hash, Route, Flag } from 'lucide-react';
 import type { Stop } from '@/lib/types';
 import { getCoords, geocodeCity } from '@/lib/coords';
 import { Button } from '@/components/ui/button';
