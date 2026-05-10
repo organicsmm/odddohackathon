@@ -30,7 +30,7 @@ export const stopSchema = z.object({
     stay: z.number().min(0).max(100000),
     meals: z.number().min(0).max(100000),
   }),
-}).refine(s => s.endDate >= s.startDate, { message: 'End date must be on or after start date', path: ['endDate'] });
+});
 
 export const tripDraftSchema = z.object({
   name: z.string().trim().min(1, 'Trip name required').max(100),
@@ -39,30 +39,40 @@ export const tripDraftSchema = z.object({
   endDate: isoDate,
   budget: z.number().min(0).max(1_000_000).optional(),
   stops: z.array(stopSchema).min(1, 'Add at least one stop'),
-}).refine(t => t.endDate >= t.startDate, { message: 'Trip end must be on or after start', path: ['endDate'] })
-  .refine(t => {
-    // stops must be chronologically ordered and within trip range
-    for (let i = 0; i < t.stops.length; i++) {
-      const s = t.stops[i];
-      if (s.startDate < t.startDate || s.endDate > t.endDate) return false;
-      if (i > 0 && s.startDate < t.stops[i - 1].endDate) return false;
-    }
-    return true;
-  }, { message: 'Stops must be sequential and within the trip dates', path: ['stops'] });
+});
 
 export type TripDraft = z.infer<typeof tripDraftSchema>;
 
-// Per-field error map: { "stops.0.city": "City required", ... }
 export type FieldErrors = Record<string, string>;
 
-export function validateDraft(d: TripDraft): { ok: true } | { ok: false; errors: FieldErrors } {
-  const r = tripDraftSchema.safeParse(d);
-  if (r.success) return { ok: true };
+export function validateDraft(d: TripDraft): { ok: boolean; errors: FieldErrors } {
   const errors: FieldErrors = {};
-  for (const issue of r.error.issues) {
-    errors[issue.path.join('.')] = issue.message;
+  const r = tripDraftSchema.safeParse(d);
+  if (!r.success) {
+    for (const issue of r.error.issues) errors[issue.path.join('.')] = issue.message;
   }
-  return { ok: false, errors };
+  // Cross-field checks
+  if (d.endDate && d.startDate && d.endDate < d.startDate) {
+    errors['endDate'] = 'Trip end must be on or after start';
+  }
+  d.stops.forEach((s, i) => {
+    if (s.endDate && s.startDate && s.endDate < s.startDate) {
+      errors[`stops.${i}.endDate`] = 'End date must be on or after start date';
+    }
+    if (d.startDate && s.startDate && s.startDate < d.startDate) {
+      errors[`stops.${i}.startDate`] = 'Stop starts before trip';
+    }
+    if (d.endDate && s.endDate && s.endDate > d.endDate) {
+      errors[`stops.${i}.endDate`] = 'Stop ends after trip';
+    }
+    if (i > 0) {
+      const prev = d.stops[i - 1];
+      if (prev.endDate && s.startDate && s.startDate < prev.endDate) {
+        errors[`stops.${i}.startDate`] = `Overlaps stop ${i}`;
+      }
+    }
+  });
+  return { ok: Object.keys(errors).length === 0, errors };
 }
 
 // Coerce a raw AI payload into a safe TripDraft (best-effort, never throws).
