@@ -699,3 +699,155 @@ function Settings({ trip, update, onDelete }: { trip: Trip; update: (p: Partial<
     </Card>
   );
 }
+
+/* ------------------- SHARE DIALOG ------------------- */
+
+function ShareDialog({ trip, update }: { trip: Trip; update: (p: Partial<Trip> | ((t: Trip) => Trip)) => void }) {
+  const { user } = useAuth();
+  const [open, setOpen] = useState(false);
+  const [invitedEmail, setInvitedEmail] = useState('');
+  const [tick, setTick] = useState(0);
+  const friends: Friend[] = (user?.friends || []) as Friend[];
+  const invites = trip.invites || [];
+  const sharedWith = trip.sharedWith || [];
+
+  const refresh = () => {
+    const fresh = getTrip(trip.id);
+    if (fresh) update(() => fresh);
+    setTick(t => t + 1);
+  };
+
+  const generate = (email?: string) => {
+    const inv = createInvite(trip.id, email);
+    refresh();
+    const url = `${window.location.origin}/invite/${inv.token}`;
+    navigator.clipboard.writeText(url).catch(() => {});
+    toast.success(email ? `Invite for ${email} copied to clipboard` : 'Invite link copied to clipboard');
+    return inv;
+  };
+
+  const inviteUrl = (token: string) => `${window.location.origin}/invite/${token}`;
+
+  return (
+    <Dialog open={open} onOpenChange={setOpen}>
+      <DialogTrigger asChild>
+        <Button variant="secondary"><Share2 className="h-4 w-4" /> Share</Button>
+      </DialogTrigger>
+      <DialogContent className="max-w-lg">
+        <DialogHeader>
+          <DialogTitle>Share "{trip.name}"</DialogTitle>
+          <DialogDescription>Invite friends privately or make the trip publicly viewable.</DialogDescription>
+        </DialogHeader>
+
+        <div className="space-y-5">
+          {/* Public toggle */}
+          <div className="flex items-center justify-between rounded-xl border border-border p-3">
+            <div>
+              <div className="font-medium flex items-center gap-2">
+                {trip.isPublic ? <Globe className="h-4 w-4 text-primary" /> : <Lock className="h-4 w-4" />}
+                {trip.isPublic ? 'Public' : 'Private'}
+              </div>
+              <p className="text-xs text-muted-foreground">
+                {trip.isPublic ? 'Anyone with the link can view this trip.' : 'Only people you invite can view this trip.'}
+              </p>
+            </div>
+            <Switch
+              checked={trip.isPublic}
+              onCheckedChange={v => { update({ isPublic: v }); toast.success(v ? 'Trip is now public' : 'Trip is now private'); }}
+            />
+          </div>
+
+          {/* Invite from friends */}
+          <div className="rounded-xl border border-border p-3">
+            <div className="font-medium flex items-center gap-2"><Users className="h-4 w-4 text-primary" /> Invite a friend</div>
+            {friends.length === 0 ? (
+              <p className="mt-2 text-xs text-muted-foreground">
+                No friends yet. <a href="/app/friends" className="text-primary hover:underline">Add some</a> to invite them in one click.
+              </p>
+            ) : (
+              <ul className="mt-2 max-h-40 overflow-auto divide-y divide-border">
+                {friends.map(f => {
+                  const already = sharedWith.includes(f.email);
+                  return (
+                    <li key={f.email} className="flex items-center justify-between py-2">
+                      <div className="min-w-0">
+                        <div className="text-sm font-medium truncate">{f.name}</div>
+                        <div className="text-xs text-muted-foreground truncate">{f.email}</div>
+                      </div>
+                      <Button size="sm" variant={already ? 'outline' : 'hero'} onClick={() => generate(f.email)} disabled={already}>
+                        {already ? 'Has access' : 'Invite'}
+                      </Button>
+                    </li>
+                  );
+                })}
+              </ul>
+            )}
+            <div className="mt-3 flex gap-2">
+              <Input
+                type="email"
+                placeholder="Or enter an email"
+                value={invitedEmail}
+                onChange={e => setInvitedEmail(e.target.value)}
+              />
+              <Button variant="outline" onClick={() => {
+                const e = invitedEmail.trim().toLowerCase();
+                if (!e) { generate(); return; }
+                generate(e);
+                setInvitedEmail('');
+              }}><Mail className="h-4 w-4" /> Invite</Button>
+            </div>
+            <Button variant="ghost" size="sm" className="mt-2 w-full" onClick={() => generate()}>
+              <Copy className="h-4 w-4" /> Generate open invite link
+            </Button>
+          </div>
+
+          {/* Active invites */}
+          {invites.length > 0 && (
+            <div className="rounded-xl border border-border p-3">
+              <div className="font-medium text-sm">Active invite links ({invites.length})</div>
+              <ul className="mt-2 space-y-2">
+                {invites.map(i => (
+                  <li key={i.token} className="flex items-center justify-between gap-2 rounded-lg bg-muted/40 p-2">
+                    <div className="min-w-0 text-xs">
+                      <div className="truncate font-medium">{i.invitedEmail || 'Open invite'}</div>
+                      <div className="text-muted-foreground truncate">{inviteUrl(i.token)}</div>
+                    </div>
+                    <div className="flex gap-1">
+                      <Button size="icon" variant="ghost" onClick={() => { navigator.clipboard.writeText(inviteUrl(i.token)); toast.success('Copied'); }} aria-label="Copy">
+                        <Copy className="h-4 w-4" />
+                      </Button>
+                      <Button size="icon" variant="ghost" onClick={() => { revokeInvite(trip.id, i.token); refresh(); toast.success('Invite revoked'); }} aria-label="Revoke">
+                        <X className="h-4 w-4 text-destructive" />
+                      </Button>
+                    </div>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+
+          {/* Has access */}
+          {sharedWith.length > 0 && (
+            <div className="rounded-xl border border-border p-3">
+              <div className="font-medium text-sm">People with access ({sharedWith.length})</div>
+              <ul className="mt-2 flex flex-wrap gap-2">
+                {sharedWith.map(e => (
+                  <li key={e} className="flex items-center gap-1 rounded-full border border-border bg-muted/40 px-2 py-1 text-xs">
+                    <span>{e}</span>
+                    <button
+                      className="text-muted-foreground hover:text-destructive"
+                      onClick={() => { unshareWith(trip.id, e); refresh(); toast.success('Access removed'); }}
+                      aria-label="Remove access"
+                    >
+                      <X className="h-3 w-3" />
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+        </div>
+      </DialogContent>
+    </Dialog>
+  );
+}
