@@ -51,6 +51,8 @@ export default function RouteMap({ stops, onSelectStop, highlightedStopId }: { s
   const [zoom, setZoom] = useState(1);
   const [center, setCenter] = useState<[number, number]>([0, 20]);
   const [resolved, setResolved] = useState<Record<string, [number, number]>>({});
+  const [failed, setFailed] = useState<Record<string, true>>({});
+  const [pendingCount, setPendingCount] = useState(0);
   const [showNumbers, setShowNumbers] = useState(true);
   const [dashedPaths, setDashedPaths] = useState(true);
   const [highlightEnds, setHighlightEnds] = useState(true);
@@ -63,22 +65,27 @@ export default function RouteMap({ stops, onSelectStop, highlightedStopId }: { s
     let cancelled = false;
     const missingCities = stops
       .map(s => s.city)
-      .filter(c => !getCoords(c) && !(c.trim().toLowerCase() in resolved));
+      .filter(c => !getCoords(c) && !(c.trim().toLowerCase() in resolved) && !(c.trim().toLowerCase() in failed));
     if (missingCities.length === 0) return;
 
+    setPendingCount(missingCities.length);
     (async () => {
       const updates: Record<string, [number, number]> = {};
+      const fails: Record<string, true> = {};
       for (const city of missingCities) {
         const c = await geocodeCity(city);
-        if (c) updates[city.trim().toLowerCase()] = c;
+        const key = city.trim().toLowerCase();
+        if (c) updates[key] = c;
+        else fails[key] = true;
+        if (!cancelled) setPendingCount(n => Math.max(0, n - 1));
       }
-      if (!cancelled && Object.keys(updates).length) {
-        setResolved(prev => ({ ...prev, ...updates }));
-      }
+      if (cancelled) return;
+      if (Object.keys(updates).length) setResolved(prev => ({ ...prev, ...updates }));
+      if (Object.keys(fails).length) setFailed(prev => ({ ...prev, ...fails }));
     })();
 
     return () => { cancelled = true; };
-  }, [stops, resolved]);
+  }, [stops, resolved, failed]);
 
   const plotted: PlottedStop[] = useMemo(() => {
     return stops
@@ -91,6 +98,16 @@ export default function RouteMap({ stops, onSelectStop, highlightedStopId }: { s
   }, [stops, resolved]);
 
   const missing = stops.length - plotted.length;
+  const failedCities = useMemo(
+    () => stops.map(s => s.city).filter(c => c.trim().toLowerCase() in failed),
+    [stops, failed],
+  );
+  const isLocating = pendingCount > 0;
+  const subtitle = isLocating
+    ? `${plotted.length} plotted · locating ${pendingCount} more…`
+    : missing > 0
+      ? `${plotted.length} plotted · ${missing} couldn't be located`
+      : `${plotted.length} stops plotted`;
 
   // Auto-fit center on plotted stops
   const fitView = () => {
@@ -116,9 +133,7 @@ export default function RouteMap({ stops, onSelectStop, highlightedStopId }: { s
           </span>
           <div>
             <h3 className="font-display text-lg font-bold leading-tight">Route map</h3>
-            <p className="text-xs text-muted-foreground">
-              {plotted.length} stops plotted{missing > 0 ? ` · ${missing} unmapped` : ''}
-            </p>
+            <p className="text-xs text-muted-foreground">{subtitle}</p>
           </div>
         </div>
         <div className="flex flex-wrap items-center gap-1">
@@ -318,9 +333,27 @@ export default function RouteMap({ stops, onSelectStop, highlightedStopId }: { s
           );
         })()}
 
-        {missing > 0 && (
-          <div className="pointer-events-none absolute bottom-3 right-3 rounded-md bg-card/90 px-2 py-1 text-[10px] text-muted-foreground shadow-soft backdrop-blur">
-            {missing} stop{missing > 1 ? 's' : ''} without map data
+        {(isLocating || failedCities.length > 0) && (
+          <div
+            className="pointer-events-auto absolute bottom-3 right-3 max-w-[18rem] rounded-md bg-card/90 px-2.5 py-1.5 text-[10px] text-muted-foreground shadow-soft backdrop-blur"
+            title={failedCities.length > 0 ? failedCities.join(', ') : undefined}
+          >
+            {isLocating ? (
+              <span className="inline-flex items-center gap-1.5">
+                <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-primary" />
+                Locating {pendingCount} stop{pendingCount > 1 ? 's' : ''}…
+              </span>
+            ) : (
+              <span className="inline-flex items-center gap-1.5">
+                <MapPin className="h-3 w-3 text-muted-foreground" />
+                <span className="truncate">
+                  Couldn't locate {failedCities.length === 1
+                    ? <strong className="font-semibold text-foreground/80">{failedCities[0]}</strong>
+                    : <><strong className="font-semibold text-foreground/80">{failedCities[0]}</strong> +{failedCities.length - 1} more</>}
+                  {' · try a nearby city'}
+                </span>
+              </span>
+            )}
           </div>
         )}
       </div>
