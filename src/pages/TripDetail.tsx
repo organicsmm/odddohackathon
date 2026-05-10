@@ -143,17 +143,42 @@ function Itinerary({ trip, update }: { trip: Trip; update: (p: Partial<Trip> | (
     toast.success(`${p.city} added`);
   };
 
-  const removeStop = (id: string) => update(t => ({ ...t, stops: t.stops.filter(s => s.id !== id) }));
-  const moveStop = (id: string, dir: -1 | 1) => update(t => {
-    const stops = [...t.stops];
-    const i = stops.findIndex(s => s.id === id);
-    const j = i + dir;
-    if (i < 0 || j < 0 || j >= stops.length) return t;
-    [stops[i], stops[j]] = [stops[j], stops[i]];
-    return { ...t, stops };
-  });
+  const removeStop = (id: string) =>
+    update(t => resequenceStops(t, t.stops.filter(s => s.id !== id)));
+
   const updateStop = (id: string, patch: Partial<Stop>) =>
     update(t => ({ ...t, stops: t.stops.map(s => s.id === id ? { ...s, ...patch } : s) }));
+
+  const setDuration = (id: string, days: number) =>
+    update(t => {
+      const d = Math.max(1, Math.min(60, days));
+      const stops = t.stops.map(s => {
+        if (s.id !== id) return s;
+        const start = new Date(s.startDate);
+        const end = new Date(start);
+        end.setDate(start.getDate() + d - 1);
+        return { ...s, endDate: end.toISOString().slice(0, 10) };
+      });
+      return resequenceStops(t, stops);
+    });
+
+  const sensors = useSensors(
+    useSensor(PointerSensor, { activationConstraint: { distance: 5 } }),
+    useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates }),
+  );
+
+  const onDragEnd = (e: DragEndEvent) => {
+    const { active, over } = e;
+    if (!over || active.id === over.id) return;
+    update(t => {
+      const oldIdx = t.stops.findIndex(s => s.id === active.id);
+      const newIdx = t.stops.findIndex(s => s.id === over.id);
+      if (oldIdx < 0 || newIdx < 0) return t;
+      const reordered = arrayMove(t.stops, oldIdx, newIdx);
+      toast.success('Itinerary reordered — dates updated');
+      return resequenceStops(t, reordered);
+    });
+  };
 
   return (
     <div className="space-y-4">
@@ -178,14 +203,25 @@ function Itinerary({ trip, update }: { trip: Trip; update: (p: Partial<Trip> | (
       )}
 
       {view === 'list' ? (
-        <div className="space-y-4">
-          {trip.stops.map((s, i) => (
-            <StopCard
-              key={s.id} stop={s} index={i} total={trip.stops.length}
-              onMove={moveStop} onRemove={removeStop} onUpdate={updateStop}
-            />
-          ))}
-        </div>
+        <>
+          {trip.stops.length > 1 && (
+            <p className="text-xs text-muted-foreground flex items-center gap-1.5">
+              <GripVertical className="h-3 w-3" /> Drag stops to reorder · change duration to auto-shift dates
+            </p>
+          )}
+          <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={onDragEnd}>
+            <SortableContext items={trip.stops.map(s => s.id)} strategy={verticalListSortingStrategy}>
+              <div className="space-y-4">
+                {trip.stops.map((s, i) => (
+                  <SortableStopCard
+                    key={s.id} stop={s} index={i}
+                    onRemove={removeStop} onUpdate={updateStop} onSetDuration={setDuration}
+                  />
+                ))}
+              </div>
+            </SortableContext>
+          </DndContext>
+        </>
       ) : (
         <CalendarView trip={trip} />
       )}
@@ -193,11 +229,33 @@ function Itinerary({ trip, update }: { trip: Trip; update: (p: Partial<Trip> | (
   );
 }
 
-function StopCard({ stop, index, total, onMove, onRemove, onUpdate }: {
-  stop: Stop; index: number; total: number;
-  onMove: (id: string, dir: -1 | 1) => void;
+function SortableStopCard(props: {
+  stop: Stop; index: number;
   onRemove: (id: string) => void;
   onUpdate: (id: string, p: Partial<Stop>) => void;
+  onSetDuration: (id: string, days: number) => void;
+}) {
+  const { stop } = props;
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id: stop.id });
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    opacity: isDragging ? 0.5 : 1,
+    zIndex: isDragging ? 10 : 'auto' as const,
+  };
+  return (
+    <div ref={setNodeRef} style={style}>
+      <StopCard {...props} dragHandle={{ ...attributes, ...listeners }} />
+    </div>
+  );
+}
+
+function StopCard({ stop, index, onRemove, onUpdate, onSetDuration, dragHandle }: {
+  stop: Stop; index: number;
+  onRemove: (id: string) => void;
+  onUpdate: (id: string, p: Partial<Stop>) => void;
+  onSetDuration: (id: string, days: number) => void;
+  dragHandle?: React.HTMLAttributes<HTMLButtonElement>;
 }) {
   const days = stopDays(stop);
   const stopTotal =
