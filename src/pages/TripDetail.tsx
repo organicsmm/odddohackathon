@@ -839,6 +839,7 @@ function BudgetView({ trip, update, currency }: { trip: Trip; update: (p: Partia
                 color={c.color}
                 spent={c.spent}
                 goal={trip.categoryBudgets?.[c.key]}
+                currency={currency}
                 onChange={(v) => update({ categoryBudgets: { ...(trip.categoryBudgets || {}), [c.key]: v } })}
               />
             ))}
