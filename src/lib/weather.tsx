@@ -1,5 +1,5 @@
-import { useEffect, useState } from 'react';
-import { Cloud, Sun, CloudRain, Snowflake, CloudSun, CloudFog, CloudLightning, Wind, Loader2 } from 'lucide-react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import { Cloud, Sun, CloudRain, Snowflake, CloudSun, CloudFog, CloudLightning, Wind, Loader2, CloudOff, RefreshCw, Droplets, Thermometer } from 'lucide-react';
 import { getCoords } from '@/lib/coords';
 
 // WMO weather code mapping → icon + label
@@ -178,11 +178,12 @@ export function WeatherBadge({ city, date }: { city: string; date: string }) {
   );
 }
 
-// Full daily forecast strip for a stop
+// Full daily forecast strip for a stop — editorial card with skeleton + error fallback
 export function WeatherForecast({ city, startDate, endDate }: { city: string; startDate: string; endDate: string }) {
   const [forecast, setForecast] = useState<DayForecast[] | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
+  const [reloadKey, setReloadKey] = useState(0);
 
   useEffect(() => {
     let alive = true;
@@ -195,62 +196,172 @@ export function WeatherForecast({ city, startDate, endDate }: { city: string; st
       setLoading(false);
     });
     return () => { alive = false; };
-  }, [city, startDate, endDate]);
+  }, [city, startDate, endDate, reloadKey]);
 
-  if (loading) {
-    return (
-      <div className="rounded-xl border border-border bg-muted/30 p-4 text-sm text-muted-foreground flex items-center gap-2">
-        <Loader2 className="h-4 w-4 animate-spin" /> Loading forecast...
-      </div>
-    );
-  }
-  if (error || !forecast || forecast.length === 0) {
-    return (
-      <div className="rounded-xl border border-border bg-muted/30 p-4 text-sm text-muted-foreground">
-        Weather unavailable for this destination.
-      </div>
-    );
-  }
+  const retry = useCallback(() => setReloadKey(k => k + 1), []);
 
   const today = new Date().toISOString().slice(0, 10);
   const isFuture = startDate > today;
   const daysAhead = Math.round((new Date(startDate).getTime() - Date.now()) / 86400000);
   const isClimate = daysAhead > 16 || new Date(endDate) < new Date(today);
 
+  const summary = useMemo(() => {
+    if (!forecast || forecast.length === 0) return null;
+    const max = Math.max(...forecast.map(d => d.tempMax));
+    const min = Math.min(...forecast.map(d => d.tempMin));
+    const avgRain = Math.round(forecast.reduce((a, b) => a + b.precipProb, 0) / forecast.length);
+    const counts = forecast.reduce<Record<string, number>>((acc, d) => {
+      acc[d.label] = (acc[d.label] || 0) + 1;
+      return acc;
+    }, {});
+    const dominant = Object.entries(counts).sort((a, b) => b[1] - a[1])[0]?.[0] ?? '';
+    return { max, min, avgRain, dominant, range: Math.max(1, max - min) };
+  }, [forecast]);
+
+  // Editorial shell that wraps every state for visual consistency
+  const Shell: React.FC<{ children: React.ReactNode; rightSlot?: React.ReactNode }> = ({ children, rightSlot }) => (
+    <section className="surface-premium rounded-2xl overflow-hidden">
+      <header className="flex items-center justify-between gap-3 border-b border-border/60 bg-gradient-aurora px-5 py-3">
+        <div className="flex items-center gap-2">
+          <span className="grid h-7 w-7 place-items-center rounded-lg bg-card shadow-ring">
+            <CloudSun className="h-4 w-4 text-primary" />
+          </span>
+          <div>
+            <div className="text-[10px] font-semibold uppercase tracking-[0.16em] text-muted-foreground">Weather</div>
+            <div className="font-display text-sm font-semibold leading-tight">{city || 'Forecast'}</div>
+          </div>
+        </div>
+        {rightSlot}
+      </header>
+      {children}
+    </section>
+  );
+
+  if (loading) {
+    return (
+      <Shell rightSlot={<span className="inline-flex items-center gap-1.5 text-[10px] font-medium uppercase tracking-wider text-muted-foreground"><Loader2 className="h-3 w-3 animate-spin" /> loading</span>}>
+        <div className="p-5">
+          <div className="mb-3 flex items-center gap-2">
+            <div className="h-3 w-32 rounded bg-muted animate-pulse" />
+            <div className="h-3 w-16 rounded bg-muted animate-pulse" />
+          </div>
+          <div className="flex gap-2 overflow-hidden">
+            {Array.from({ length: 6 }).map((_, i) => (
+              <div key={i} className="min-w-[84px] flex-1 rounded-xl border border-border/60 bg-muted/40 p-3">
+                <div className="mx-auto h-3 w-10 rounded bg-muted animate-pulse" />
+                <div className="mx-auto mt-2 h-6 w-6 rounded-full bg-muted animate-pulse" />
+                <div className="mx-auto mt-2 h-3 w-12 rounded bg-muted animate-pulse" />
+                <div className="mx-auto mt-2 h-2 w-8 rounded bg-muted animate-pulse" />
+              </div>
+            ))}
+          </div>
+        </div>
+      </Shell>
+    );
+  }
+
+  if (error || !forecast || forecast.length === 0) {
+    return (
+      <Shell
+        rightSlot={
+          <button
+            type="button"
+            onClick={retry}
+            className="inline-flex items-center gap-1.5 rounded-md border border-border bg-card px-2 py-1 text-[11px] font-medium hover:bg-muted transition-smooth"
+          >
+            <RefreshCw className="h-3 w-3" /> Retry
+          </button>
+        }
+      >
+        <div className="flex flex-col items-center gap-2 p-8 text-center">
+          <span className="grid h-12 w-12 place-items-center rounded-full bg-muted/60 text-muted-foreground">
+            <CloudOff className="h-6 w-6" />
+          </span>
+          <p className="text-sm font-medium">Forecast unavailable</p>
+          <p className="max-w-[36ch] text-xs text-muted-foreground">
+            We couldn't reach the weather service for <span className="font-medium text-foreground">{city || 'this destination'}</span>. Check the city name or try again.
+          </p>
+        </div>
+      </Shell>
+    );
+  }
+
+  const sourceTag = isClimate ? 'Climate average' : isFuture ? `${Math.max(0, daysAhead)}d outlook` : 'Live';
+  const sourceTone = isClimate ? 'bg-warning/15 text-warning' : 'bg-success/15 text-success';
+  const todayIso = new Date().toISOString().slice(0, 10);
+
   return (
-    <div className="rounded-xl border border-border bg-card p-4">
-      <div className="mb-3 flex items-center justify-between">
-        <h5 className="text-sm font-display font-semibold flex items-center gap-1.5">
-          <CloudSun className="h-4 w-4 text-primary" />
-          Weather forecast
-        </h5>
-        <span className="text-[10px] uppercase tracking-wider text-muted-foreground">
-          {isClimate ? 'Climate average' : isFuture ? `${daysAhead}d outlook` : 'Live'}
+    <Shell
+      rightSlot={
+        <span className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider ${sourceTone}`}>
+          <span className={`h-1.5 w-1.5 rounded-full ${isClimate ? 'bg-warning' : 'bg-success'}`} />
+          {sourceTag}
         </span>
-      </div>
-      <div className="flex gap-2 overflow-x-auto pb-1">
+      }
+    >
+      {summary && (
+        <div className="grid grid-cols-3 divide-x divide-border/60 border-b border-border/60 bg-card/40 text-center">
+          <div className="px-3 py-2.5">
+            <div className="text-[10px] uppercase tracking-wider text-muted-foreground inline-flex items-center gap-1"><Thermometer className="h-3 w-3" /> High</div>
+            <div className="font-display text-base font-bold tabular-nums">{summary.max}°</div>
+          </div>
+          <div className="px-3 py-2.5">
+            <div className="text-[10px] uppercase tracking-wider text-muted-foreground inline-flex items-center gap-1"><Thermometer className="h-3 w-3 rotate-180" /> Low</div>
+            <div className="font-display text-base font-bold tabular-nums">{summary.min}°</div>
+          </div>
+          <div className="px-3 py-2.5">
+            <div className="text-[10px] uppercase tracking-wider text-muted-foreground inline-flex items-center gap-1"><Droplets className="h-3 w-3" /> Rain</div>
+            <div className="font-display text-base font-bold tabular-nums">{summary.avgRain}%</div>
+          </div>
+        </div>
+      )}
+      <div className="flex gap-2 overflow-x-auto p-4">
         {forecast.map(d => {
           const Icon = ICONS[d.icon];
           const date = new Date(d.date);
+          const isToday = d.date === todayIso;
+          // Compute relative bar position for the day's range vs trip span
+          const top = summary ? ((summary.max - d.tempMax) / summary.range) * 100 : 0;
+          const bottom = summary ? ((d.tempMin - summary.min) / summary.range) * 100 : 0;
           return (
             <div
               key={d.date}
-              className="flex min-w-[78px] flex-col items-center gap-1 rounded-lg bg-muted/40 p-2 text-center"
-              title={d.label}
+              className={`group relative flex min-w-[86px] flex-col items-center gap-1.5 rounded-xl border p-3 text-center transition-spring ${
+                isToday ? 'border-primary/40 bg-primary/5 shadow-soft' : 'border-border/60 bg-card hover:bg-muted/40'
+              }`}
+              title={`${d.label} · ${d.tempMax}° / ${d.tempMin}° · ${d.precipProb}% rain`}
             >
-              <div className="text-[10px] font-medium uppercase text-muted-foreground">
+              {isToday && (
+                <span className="absolute -top-2 left-1/2 -translate-x-1/2 rounded-full bg-primary px-1.5 py-0.5 text-[8px] font-bold uppercase tracking-wider text-primary-foreground">Today</span>
+              )}
+              <div className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
                 {date.toLocaleDateString(undefined, { weekday: 'short' })}
               </div>
-              <div className="text-xs font-semibold">{date.getDate()}</div>
-              <Icon className="h-5 w-5 text-primary" />
-              <div className="text-xs font-bold">{d.tempMax}°<span className="text-muted-foreground font-normal">/{d.tempMin}°</span></div>
-              <div className="flex items-center gap-0.5 text-[10px] text-primary">
-                <CloudRain className="h-2.5 w-2.5" /> {d.precipProb}%
+              <div className="text-[11px] font-medium text-foreground">{date.getDate()}</div>
+              <Icon className="h-6 w-6 text-primary transition-spring group-hover:scale-110" />
+              <div className="font-display text-sm font-bold tabular-nums">
+                {d.tempMax}°<span className="ml-0.5 text-xs font-normal text-muted-foreground">/{d.tempMin}°</span>
+              </div>
+              {summary && (
+                <div className="relative h-1 w-10 overflow-hidden rounded-full bg-muted">
+                  <div
+                    className="absolute inset-y-0 rounded-full bg-gradient-sunset"
+                    style={{ left: `${bottom}%`, right: `${top}%` }}
+                  />
+                </div>
+              )}
+              <div className="mt-0.5 inline-flex items-center gap-0.5 text-[10px] tabular-nums text-primary">
+                <Droplets className="h-2.5 w-2.5" /> {d.precipProb}%
               </div>
             </div>
           );
         })}
       </div>
-    </div>
+      {summary && (
+        <footer className="border-t border-border/60 px-5 py-2.5 text-[11px] text-muted-foreground">
+          Mostly <span className="font-medium text-foreground">{summary.dominant.toLowerCase()}</span> · range {summary.min}° – {summary.max}° · avg {summary.avgRain}% precipitation
+        </footer>
+      )}
+    </Shell>
   );
 }
