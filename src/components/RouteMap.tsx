@@ -58,15 +58,14 @@ export default function RouteMap({ stops, onSelectStop, highlightedStopId }: { s
   const [hover, setHover] = useState<string | null>(null);
   const [zoom, setZoom] = useState(1);
   const [center, setCenter] = useState<[number, number]>([0, 20]);
-  const [resolved, setResolved] = useState<Record<string, [number, number]>>({});
+  const [resolved, setResolved] = useState<Record<string, GeoResult>>({});
   const [failed, setFailed] = useState<Record<string, true>>({});
-  const [pendingCount, setPendingCount] = useState(0);
-  const [showNumbers, setShowNumbers] = useState(true);
-  const [dashedPaths, setDashedPaths] = useState(true);
-  const [highlightEnds, setHighlightEnds] = useState(true);
 
-  const lookup = (city: string): [number, number] | null =>
-    getCoords(city) ?? resolved[city.trim().toLowerCase()] ?? null;
+  const lookupMeta = (city: string): GeoResult | null => {
+    const builtin = getCoords(city);
+    if (builtin) return { coords: builtin, confidence: 'exact', source: 'builtin', matchedName: city };
+    return resolved[city.trim().toLowerCase()] ?? null;
+  };
 
   // Async-resolve any cities not in the built-in list
   useEffect(() => {
@@ -78,12 +77,12 @@ export default function RouteMap({ stops, onSelectStop, highlightedStopId }: { s
 
     setPendingCount(missingCities.length);
     (async () => {
-      const updates: Record<string, [number, number]> = {};
+      const updates: Record<string, GeoResult> = {};
       const fails: Record<string, true> = {};
       for (const city of missingCities) {
-        const c = await geocodeCity(city);
+        const r = await geocodeCityMeta(city);
         const key = city.trim().toLowerCase();
-        if (c) updates[key] = c;
+        if (r) updates[key] = r;
         else fails[key] = true;
         if (!cancelled) setPendingCount(n => Math.max(0, n - 1));
       }
@@ -98,8 +97,12 @@ export default function RouteMap({ stops, onSelectStop, highlightedStopId }: { s
   const plotted: PlottedStop[] = useMemo(() => {
     return stops
       .map((s, i) => {
-        const c = lookup(s.city);
-        return c ? { stop: s, coords: c, index: i } : null;
+        const m = lookupMeta(s.city);
+        return m ? {
+          stop: s, index: i,
+          coords: m.coords, confidence: m.confidence, source: m.source,
+          matchedName: m.matchedName, country: m.country,
+        } : null;
       })
       .filter((x): x is PlottedStop => x !== null);
     // eslint-disable-next-line react-hooks/exhaustive-deps
