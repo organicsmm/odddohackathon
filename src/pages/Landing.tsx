@@ -63,80 +63,70 @@ export default function Landing() {
         </div>
       </header>
 
-      {/* HERO */}
-      <section className="relative overflow-hidden">
-        {/* gallery backdrop */}
-        <div aria-hidden className="absolute inset-0 scale-110 opacity-40 blur-sm">
-          <ImageGallery showHeader={false} className="h-full" />
-        </div>
-        {/* aurora + dim overlay on top of gallery */}
-        <div aria-hidden className="absolute inset-0 bg-gradient-aurora opacity-80" />
-        <div aria-hidden className="absolute inset-0 bg-background/60 backdrop-blur-xl" />
-        <div aria-hidden className="absolute -top-40 -left-20 h-[480px] w-[480px] rounded-full bg-primary/20 blur-[140px]" />
-        <div aria-hidden className="absolute -bottom-40 -right-20 h-[520px] w-[520px] rounded-full bg-accent/20 blur-[160px]" />
-
-        <div className="relative container grid items-center gap-12 py-16 md:py-24 lg:grid-cols-[1.1fr_1fr]">
-          <div className="animate-fade-in">
-            <Badge variant="glass" className="border-border/60">
-              <Sparkles className="h-3 w-3 text-accent" /> New · AI Trip Generator
-            </Badge>
-            <Display gradient={false} className="mt-5 text-balance">
-              Plan trips you'll <span className="text-gradient">actually take</span>.
-            </Display>
-            <Lead className="mt-5 max-w-xl">
-              Traveloop turns chaotic Google docs and group chats into beautiful, shareable itineraries — with smart budgets, day-wise plans and packing checklists, baked in.
-            </Lead>
-            <div className="mt-8 flex flex-wrap gap-3">
-              <Button asChild size="xl" variant="premium">
-                <Link to={cta}>Start planning <ArrowRight className="h-4 w-4" /></Link>
-              </Button>
-              <Button asChild size="xl" variant="glass">
-                <Link to={cta}>See a demo trip</Link>
-              </Button>
-            </div>
-
-            {/* Trust strip */}
-            <div className="mt-10 flex flex-wrap items-center gap-6 text-sm text-muted-foreground">
-              <div className="flex items-center gap-1 text-warning">
-                {Array.from({ length: 5 }).map((_, i) => <Star key={i} className="h-4 w-4 fill-warning" />)}
-                <span className="ml-1 font-semibold text-foreground">4.9</span>
-                <span className="text-muted-foreground">/5 from 1.2k travelers</span>
-              </div>
-              <span className="hidden sm:inline opacity-30">·</span>
-              <div className="inline-flex items-center gap-1.5"><ShieldCheck className="h-4 w-4 text-success" /> No card required</div>
-            </div>
-          </div>
-
-          {/* Hero gallery card (foreground) */}
-          <div className="relative animate-scale-in">
-            <div aria-hidden className="absolute -inset-8 rounded-[2.5rem] bg-gradient-hero opacity-30 blur-3xl" />
-            <div className="relative rounded-[2rem] surface-premium p-4 md:p-5">
-              <ImageGallery showHeader={false} />
-              {/* Floating glass cards */}
-              <div className="absolute left-6 top-6 glass rounded-xl px-3 py-2 text-xs font-medium shadow-soft animate-float z-10">
-                <div className="flex items-center gap-1.5"><Globe className="h-3.5 w-3.5 text-primary" /> 7-day Greek Isles</div>
-              </div>
-              <div className="absolute -bottom-5 -left-5 hidden md:block animate-float z-10" style={{ animationDelay: '0.6s' }}>
-                <Card variant="glass" className="p-3 min-w-[200px]">
-                  <Eyebrow>Next stop</Eyebrow>
-                  <div className="mt-1 font-display font-bold leading-tight">Santorini → Athens</div>
-                  <div className="mt-1.5 inline-flex items-center gap-1.5 text-xs text-success">
-                    <span className="h-1.5 w-1.5 rounded-full bg-success" /> Budget on track · $1,420
+      {/* HERO — full-bleed swipe slider */}
+      <section className="relative h-[calc(100vh-4rem)] min-h-[600px] w-full overflow-hidden">
+        <HeroSlider
+          slides={[
+            {
+              image: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?q=80&w=2400&auto=format&fit=crop",
+              eyebrow: "Coastal escapes",
+              title: "Plan trips you'll actually take",
+              subtitle: "Beautiful itineraries, smart budgets and day-wise plans — built in seconds.",
+            },
+            {
+              image: "https://images.unsplash.com/photo-1530789253388-582c481c54b0?q=80&w=2400&auto=format&fit=crop",
+              eyebrow: "Mountain trails",
+              title: "From Reykjavík to Kyoto",
+              subtitle: "Multi-city routes with weather, transit and packing — all in one view.",
+            },
+            {
+              image: "https://images.unsplash.com/photo-1517760444937-f6397edcbbcd?q=80&w=2400&auto=format&fit=crop",
+              eyebrow: "City lights",
+              title: "Share a cinematic itinerary",
+              subtitle: "Public read-only links unfurl into a stunning preview page.",
+            },
+            {
+              image: "https://images.unsplash.com/photo-1502920917128-1aa500764cbd?q=80&w=2400&auto=format&fit=crop",
+              eyebrow: "Desert horizons",
+              title: "AI builds it. You refine it.",
+              subtitle: "Describe the vibe — get a fully-built trip in seconds.",
+            },
+          ]}
+        >
+          {(slide) => (
+            <div className="container relative flex h-full items-center">
+              <div className="max-w-2xl animate-fade-in" key={slide.title}>
+                <Badge variant="glass" className="border-border/60">
+                  <Sparkles className="h-3 w-3 text-accent" /> {slide.eyebrow ?? "AI Trip Generator"}
+                </Badge>
+                <Display gradient={false} className="mt-5 text-balance">
+                  {slide.title}
+                </Display>
+                <Lead className="mt-5 max-w-xl">
+                  {slide.subtitle}
+                </Lead>
+                <div className="mt-8 flex flex-wrap gap-3">
+                  <Button asChild size="xl" variant="premium">
+                    <Link to={cta}>Start planning <ArrowRight className="h-4 w-4" /></Link>
+                  </Button>
+                  <Button asChild size="xl" variant="glass">
+                    <Link to={cta}>See a demo trip</Link>
+                  </Button>
+                </div>
+                <div className="mt-10 flex flex-wrap items-center gap-6 text-sm text-muted-foreground">
+                  <div className="flex items-center gap-1 text-warning">
+                    {Array.from({ length: 5 }).map((_, i) => <Star key={i} className="h-4 w-4 fill-warning" />)}
+                    <span className="ml-1 font-semibold text-foreground">4.9</span>
+                    <span className="text-muted-foreground">/5 from 1.2k travelers</span>
                   </div>
-                </Card>
-              </div>
-              <div className="absolute -top-4 -right-4 hidden md:block animate-float z-10" style={{ animationDelay: '1.2s' }}>
-                <Card variant="glass" className="p-3 min-w-[180px]">
-                  <Eyebrow>Weather</Eyebrow>
-                  <div className="mt-1 flex items-center gap-2">
-                    <span className="font-display text-2xl font-bold tabular-nums">26°</span>
-                    <div className="text-xs text-muted-foreground">Sunny<br />8% rain</div>
-                  </div>
-                </Card>
+                  <span className="hidden sm:inline opacity-30">·</span>
+                  <div className="inline-flex items-center gap-1.5"><ShieldCheck className="h-4 w-4 text-success" /> No card required</div>
+                </div>
               </div>
             </div>
-          </div>
-        </div>
+          )}
+        </HeroSlider>
+      </section>
 
         {/* Marquee of destinations */}
         <div className="relative border-y border-border/60 bg-card/40 py-4 backdrop-blur-sm">
