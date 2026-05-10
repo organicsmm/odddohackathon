@@ -881,7 +881,7 @@ function BudgetView({ trip, update, currency }: { trip: Trip; update: (p: Partia
           )}
 
           <div className="mt-6 space-y-1">
-            <h4 className="font-display text-[11px] font-semibold uppercase tracking-[0.16em] text-muted-foreground">Category goals</h4>
+            <Eyebrow className="block">Category goals</Eyebrow>
             <p className="text-xs text-muted-foreground">Set a target per category to track each one independently.</p>
           </div>
           <div className="mt-3 space-y-3">
