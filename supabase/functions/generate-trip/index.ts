@@ -1,4 +1,4 @@
-// AI Trip Generator – uses Lovable AI Gateway via OpenAI-compatible API.
+// AI Trip Generator – calls an OpenAI-compatible AI gateway.
 // Returns a structured trip itinerary (stops + activities) from a free-form prompt.
 
 const corsHeaders = {
