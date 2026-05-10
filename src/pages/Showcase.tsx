@@ -24,19 +24,65 @@ import {
 } from '@/components/ui/typography';
 
 /* -------------------------------------------------------------------------- */
+/*  Filter context + section registry                                         */
+/* -------------------------------------------------------------------------- */
+
+type Category = 'foundations' | 'components' | 'patterns';
+
+type SectionMeta = {
+  id: string;
+  eyebrow: string;
+  title: string;
+  description: string;
+  category: Category;
+  keywords?: string[];
+};
+
+const SECTIONS: SectionMeta[] = [
+  { id: 'typography', category: 'foundations', eyebrow: '01 · Typography', title: 'A single, harmonious scale', description: 'All headings and body text route through the typography primitives so spacing, line-height, and gradients stay consistent.', keywords: ['display', 'heading', 'lead', 'eyebrow', 'text', 'muted', 'font'] },
+  { id: 'buttons', category: 'components', eyebrow: '02 · Buttons', title: 'Premium, hero, glass and the essentials', description: 'Pick a variant by intent. `premium` for the single most important CTA on the screen, `hero` for marketing, `glass` for layered surfaces.', keywords: ['cta', 'button', 'variant'] },
+  { id: 'cards', category: 'components', eyebrow: '03 · Cards', title: 'Surfaces with personality', description: 'Use `premium` for editorial feature cards, `aurora` for branded highlights, `glass` for floating panels, and `default` for neutral content.', keywords: ['surface', 'panel', 'aurora', 'glass'] },
+  { id: 'badges', category: 'components', eyebrow: '04 · Badges', title: 'Tiny chips, big signal', description: 'Use sparingly to label state, role, or category. `gradient` and `glass` are the premium variants; the others mirror shadcn defaults.', keywords: ['chip', 'tag', 'label'] },
+  { id: 'modals', category: 'components', eyebrow: '05 · Modals', title: 'Dialogs that match the surfaces', description: 'The default `DialogContent` already feels premium. For richer flows, layer in `bg-gradient-card backdrop-blur-xl` and an Eyebrow + Display title.', keywords: ['dialog', 'modal', 'popup', 'overlay'] },
+  { id: 'tokens', category: 'foundations', eyebrow: '06 · Tokens', title: 'Semantic color tokens', description: 'Always reference these via Tailwind classes (e.g. `bg-primary`, `text-muted-foreground`) — never hardcode hex values.', keywords: ['color', 'palette', 'theme', 'hsl'] },
+  { id: 'toasts', category: 'components', eyebrow: '07 · Toasts', title: 'Notifications that match the system', description: 'All app feedback flows through `sonner`. The toaster is themed with our gradient-card surface, semantic accent strip, and design-token icons.', keywords: ['notification', 'sonner', 'alert', 'snackbar'] },
+  { id: 'accessibility', category: 'patterns', eyebrow: '08 · Accessibility', title: 'Keyboard & focus states', description: 'Every primitive ships with a visible focus ring (2px ring + 2px offset) using the `--ring` token. Use Tab / Shift+Tab to traverse, Space / Enter to activate, Esc to dismiss dialogs.', keywords: ['a11y', 'aria', 'keyboard', 'focus', 'tab'] },
+  { id: 'playground', category: 'patterns', eyebrow: '09 · Playground', title: 'Interactive props playground', description: 'Tweak props on the left, see the live component and generated JSX update instantly. Great for designing variants without leaving the page.', keywords: ['demo', 'props', 'live', 'sandbox'] },
+];
+
+const FilterContext = createContext<{
+  query: string;
+  category: Category | 'all';
+  matches: (id: string) => boolean;
+}>({ query: '', category: 'all', matches: () => true });
+
+function sectionMatches(meta: SectionMeta, query: string, category: Category | 'all') {
+  if (category !== 'all' && meta.category !== category) return false;
+  const q = query.trim().toLowerCase();
+  if (!q) return true;
+  const haystack = [meta.id, meta.eyebrow, meta.title, meta.description, ...(meta.keywords ?? [])]
+    .join(' ')
+    .toLowerCase();
+  return haystack.includes(q);
+}
+
+/* -------------------------------------------------------------------------- */
 /*  Local helpers                                                             */
 /* -------------------------------------------------------------------------- */
 
 function Section({
-  eyebrow, title, description, children,
+  id, eyebrow, title, description, children,
 }: {
+  id: string;
   eyebrow: string;
   title: string;
   description: string;
   children: React.ReactNode;
 }) {
+  const { matches } = useContext(FilterContext);
+  if (!matches(id)) return null;
   return (
-    <section className="space-y-5 border-t border-border/60 pt-10">
+    <section id={id} className="scroll-mt-28 space-y-5 border-t border-border/60 pt-10">
       <div className="max-w-2xl">
         <Eyebrow tone="primary">{eyebrow}</Eyebrow>
         <Heading level={2} className="mt-1.5" weight="bold">{title}</Heading>
@@ -44,6 +90,82 @@ function Section({
       </div>
       {children}
     </section>
+  );
+}
+
+function FilterBar({
+  query, setQuery, category, setCategory, visibleIds,
+}: {
+  query: string;
+  setQuery: (v: string) => void;
+  category: Category | 'all';
+  setCategory: (c: Category | 'all') => void;
+  visibleIds: Set<string>;
+}) {
+  const cats: Array<{ id: Category | 'all'; label: string }> = [
+    { id: 'all', label: 'All' },
+    { id: 'foundations', label: 'Foundations' },
+    { id: 'components', label: 'Components' },
+    { id: 'patterns', label: 'Patterns' },
+  ];
+
+  const visibleSections = SECTIONS.filter((s) => visibleIds.has(s.id));
+
+  return (
+    <div className="sticky top-0 z-30 -mx-4 border-b border-border/60 bg-background/85 px-4 backdrop-blur-xl supports-[backdrop-filter]:bg-background/70">
+      <div className="container flex flex-col gap-3 py-3 sm:flex-row sm:items-center">
+        <div className="relative flex-1">
+          <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+          <Input
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            placeholder="Search components, tokens, props…"
+            className="h-9 pl-9 pr-9"
+            aria-label="Search design system"
+          />
+          {query && (
+            <button
+              onClick={() => setQuery('')}
+              aria-label="Clear search"
+              className="absolute right-2 top-1/2 grid h-6 w-6 -translate-y-1/2 place-items-center rounded-md text-muted-foreground transition-colors hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+            >
+              <X className="h-3.5 w-3.5" />
+            </button>
+          )}
+        </div>
+
+        <div className="flex flex-wrap items-center gap-1.5 rounded-full border border-border/60 bg-muted/40 p-1">
+          {cats.map((c) => (
+            <button
+              key={c.id}
+              onClick={() => setCategory(c.id)}
+              aria-pressed={category === c.id}
+              className={`rounded-full px-3 py-1.5 text-xs font-medium transition-smooth focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background ${
+                category === c.id ? 'bg-card text-foreground shadow-soft' : 'text-muted-foreground hover:text-foreground'
+              }`}
+            >
+              {c.label}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      <div className="container flex flex-wrap items-center gap-1.5 pb-3">
+        {visibleSections.length === 0 ? (
+          <Muted variant="small">No sections match — try clearing the filters.</Muted>
+        ) : (
+          visibleSections.map((s) => (
+            <a
+              key={s.id}
+              href={`#${s.id}`}
+              className="inline-flex items-center gap-1 rounded-full border border-border/60 bg-card/40 px-2.5 py-1 text-[11px] font-medium text-muted-foreground transition-colors hover:border-primary/40 hover:bg-primary/5 hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+            >
+              {s.eyebrow.split('·')[1]?.trim() ?? s.title}
+            </a>
+          ))
+        )}
+      </div>
+    </div>
   );
 }
 
