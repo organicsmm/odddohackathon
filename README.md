@@ -2,8 +2,6 @@
 
 > Cinematic, intelligent, and collaborative travel planning. Dream it, design it, share it.
 
-**Live demo:** https://odddohackathon.lovable.app
-
 ---
 
 ## 📸 Screenshots
@@ -22,7 +20,101 @@
 |---|---|
 | ![AI Generator](docs/screenshots/05-ai-generator.png) | ![Admin](docs/screenshots/06-admin.png) |
 
-> 💡 **How to capture:** open the live app at 1440×900 and use your OS screenshot tool. Save into `docs/screenshots/` with the filenames above.
+---
+
+## ✨ Vision
+
+Traveloop is a personalized, intelligent, and collaborative platform that transforms the way individuals plan and experience travel. We empower users to **dream, design, and organize trips** with ease — combining flexibility, interactivity, and beautiful design so that planning a trip feels as exciting as the trip itself.
+
+## 🎯 Mission
+
+Build a user-centric, responsive application that simplifies multi-city travel planning by giving travelers intuitive tools to:
+
+- Add and manage travel stops and durations
+- Explore cities and activities of interest
+- Estimate trip budgets automatically
+- Visualize timelines and day-wise plans
+- Share trip plans publicly or with friends
+
+## 🧩 Problem Statement
+
+Design and develop a complete travel planning application where users can create customized **multi-city itineraries**, assign **dates, activities and budgets**, discover destinations, see **cost breakdowns and visual calendars**, and share their plans publicly or with friends. The system uses a relational database to store complex travel data and provides dynamic UIs that adapt to each user's flow.
+
+---
+
+## 🚀 Features
+
+| # | Feature | Description |
+|---|---------|-------------|
+| 1 | **Login / Signup** | Email + password auth, Google OAuth, validation. |
+| 2 | **Dashboard** | Welcome hub with recent trips, recommended cities, budget highlights. |
+| 3 | **Create Trip** | Name, dates, description, optional cover photo, budget in ₹ INR. |
+| 4 | **My Trips** | Cards with destination count, date range, edit/view/delete. |
+| 5 | **Itinerary Builder** | Add stops, pick cities, assign dates and activities, reorder cities. |
+| 6 | **Itinerary View** | Day-wise visual itinerary with activity blocks, time, and cost. |
+| 7 | **City Search** | Curated catalog of famous **Indian cities** with photos and filters. |
+| 8 | **Activity Search** | Browse activities by type, cost, duration. |
+| 9 | **Budget & Cost Breakdown** | Auto-calculated costs (stay, meals, transport, activities) with charts. |
+| 10 | **Packing Checklist** | Categorized checklist with packed status. |
+| 11 | **Public / Shared Itinerary** | Read-only public link, copy-trip option, social sharing. |
+| 12 | **Friends & Invites** | Token-based collaboration on trips. |
+| 13 | **Profile / Settings** | Editable profile, language, saved destinations, account deletion. |
+| 14 | **Trip Notes / Journal** | Timestamped notes per trip or per day. |
+| 15 | **🤖 AI Trip Generator** | Describe your vibe → fully-built itinerary in seconds. |
+| 16 | **🧠 Real-time Suggestions** | Destination-aware packing tips and local recommendations. |
+| 17 | **💱 Multi-currency** | Live FX rates; default INR with switcher. |
+| 18 | **🛡️ Admin Panel** | Analytics, user management, subscriptions, trip moderation. |
+
+---
+
+## 🛠️ Tech Stack
+
+**Frontend**
+- ⚛️ React 18 + TypeScript 5
+- ⚡ Vite 5 (code-splitting, manual vendor chunks, lazy routes)
+- 🎨 Tailwind CSS v3 + custom HSL design tokens
+- 🧱 shadcn/ui + Radix UI primitives
+- 🔀 React Router v6
+- 🔄 TanStack Query
+- 🎭 Lucide Icons
+
+**Backend (Supabase)**
+- 🗄️ PostgreSQL with Row-Level Security (RLS)
+- 🔐 Supabase Auth (email/password + Google OAuth)
+- ⚡ Edge Functions (Deno)
+- 📦 Storage for trip cover photos
+- 🔔 Realtime subscriptions
+
+**AI**
+- 🤖 OpenAI-compatible AI gateway (configurable via env vars)
+- Default model: Google Gemini Flash
+- Edge functions: `generate-trip`, `trip-suggestions`
+
+**Tooling**
+- ESLint, Vitest, Husky pre-commit hooks
+- GitHub Actions for typecheck CI
+
+---
+
+## 🧰 Use Case → Technology Used
+
+| Use Case / Feature | Technology Used |
+|---|---|
+| Authentication (email + Google OAuth) | Supabase Auth + `AuthContext` |
+| Role-based admin panel | `user_roles` table + `has_role()` SECURITY DEFINER + RLS |
+| Multi-city itinerary builder | React state + `lib/store.ts` + cloud sync to `trips` |
+| Cloud trip persistence & cross-device sync | Supabase Postgres `trips` table (JSONB payload) |
+| Public / shared trip view | `shareId` field + RLS read policy + `/share/:id` route |
+| Friends & invites | Token-based invites stored on trip JSON, accepted via `/invite/:token` |
+| AI Trip Generator | Edge function `generate-trip` → OpenAI-compatible gateway |
+| Real-time suggestions | Edge function `trip-suggestions` (SSE streaming) |
+| Multi-currency conversion | `lib/currency.ts` + open.er-api.com live FX (24 h cached) |
+| Budget breakdown + charts | Pure TS `tripCost()` + Recharts |
+| Cinematic UI | Tailwind v3 + HSL design tokens + Radix / shadcn primitives |
+| Routing + lazy loading | React Router v6 + `React.lazy` + `Suspense` |
+| Server state caching | TanStack Query (60 s stale, no focus refetch) |
+| Offline-first behavior | LocalStorage mirror in `lib/store.ts` + cloud upsert on change |
+| Type safety end-to-end | TypeScript 5 + auto-generated `supabase/types.ts` |
 
 ---
 
@@ -38,7 +130,7 @@ graph TB
         AuthCtx[AuthContext]
     end
 
-    subgraph Cloud["Lovable Cloud - Supabase"]
+    subgraph Cloud["Supabase Backend"]
         Auth[Supabase Auth<br/>email + Google OAuth]
         DB[(Postgres + RLS)]
         Edge1[Edge Function<br/>generate-trip]
@@ -46,8 +138,8 @@ graph TB
     end
 
     subgraph AI["AI Layer"]
-        Gateway[Lovable AI Gateway]
-        Gemini[Google Gemini 2.5<br/>Flash / Pro]
+        Gateway[OpenAI-compatible<br/>AI Gateway]
+        Gemini[Google Gemini<br/>Flash / Pro]
     end
 
     UI --> Router
@@ -79,7 +171,7 @@ sequenceDiagram
     participant Store as Local Store
     participant DB as Supabase DB (RLS)
     participant Edge as Edge Function
-    participant AI as Lovable AI Gateway
+    participant AI as AI Gateway
 
     Note over U,UI: Sign up / Log in
     U->>UI: Enter credentials
@@ -110,88 +202,7 @@ sequenceDiagram
 
 ---
 
-## ✨ Vision
-
-Traveloop is a personalized, intelligent, and collaborative platform that transforms the way individuals plan and experience travel. We empower users to **dream, design, and organize trips** with ease — combining flexibility, interactivity, and beautiful design so that planning a trip feels as exciting as the trip itself.
-
-## 🎯 Mission
-
-Build a user-centric, responsive application that simplifies multi-city travel planning by giving travelers intuitive tools to:
-
-- Add and manage travel stops and durations
-- Explore cities and activities of interest
-- Estimate trip budgets automatically
-- Visualize timelines and day-wise plans
-- Share trip plans publicly or with friends
-
-## 🧩 Problem Statement
-
-Design and develop a complete travel planning application where users can:
-
-- Create customized **multi-city itineraries**
-- Assign **travel dates, activities, and budgets**
-- Discover activities and destinations through search
-- Receive **cost breakdowns and visual calendars**
-- Share their plans **publicly or with friends**
-
-The system uses a relational database to store complex travel data (users, trips, stops, activities, expenses) and provides dynamic UIs that adapt to each user's trip flow.
-
----
-
-## 🚀 Features
-
-| # | Feature | Description |
-|---|---------|-------------|
-| 1 | **Login / Signup** | Email + password authentication, Google OAuth, validation. |
-| 2 | **Dashboard** | Welcome hub with recent trips, recommended cities, budget highlights, quick "Plan New Trip". |
-| 3 | **Create Trip** | Start a trip with name, dates, description, optional cover photo, budget in ₹ INR. |
-| 4 | **My Trips** | Card list of all trips with destination count, date range, edit/view/delete. |
-| 5 | **Itinerary Builder** | Add stops, pick cities, assign dates & activities, reorder cities. |
-| 6 | **Itinerary View** | Day-wise visual itinerary with activity blocks, time, and cost. |
-| 7 | **City Search** | Curated catalog of famous **Indian cities** with photos, filters and one-click add. |
-| 8 | **Activity Search** | Browse activities by type, cost, duration; quick add/remove with images. |
-| 9 | **Budget & Cost Breakdown** | Auto-calculated costs (stay, meals, transport, activities) with charts and daily averages. |
-| 10 | **Packing Checklist** | Categorized checklist (clothing, documents, etc.) with packed status. |
-| 11 | **Public / Shared Itinerary** | Read-only public link, copy-trip option, social sharing. |
-| 12 | **Friends & Invites** | Invite friends to collaborate on a trip via secure tokens. |
-| 13 | **Profile / Settings** | Editable profile, language preference, saved destinations, account deletion. |
-| 14 | **Trip Notes / Journal** | Add timestamped notes per trip or per day. |
-| 15 | **🤖 AI Trip Generator** | Describe your vibe → get a fully-built itinerary in seconds (Lovable AI / Gemini). |
-| 16 | **🧠 Real-time Trip Suggestions** | Based on your destination, AI suggests packing items & local tips contextually. |
-| 17 | **💱 Multi-currency Support** | Live FX rates; default INR with switcher (USD, EUR, GBP, JPY, AED, etc.). |
-| 18 | **🛡️ Admin Panel** | Analytics, user management (ban/admin/delete), full user details, subscription plan management (Free / Pro / Premium), trip moderation. |
-
----
-
-## 🛠️ Tech Stack
-
-**Frontend**
-- ⚛️ **React 18** + **TypeScript 5**
-- ⚡ **Vite 5** (with code-splitting, manual vendor chunks, lazy routes)
-- 🎨 **Tailwind CSS v3** + custom HSL design tokens
-- 🧱 **shadcn/ui** + **Radix UI** primitives
-- 🔀 **React Router v6**
-- 🔄 **TanStack Query** (with tuned caching)
-- 🎭 **Lucide Icons**
-
-**Backend (Lovable Cloud — managed Supabase)**
-- 🗄️ **PostgreSQL** with Row-Level Security (RLS)
-- 🔐 **Supabase Auth** (email/password + Google OAuth)
-- ⚡ **Edge Functions** (Deno) for AI features
-- 📦 **Storage** for trip cover photos
-- 🔔 **Realtime** subscriptions
-
-**AI**
-- 🤖 **Lovable AI Gateway** (Google Gemini 2.5 Flash / Pro)
-- Edge functions: `generate-trip`, `trip-suggestions`
-
-**Tooling**
-- ESLint, Vitest, Husky pre-commit hooks
-- GitHub Actions for typecheck CI
-
----
-
-## 🗂️ Project Structure
+## 📁 Project Structure
 
 ```
 src/
@@ -215,29 +226,6 @@ supabase/
 ├── migrations/         # SQL migrations
 └── config.toml
 ```
-
----
-
-## 🧰 Use Case → Technology Used
-
-| Use Case / Feature | Technology Used |
-|---|---|
-| User authentication (email + Google OAuth) | **Supabase Auth** + `AuthContext` (React Context) |
-| Role-based admin panel | `user_roles` table + `has_role()` SECURITY DEFINER + RLS |
-| Multi-city itinerary builder | React state + `lib/store.ts` + cloud sync to `trips` |
-| Cloud trip persistence & cross-device sync | **Supabase Postgres** `trips` table (JSONB payload) |
-| Public / shared trip view | `shareId` field + RLS read policy + `/share/:id` route |
-| Friends & invites | Token-based invites stored on trip JSON, accepted via `/invite/:token` |
-| AI Trip Generator | Edge function `generate-trip` → **Lovable AI Gateway** (Gemini 2.5 Flash) |
-| Real-time destination suggestions | Edge function `trip-suggestions` → Lovable AI Gateway |
-| Multi-currency conversion | `lib/currency.ts` + open.er-api.com live FX (24 h cached) |
-| Budget breakdown + charts | Pure TS `tripCost()` + Recharts |
-| Cinematic UI | Tailwind v3 + HSL design tokens + Radix / shadcn primitives |
-| Routing + lazy loading | React Router v6 + `React.lazy` + `Suspense` |
-| Server state caching | TanStack Query (60 s stale, no focus refetch) |
-| Offline-first behavior | LocalStorage mirror in `lib/store.ts` + cloud upsert on change |
-| Admin user management | RLS "Admins update/delete any" + admin-only UI guards |
-| Type safety end-to-end | TypeScript 5 + auto-generated `supabase/types.ts` |
 
 ---
 
@@ -268,8 +256,6 @@ Four tables, all protected by Row-Level Security (RLS).
 | `role` | `app_role` enum | `admin` \| `user` |
 
 ### `trips`
-Cloud-synced trip data; JSONB payload mirrors local store.
-
 | Column | Type | Notes |
 |---|---|---|
 | `id` | uuid PK | |
@@ -292,10 +278,10 @@ Key-value site-wide config (e.g. `admin_emails` whitelist). Public read, admin-o
 
 Every table has RLS **enabled**.
 
-**`profiles`** — Authenticated users read all; users insert/update only their own; admins update/delete any.
-**`user_roles`** — Users view own roles; admins fully manage all roles.
-**`trips`** — Users full CRUD on their own trips; admins SELECT / UPDATE / DELETE any.
-**`site_settings`** — Public read; admin-only write.
+- **`profiles`** — Authenticated users read all; users insert/update only their own; admins update/delete any.
+- **`user_roles`** — Users view own roles; admins fully manage all roles.
+- **`trips`** — Users full CRUD on their own trips; admins SELECT / UPDATE / DELETE any.
+- **`site_settings`** — Public read; admin-only write.
 
 > All admin checks go through `has_role(auth.uid(), 'admin')` — never trust the client.
 
@@ -306,15 +292,22 @@ Every table has RLS **enabled**.
 ### `generate-trip`
 - **Purpose:** Generate complete itinerary from a free-text prompt.
 - **Input:** `{ prompt, days?, budget? }`
-- **Flow:** Verify auth → Lovable AI Gateway (Gemini 2.5 Flash) → structured JSON (stops, activities, packing).
+- **Flow:** Verify auth → call AI gateway → return structured JSON (stops, activities, packing).
 
 ### `trip-suggestions`
-- **Purpose:** Real-time contextual recommendations (packing, local tips, must-see) for a destination.
+- **Purpose:** Real-time contextual recommendations (packing, local tips) for a destination.
 - **Input:** `{ destination, dates? }`
-- **Flow:** Build prompt → Lovable AI Gateway → suggestions stream back to `TripSuggestions.tsx`.
+- **Flow:** Build prompt → AI gateway (SSE stream) → suggestions stream back to `TripSuggestions.tsx`.
 
 ### Edge Function Secrets
-`LOVABLE_API_KEY`, `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY`, `SUPABASE_ANON_KEY`, `SUPABASE_PUBLISHABLE_KEY`.
+| Secret | Description |
+|---|---|
+| `AI_GATEWAY_KEY` | API key for the AI gateway (Bearer token) |
+| `AI_GATEWAY_URL` | Optional. Base URL of an OpenAI-compatible gateway (default supplied) |
+| `AI_MODEL` | Optional. Model identifier (default `google/gemini-3-flash-preview`) |
+| `SUPABASE_URL` | Auto-set by Supabase |
+| `SUPABASE_SERVICE_ROLE_KEY` | Server-side DB access |
+| `SUPABASE_ANON_KEY` | JWT verification |
 
 ---
 
@@ -322,22 +315,13 @@ Every table has RLS **enabled**.
 
 | Aspect | Details |
 |---|---|
-| Provider | **Lovable AI Gateway** (no user API key needed) |
-| Default model | `google/gemini-2.5-flash` — fast, multimodal, low-cost |
-| Heavy-prompt fallback | `google/gemini-2.5-pro` |
+| Protocol | OpenAI-compatible `/v1/chat/completions` |
+| Default model | `google/gemini-3-flash-preview` |
 | Where called | Edge functions only — keys never exposed to browser |
 | UI integration | `AiTripGenerator.tsx`, `TripSuggestions.tsx` |
+| Configurable | Yes — set `AI_GATEWAY_URL`, `AI_GATEWAY_KEY`, `AI_MODEL` |
 
----
-
-## 🔗 Live Demo
-
-| Environment | URL |
-|---|---|
-| 🚀 **Production** | https://odddohackathon.lovable.app |
-| 🧪 Preview (login required) | https://id-preview--82eaa6a9-82f4-4b41-9b64-4b59993322c1.lovable.app |
-
-**Demo admin login:** request from the team (admin emails are whitelisted via `site_settings.admin_emails`).
+You can point the gateway at **any** OpenAI-compatible provider — OpenRouter, Together AI, Groq, your own proxy, etc.
 
 ---
 
@@ -346,7 +330,7 @@ Every table has RLS **enabled**.
 ### Prerequisites
 - **Node.js 18+**
 - **bun** (recommended) or **npm**
-- A **Supabase** project (free tier works) — only needed for self-hosting; Lovable Cloud users skip this
+- A **Supabase** project (free tier works)
 
 ### 1. Clone & install
 ```bash
@@ -359,21 +343,19 @@ bun install        # or: npm install
 Create a `.env` file in the project root:
 
 ```env
-# Supabase / Lovable Cloud
 VITE_SUPABASE_URL=https://<your-project-ref>.supabase.co
 VITE_SUPABASE_PUBLISHABLE_KEY=<your-anon-publishable-key>
 VITE_SUPABASE_PROJECT_ID=<your-project-ref>
 ```
 
-> ℹ️ When using Lovable Cloud these are **auto-injected** — no manual setup required.
-
-### 3. Set Edge Function secrets (server-side only)
-In the Supabase dashboard → **Project Settings → Edge Functions → Secrets**, add:
+### 3. Set Edge Function secrets
+In the Supabase dashboard → **Project Settings → Edge Functions → Secrets**:
 
 | Secret | Where to get it |
 |---|---|
-| `LOVABLE_API_KEY` | https://lovable.dev → Workspace → API Keys (or use your own OpenAI/Gemini key + adapt the function) |
-| `SUPABASE_URL` | Auto-set |
+| `AI_GATEWAY_KEY` | Your AI provider (OpenRouter / Together / Groq / direct OpenAI) |
+| `AI_GATEWAY_URL` | (Optional) Provider's base URL ending in `/v1` |
+| `AI_MODEL` | (Optional) Model identifier |
 | `SUPABASE_SERVICE_ROLE_KEY` | Project Settings → API → `service_role` |
 | `SUPABASE_ANON_KEY` | Project Settings → API → `anon` |
 
@@ -411,46 +393,28 @@ App runs at **http://localhost:8080**.
 
 ## 🚀 Deployment
 
-You have **three** deployment paths — pick whichever fits your setup.
-
-### Option A — Lovable (one-click, recommended)
-1. Open the project in [Lovable](https://lovable.dev).
-2. Top-right → **Publish**.
-3. App goes live at `https://<your-slug>.lovable.app`.
-4. (Optional) **Project Settings → Domains** to attach a custom domain.
-
-> ⚡ Backend changes (Edge Functions, migrations) deploy **automatically**. Frontend changes require clicking **Update** in the publish dialog.
-
-### Option B — Vercel + Supabase (self-hosted)
-1. Push your repo to GitHub (Lovable auto-syncs via the GitHub integration).
+### Vercel + Supabase (recommended)
+1. Push your repo to GitHub.
 2. Go to [vercel.com](https://vercel.com) → **Import Git Repository**.
-3. **Framework preset:** Vite. **Build command:** `bun run build` (or `npm run build`). **Output dir:** `dist`.
-4. Add the three `VITE_SUPABASE_*` env vars in Vercel → **Settings → Environment Variables**.
+3. **Framework preset:** Vite. **Build command:** `bun run build`. **Output dir:** `dist`.
+4. Add `VITE_SUPABASE_*` env vars in Vercel → **Settings → Environment Variables**.
 5. Deploy.
-6. For backend:
-   - Create a Supabase project at [supabase.com](https://supabase.com).
-   - Run migrations from `supabase/migrations/` (CLI or SQL editor).
-   - Deploy edge functions: `supabase functions deploy generate-trip` & `trip-suggestions`.
-   - Add the secrets listed above in **Edge Functions → Secrets**.
+6. For backend: create a Supabase project → run migrations → deploy edge functions → add secrets above.
 
-### Option C — Netlify / Cloudflare Pages
-Same as Vercel — they auto-detect Vite. Just set the same `VITE_SUPABASE_*` env vars and use `bun run build` → `dist`.
+### Netlify / Cloudflare Pages
+Same as Vercel — they auto-detect Vite. Use `bun run build` → `dist`.
 
 ### Post-deployment checklist
-- [ ] Auth → **URL Configuration** → add your prod URL to **Site URL** and **Redirect URLs**
+- [ ] Auth → **URL Configuration** → add prod URL to **Site URL** and **Redirect URLs**
 - [ ] Google OAuth → add prod URL to authorized redirect URIs in Google Cloud Console
-- [ ] Run a smoke test: signup → create trip → AI generate → share link
+- [ ] Smoke test: signup → create trip → AI generate → share link
 - [ ] Add admin emails to `site_settings.admin_emails` JSONB array
-
----
-
-
 
 ---
 
 ## ⚡ Performance Optimizations
 
-- Route-level **code splitting** via `React.lazy` (initial bundle < 100 KB gz)
+- Route-level **code splitting** via `React.lazy`
 - **Manual vendor chunks**: react / query / supabase / icons
 - TanStack Query: `staleTime 60s`, no refetch on focus
 - All decorative images: `loading="lazy"`, `decoding="async"`, `fetchpriority="low"`
@@ -486,8 +450,6 @@ Excalidraw wireframes: https://link.excalidraw.com/l/65VNwvy7c4X/22o30WE3bE4
 ## 🏆 Built For
 
 **Odoo Hackathon 2026** — Team Traveloop
-
-Built with ❤️ using [Lovable](https://lovable.dev).
 
 ---
 
