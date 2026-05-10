@@ -10,7 +10,7 @@ const GEO_URL = 'https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json'
 
 type PlottedStop = { stop: Stop; coords: [number, number]; index: number };
 
-export default function RouteMap({ stops }: { stops: Stop[] }) {
+export default function RouteMap({ stops, onSelectStop, highlightedStopId }: { stops: Stop[]; onSelectStop?: (id: string) => void; highlightedStopId?: string | null }) {
   const [hover, setHover] = useState<string | null>(null);
   const [zoom, setZoom] = useState(1);
   const [center, setCenter] = useState<[number, number]>([0, 20]);
