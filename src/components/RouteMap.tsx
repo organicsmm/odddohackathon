@@ -8,7 +8,15 @@ import { Button } from '@/components/ui/button';
 // Public world topology (110m countries)
 const GEO_URL = 'https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json';
 
-type PlottedStop = { stop: Stop; coords: [number, number]; index: number };
+type PlottedStop = {
+  stop: Stop;
+  coords: [number, number];
+  index: number;
+  confidence: GeoConfidence;
+  source: 'builtin' | 'geocoder';
+  matchedName?: string;
+  country?: string;
+};
 
 // Haversine great-circle distance in km
 function distanceKm(a: [number, number], b: [number, number]): number {
