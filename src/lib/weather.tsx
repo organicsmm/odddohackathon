@@ -28,9 +28,35 @@ export type DayForecast = {
   label: string;
 };
 
+// Geocoding cache so we only hit Open-Meteo's geocoding API once per unknown city per session
+const geoCache = new Map<string, [number, number] | null>();
+
+async function resolveCoords(city: string): Promise<[number, number] | null> {
+  const local = getCoords(city);
+  if (local) return local;
+  const key = city.trim().toLowerCase();
+  if (geoCache.has(key)) return geoCache.get(key)!;
+  try {
+    const url = `https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(city)}&count=1&language=en&format=json`;
+    const res = await fetch(url);
+    if (!res.ok) throw new Error('geocode failed');
+    const data = await res.json();
+    const r = data?.results?.[0];
+    if (r && typeof r.latitude === 'number' && typeof r.longitude === 'number') {
+      const tuple: [number, number] = [r.longitude, r.latitude];
+      geoCache.set(key, tuple);
+      return tuple;
+    }
+  } catch {
+    // fall through
+  }
+  geoCache.set(key, null);
+  return null;
+}
+
 // Open-Meteo forecast (up to ~16 days ahead). Falls back to climate normals for dates outside window.
 export async function fetchForecast(city: string, startDate: string, endDate: string): Promise<DayForecast[] | null> {
-  const c = getCoords(city);
+  const c = await resolveCoords(city);
   if (!c) return null;
   const [lng, lat] = c;
 
@@ -43,7 +69,7 @@ export async function fetchForecast(city: string, startDate: string, endDate: st
 
   // If trip is fully in the past or fully > 16 days out, use climate fallback
   if (end < today || start > maxFuture) {
-    return climateFallback(city, startDate, endDate);
+    return climateFallback(city, startDate, endDate, lat);
   }
 
   const clampStart = start < today ? today : start;
@@ -70,7 +96,7 @@ export async function fetchForecast(city: string, startDate: string, endDate: st
       };
     });
   } catch {
-    return climateFallback(city, startDate, endDate);
+    return climateFallback(city, startDate, endDate, lat);
   }
 }
 
