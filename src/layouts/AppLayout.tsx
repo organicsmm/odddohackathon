@@ -1,7 +1,6 @@
 import { Link, NavLink, Outlet, useNavigate } from 'react-router-dom';
-import { Plane, LayoutDashboard, MapPinned, Plus, User as UserIcon, LogOut, Users } from 'lucide-react';
+import { Plane, LayoutDashboard, MapPinned, Plus, User as UserIcon, LogOut, Users, Shield } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
-import { logout } from '@/lib/store';
 import { Button } from '@/components/ui/button';
 import { useEffect } from 'react';
 import BuildStatusBadge from '@/components/dev/BuildStatusBadge';
