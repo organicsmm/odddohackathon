@@ -1,4 +1,4 @@
-import type { Trip, User, PackItem } from './types';
+import type { Trip, User, PackItem, Stop } from './types';
 import { DEFAULT_PACKING } from './catalog';
 
 const TRIPS_KEY = 'traveloop:trips';
@@ -126,4 +126,24 @@ export function tripCost(trip: Trip) {
   });
   const total = stay + meals + transport + activities;
   return { stay, meals, transport, activities, total };
+}
+
+// Re-assign sequential startDate/endDate to stops based on each stop's current duration.
+// Keeps the trip's startDate as the anchor and extends trip.endDate to fit.
+export function resequenceStops(trip: Trip, stops: Stop[]): Trip {
+  if (stops.length === 0) return { ...trip, stops };
+  const anchor = new Date(trip.startDate);
+  let cursor = new Date(anchor);
+  const next: Stop[] = stops.map(s => {
+    const d = stopDays(s);
+    const start = new Date(cursor);
+    const end = new Date(cursor);
+    end.setDate(end.getDate() + d - 1);
+    cursor = new Date(end);
+    cursor.setDate(cursor.getDate() + 1);
+    return { ...s, startDate: start.toISOString().slice(0, 10), endDate: end.toISOString().slice(0, 10) };
+  });
+  const lastEnd = next[next.length - 1].endDate;
+  const tripEnd = lastEnd > trip.endDate ? lastEnd : trip.endDate;
+  return { ...trip, stops: next, endDate: tripEnd };
 }

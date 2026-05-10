@@ -1,11 +1,11 @@
 import { useNavigate, useParams } from 'react-router-dom';
 import { useEffect, useMemo, useState } from 'react';
 import {
-  Calendar, MapPin, Plus, Trash2, ArrowUp, ArrowDown, Share2, Globe, Lock,
+  Calendar, MapPin, Plus, Trash2, Share2, Globe, Lock, GripVertical,
   Wallet, ListChecks, StickyNote, MapIcon, ChevronLeft, Clock, Printer,
 } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
-import { getTrip, upsertTrip, uid, tripCost, stopDays, tripDays } from '@/lib/store';
+import { getTrip, upsertTrip, uid, tripCost, stopDays, tripDays, resequenceStops } from '@/lib/store';
 import type { Trip, Stop, Activity, Note, PackItem } from '@/lib/types';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -22,6 +22,15 @@ import ActivitySearchDialog from '@/components/ActivitySearchDialog';
 import RouteTimeline from '@/components/RouteTimeline';
 import { WeatherBadge } from '@/lib/weather';
 import { toast } from 'sonner';
+import {
+  DndContext, closestCenter, KeyboardSensor, PointerSensor, useSensor, useSensors,
+  type DragEndEvent,
+} from '@dnd-kit/core';
+import {
+  arrayMove, SortableContext, sortableKeyboardCoordinates,
+  verticalListSortingStrategy, useSortable,
+} from '@dnd-kit/sortable';
+import { CSS } from '@dnd-kit/utilities';
 
 export default function TripDetail() {
   const { id } = useParams();
@@ -134,17 +143,42 @@ function Itinerary({ trip, update }: { trip: Trip; update: (p: Partial<Trip> | (
     toast.success(`${p.city} added`);
   };
 
-  const removeStop = (id: string) => update(t => ({ ...t, stops: t.stops.filter(s => s.id !== id) }));
-  const moveStop = (id: string, dir: -1 | 1) => update(t => {
-    const stops = [...t.stops];
-    const i = stops.findIndex(s => s.id === id);
-    const j = i + dir;
-    if (i < 0 || j < 0 || j >= stops.length) return t;
-    [stops[i], stops[j]] = [stops[j], stops[i]];
-    return { ...t, stops };
-  });
+  const removeStop = (id: string) =>
+    update(t => resequenceStops(t, t.stops.filter(s => s.id !== id)));
+
   const updateStop = (id: string, patch: Partial<Stop>) =>
     update(t => ({ ...t, stops: t.stops.map(s => s.id === id ? { ...s, ...patch } : s) }));
+
+  const setDuration = (id: string, days: number) =>
+    update(t => {
+      const d = Math.max(1, Math.min(60, days));
+      const stops = t.stops.map(s => {
+        if (s.id !== id) return s;
+        const start = new Date(s.startDate);
+        const end = new Date(start);
+        end.setDate(start.getDate() + d - 1);
+        return { ...s, endDate: end.toISOString().slice(0, 10) };
+      });
+      return resequenceStops(t, stops);
+    });
+
+  const sensors = useSensors(
+    useSensor(PointerSensor, { activationConstraint: { distance: 5 } }),
+    useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates }),
+  );
+
+  const onDragEnd = (e: DragEndEvent) => {
+    const { active, over } = e;
+    if (!over || active.id === over.id) return;
+    update(t => {
+      const oldIdx = t.stops.findIndex(s => s.id === active.id);
+      const newIdx = t.stops.findIndex(s => s.id === over.id);
+      if (oldIdx < 0 || newIdx < 0) return t;
+      const reordered = arrayMove(t.stops, oldIdx, newIdx);
+      toast.success('Itinerary reordered — dates updated');
+      return resequenceStops(t, reordered);
+    });
+  };
 
   return (
     <div className="space-y-4">
@@ -169,14 +203,25 @@ function Itinerary({ trip, update }: { trip: Trip; update: (p: Partial<Trip> | (
       )}
 
       {view === 'list' ? (
-        <div className="space-y-4">
-          {trip.stops.map((s, i) => (
-            <StopCard
-              key={s.id} stop={s} index={i} total={trip.stops.length}
-              onMove={moveStop} onRemove={removeStop} onUpdate={updateStop}
-            />
-          ))}
-        </div>
+        <>
+          {trip.stops.length > 1 && (
+            <p className="text-xs text-muted-foreground flex items-center gap-1.5">
+              <GripVertical className="h-3 w-3" /> Drag stops to reorder · change duration to auto-shift dates
+            </p>
+          )}
+          <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={onDragEnd}>
+            <SortableContext items={trip.stops.map(s => s.id)} strategy={verticalListSortingStrategy}>
+              <div className="space-y-4">
+                {trip.stops.map((s, i) => (
+                  <SortableStopCard
+                    key={s.id} stop={s} index={i}
+                    onRemove={removeStop} onUpdate={updateStop} onSetDuration={setDuration}
+                  />
+                ))}
+              </div>
+            </SortableContext>
+          </DndContext>
+        </>
       ) : (
         <CalendarView trip={trip} />
       )}
@@ -184,11 +229,33 @@ function Itinerary({ trip, update }: { trip: Trip; update: (p: Partial<Trip> | (
   );
 }
 
-function StopCard({ stop, index, total, onMove, onRemove, onUpdate }: {
-  stop: Stop; index: number; total: number;
-  onMove: (id: string, dir: -1 | 1) => void;
+function SortableStopCard(props: {
+  stop: Stop; index: number;
   onRemove: (id: string) => void;
   onUpdate: (id: string, p: Partial<Stop>) => void;
+  onSetDuration: (id: string, days: number) => void;
+}) {
+  const { stop } = props;
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id: stop.id });
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    opacity: isDragging ? 0.5 : 1,
+    zIndex: isDragging ? 10 : 'auto' as const,
+  };
+  return (
+    <div ref={setNodeRef} style={style}>
+      <StopCard {...props} dragHandle={{ ...attributes, ...listeners }} />
+    </div>
+  );
+}
+
+function StopCard({ stop, index, onRemove, onUpdate, onSetDuration, dragHandle }: {
+  stop: Stop; index: number;
+  onRemove: (id: string) => void;
+  onUpdate: (id: string, p: Partial<Stop>) => void;
+  onSetDuration: (id: string, days: number) => void;
+  dragHandle?: React.HTMLAttributes<HTMLButtonElement>;
 }) {
   const days = stopDays(stop);
   const stopTotal =
@@ -212,11 +279,30 @@ function StopCard({ stop, index, total, onMove, onRemove, onUpdate }: {
               <WeatherBadge city={stop.city} date={stop.startDate} />
             </div>
           </div>
-          <div className="flex gap-1">
-            <Button size="icon" variant="ghost" className="text-primary-foreground hover:bg-white/20" disabled={index === 0} onClick={() => onMove(stop.id, -1)}><ArrowUp className="h-4 w-4" /></Button>
-            <Button size="icon" variant="ghost" className="text-primary-foreground hover:bg-white/20" disabled={index === total - 1} onClick={() => onMove(stop.id, 1)}><ArrowDown className="h-4 w-4" /></Button>
+          <div className="flex items-center gap-1">
+            <button
+              {...dragHandle}
+              type="button"
+              aria-label="Drag to reorder"
+              className="cursor-grab active:cursor-grabbing rounded-md p-2 text-primary-foreground hover:bg-white/20 touch-none"
+            >
+              <GripVertical className="h-5 w-5" />
+            </button>
+            <div className="flex items-center gap-1 rounded-md bg-white/15 px-2 py-1 text-xs">
+              <Clock className="h-3 w-3" />
+              <input
+                type="number"
+                min={1}
+                max={60}
+                value={days}
+                onChange={e => onSetDuration(stop.id, Number(e.target.value) || 1)}
+                className="w-10 bg-transparent text-center font-semibold outline-none"
+              />
+              <span>day{days > 1 ? 's' : ''}</span>
+            </div>
             <Button size="icon" variant="ghost" className="text-primary-foreground hover:bg-white/20" onClick={() => onRemove(stop.id)}><Trash2 className="h-4 w-4" /></Button>
           </div>
+
         </div>
       </div>
 
