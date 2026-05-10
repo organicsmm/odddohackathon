@@ -99,16 +99,17 @@ export default function RouteMap({ stops, onSelectStop, highlightedStopId }: { s
   }, [stops, resolved, failed]);
 
   const plotted: PlottedStop[] = useMemo(() => {
-    return stops
-      .map((s, i) => {
-        const m = lookupMeta(s.city);
-        return m ? {
-          stop: s, index: i,
-          coords: m.coords, confidence: m.confidence, source: m.source,
-          matchedName: m.matchedName, country: m.country,
-        } : null;
-      })
-      .filter((x): x is PlottedStop => x !== null);
+    const out: PlottedStop[] = [];
+    stops.forEach((s, i) => {
+      const m = lookupMeta(s.city);
+      if (!m) return;
+      out.push({
+        stop: s, index: i,
+        coords: m.coords, confidence: m.confidence, source: m.source,
+        matchedName: m.matchedName, country: m.country,
+      });
+    });
+    return out;
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [stops, resolved]);
 
