@@ -253,6 +253,11 @@ export default function RouteMap({ stops, onSelectStop, highlightedStopId }: { s
         {hover && (() => {
           const p = plotted.find(x => x.stop.id === hover);
           if (!p) return null;
+          const idx = plotted.indexOf(p);
+          const prev = idx > 0 ? plotted[idx - 1] : null;
+          const next = idx < plotted.length - 1 ? plotted[idx + 1] : null;
+          const inLeg = prev ? { km: distanceKm(prev.coords, p.coords) } : null;
+          const outLeg = next ? { km: distanceKm(p.coords, next.coords) } : null;
           return (
             <div className="pointer-events-none absolute left-4 top-4 max-w-xs rounded-xl border border-border bg-card/95 p-3 shadow-elegant backdrop-blur">
               <div className="flex items-center gap-2 text-xs text-muted-foreground">
@@ -266,6 +271,26 @@ export default function RouteMap({ stops, onSelectStop, highlightedStopId }: { s
               <div className="mt-1 text-xs text-primary font-medium">
                 {p.stop.activities.length} activit{p.stop.activities.length === 1 ? 'y' : 'ies'}
               </div>
+              {(inLeg || outLeg) && (
+                <div className="mt-2 space-y-0.5 border-t border-border/60 pt-2 text-xs">
+                  {inLeg && (() => {
+                    const e = estimateLeg(inLeg.km);
+                    return (
+                      <div className="text-muted-foreground">
+                        ← from <span className="font-medium text-foreground">{prev!.stop.city}</span>: {fmtKm(inLeg.km)} · ~{fmtHours(e.hours)} {e.label}
+                      </div>
+                    );
+                  })()}
+                  {outLeg && (() => {
+                    const e = estimateLeg(outLeg.km);
+                    return (
+                      <div className="text-muted-foreground">
+                        → to <span className="font-medium text-foreground">{next!.stop.city}</span>: {fmtKm(outLeg.km)} · ~{fmtHours(e.hours)} {e.label}
+                      </div>
+                    );
+                  })()}
+                </div>
+              )}
             </div>
           );
         })()}
