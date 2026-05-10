@@ -442,103 +442,201 @@ function CalendarView({ trip }: { trip: Trip }) {
 
 function BudgetView({ trip, update }: { trip: Trip; update: (p: Partial<Trip>) => void }) {
   const cost = tripCost(trip);
-  const items = [
-    { label: 'Transport', value: cost.transport, color: 'bg-primary' },
-    { label: 'Stay', value: cost.stay, color: 'bg-accent' },
-    { label: 'Meals', value: cost.meals, color: 'bg-success' },
-    { label: 'Activities', value: cost.activities, color: 'bg-warning' },
-  ];
-  const total = cost.total || 1;
   const days = tripDays(trip);
-  const avg = cost.total / days;
+  const avg = days > 0 ? cost.total / days : 0;
+
+  const COLORS = {
+    Transport: 'hsl(var(--primary))',
+    Stay: 'hsl(var(--accent))',
+    Meals: 'hsl(var(--success))',
+    Activities: 'hsl(var(--warning))',
+  } as const;
+
+  const pieData = [
+    { name: 'Transport', value: cost.transport },
+    { name: 'Stay', value: cost.stay },
+    { name: 'Meals', value: cost.meals },
+    { name: 'Activities', value: cost.activities },
+  ].filter(d => d.value > 0);
+
+  const barData = trip.stops.map(s => {
+    const d = stopDays(s);
+    const stay = (s.costs.stay || 0) * Math.max(0, d - 1);
+    const meals = (s.costs.meals || 0) * d;
+    const transport = s.costs.transport || 0;
+    const activities = s.activities.reduce((a, b) => a + b.cost, 0);
+    return {
+      city: s.city || 'Stop',
+      Transport: transport,
+      Stay: stay,
+      Meals: meals,
+      Activities: activities,
+      total: transport + stay + meals + activities,
+    };
+  });
+
+  const total = cost.total || 1;
 
   return (
-    <div className="grid gap-6 lg:grid-cols-2">
-      <Card className="p-6">
-        <h3 className="font-display text-xl font-bold">Cost breakdown</h3>
-        <div className="mt-4 flex items-center gap-6">
-          {/* SVG donut */}
-          <Donut items={items} total={total} />
-          <ul className="flex-1 space-y-2">
-            {items.map(i => (
-              <li key={i.label} className="flex items-center gap-3 text-sm">
-                <span className={`h-3 w-3 rounded-full ${i.color}`} />
-                <span className="flex-1">{i.label}</span>
-                <span className="font-medium">${i.value.toLocaleString()}</span>
-                <span className="w-12 text-right text-muted-foreground">{Math.round((i.value / total) * 100)}%</span>
-              </li>
-            ))}
-          </ul>
-        </div>
-        <div className="mt-6 grid grid-cols-2 gap-3 border-t border-border pt-4">
-          <div><div className="text-xs text-muted-foreground">Total</div><div className="font-display text-2xl font-bold text-primary">${cost.total.toLocaleString()}</div></div>
-          <div><div className="text-xs text-muted-foreground">Avg / day</div><div className="font-display text-2xl font-bold">${Math.round(avg).toLocaleString()}</div></div>
-        </div>
-      </Card>
+    <div className="space-y-6">
+      {/* KPI strip */}
+      <div className="grid gap-3 sm:grid-cols-4">
+        <KpiCard label="Total" value={`$${cost.total.toLocaleString()}`} accent />
+        <KpiCard label="Avg / day" value={`$${Math.round(avg).toLocaleString()}`} />
+        <KpiCard label="Stops" value={trip.stops.length.toString()} />
+        <KpiCard label="Trip length" value={`${days} day${days > 1 ? 's' : ''}`} />
+      </div>
 
-      <Card className="p-6">
-        <h3 className="font-display text-xl font-bold">Budget tracker</h3>
-        <div className="mt-4 space-y-2">
-          <Label htmlFor="budget">Trip budget (USD)</Label>
-          <Input id="budget" type="number" min={0} value={trip.budget ?? ''} onChange={e => update({ budget: e.target.value ? Number(e.target.value) : undefined })} placeholder="Set a budget" />
-        </div>
-        {trip.budget && (
+      <div className="grid gap-6 lg:grid-cols-2">
+        {/* Pie / category breakdown */}
+        <Card className="p-6">
+          <h3 className="font-display text-xl font-bold">Cost by category</h3>
+          {pieData.length === 0 ? (
+            <p className="mt-4 text-sm text-muted-foreground">Add stops and activities to see your breakdown.</p>
+          ) : (
+            <div className="mt-4 grid gap-4 sm:grid-cols-[200px_1fr] items-center">
+              <div className="h-[200px] w-full">
+                <ResponsiveContainer width="100%" height="100%">
+                  <PieChart>
+                    <Pie data={pieData} dataKey="value" nameKey="name" innerRadius={55} outerRadius={85} paddingAngle={2} stroke="hsl(var(--background))">
+                      {pieData.map(entry => (
+                        <Cell key={entry.name} fill={COLORS[entry.name as keyof typeof COLORS]} />
+                      ))}
+                    </Pie>
+                    <RTooltip
+                      contentStyle={{ background: 'hsl(var(--card))', border: '1px solid hsl(var(--border))', borderRadius: 8, fontSize: 12 }}
+                      formatter={(v: number) => `$${v.toLocaleString()}`}
+                    />
+                  </PieChart>
+                </ResponsiveContainer>
+              </div>
+              <ul className="space-y-2">
+                {pieData.map(i => (
+                  <li key={i.name} className="flex items-center gap-3 text-sm">
+                    <span className="h-3 w-3 rounded-full" style={{ background: COLORS[i.name as keyof typeof COLORS] }} />
+                    <span className="flex-1">{i.name}</span>
+                    <span className="font-medium">${i.value.toLocaleString()}</span>
+                    <span className="w-12 text-right text-muted-foreground">{Math.round((i.value / total) * 100)}%</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+        </Card>
+
+        {/* Budget tracker */}
+        <Card className="p-6">
+          <h3 className="font-display text-xl font-bold">Budget tracker</h3>
           <div className="mt-4 space-y-2">
-            <Progress value={Math.min(100, (cost.total / trip.budget) * 100)} />
-            {cost.total > trip.budget ? (
-              <p className="text-sm text-destructive font-medium">⚠ Over budget by ${(cost.total - trip.budget).toLocaleString()}</p>
-            ) : (
-              <p className="text-sm text-success font-medium">✓ ${(trip.budget - cost.total).toLocaleString()} remaining</p>
-            )}
+            <Label htmlFor="budget">Trip budget (USD)</Label>
+            <Input id="budget" type="number" min={0} value={trip.budget ?? ''} onChange={e => update({ budget: e.target.value ? Number(e.target.value) : undefined })} placeholder="Set a budget" />
           </div>
+          {trip.budget ? (
+            <div className="mt-4 space-y-2">
+              <Progress value={Math.min(100, (cost.total / trip.budget) * 100)} />
+              {cost.total > trip.budget ? (
+                <p className="text-sm text-destructive font-medium">⚠ Over budget by ${(cost.total - trip.budget).toLocaleString()}</p>
+              ) : (
+                <p className="text-sm text-success font-medium">✓ ${(trip.budget - cost.total).toLocaleString()} remaining</p>
+              )}
+            </div>
+          ) : (
+            <p className="mt-3 text-xs text-muted-foreground">Set a target to track your spending.</p>
+          )}
+
+          <div className="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-4">
+            <Mini label="Transport" value={cost.transport} color={COLORS.Transport} />
+            <Mini label="Stay" value={cost.stay} color={COLORS.Stay} />
+            <Mini label="Meals" value={cost.meals} color={COLORS.Meals} />
+            <Mini label="Activities" value={cost.activities} color={COLORS.Activities} />
+          </div>
+        </Card>
+      </div>
+
+      {/* Per-stop stacked bar */}
+      <Card className="p-6">
+        <h3 className="font-display text-xl font-bold">Spend per stop</h3>
+        {barData.length === 0 ? (
+          <p className="mt-4 text-sm text-muted-foreground">Add stops to compare per-city spending.</p>
+        ) : (
+          <>
+            <div className="mt-4 h-[280px] w-full">
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart data={barData} margin={{ top: 8, right: 8, bottom: 4, left: -12 }}>
+                  <CartesianGrid stroke="hsl(var(--border))" strokeDasharray="3 3" vertical={false} />
+                  <XAxis dataKey="city" stroke="hsl(var(--muted-foreground))" fontSize={12} />
+                  <YAxis stroke="hsl(var(--muted-foreground))" fontSize={12} tickFormatter={(v) => `$${v}`} />
+                  <RTooltip
+                    contentStyle={{ background: 'hsl(var(--card))', border: '1px solid hsl(var(--border))', borderRadius: 8, fontSize: 12 }}
+                    formatter={(v: number) => `$${Number(v).toLocaleString()}`}
+                  />
+                  <Legend wrapperStyle={{ fontSize: 12 }} />
+                  <Bar dataKey="Transport" stackId="a" fill={COLORS.Transport} radius={[0, 0, 0, 0]} />
+                  <Bar dataKey="Stay" stackId="a" fill={COLORS.Stay} />
+                  <Bar dataKey="Meals" stackId="a" fill={COLORS.Meals} />
+                  <Bar dataKey="Activities" stackId="a" fill={COLORS.Activities} radius={[6, 6, 0, 0]} />
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
+            <div className="mt-4 overflow-x-auto">
+              <table className="w-full text-sm">
+                <thead>
+                  <tr className="text-xs uppercase tracking-wider text-muted-foreground">
+                    <th className="py-2 text-left">Stop</th>
+                    <th className="py-2 text-right">Transport</th>
+                    <th className="py-2 text-right">Stay</th>
+                    <th className="py-2 text-right">Meals</th>
+                    <th className="py-2 text-right">Activities</th>
+                    <th className="py-2 text-right">Total</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-border">
+                  {barData.map(r => (
+                    <tr key={r.city}>
+                      <td className="py-2 font-medium flex items-center gap-2"><MapPin className="h-3 w-3 text-primary" />{r.city}</td>
+                      <td className="py-2 text-right">${r.Transport.toLocaleString()}</td>
+                      <td className="py-2 text-right">${r.Stay.toLocaleString()}</td>
+                      <td className="py-2 text-right">${r.Meals.toLocaleString()}</td>
+                      <td className="py-2 text-right">${r.Activities.toLocaleString()}</td>
+                      <td className="py-2 text-right font-semibold">${r.total.toLocaleString()}</td>
+                    </tr>
+                  ))}
+                  <tr className="border-t-2 border-border">
+                    <td className="py-2 font-semibold">Total</td>
+                    <td className="py-2 text-right font-semibold">${cost.transport.toLocaleString()}</td>
+                    <td className="py-2 text-right font-semibold">${cost.stay.toLocaleString()}</td>
+                    <td className="py-2 text-right font-semibold">${cost.meals.toLocaleString()}</td>
+                    <td className="py-2 text-right font-semibold">${cost.activities.toLocaleString()}</td>
+                    <td className="py-2 text-right font-bold text-primary">${cost.total.toLocaleString()}</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </>
         )}
-        <div className="mt-6">
-          <h4 className="font-display font-semibold mb-3">Per-stop spend</h4>
-          <div className="space-y-2">
-            {trip.stops.map(s => {
-              const d = stopDays(s);
-              const t = (s.costs.stay || 0) * Math.max(0, d - 1) + (s.costs.meals || 0) * d + (s.costs.transport || 0) + s.activities.reduce((a, b) => a + b.cost, 0);
-              return (
-                <div key={s.id} className="flex items-center justify-between text-sm">
-                  <span className="flex items-center gap-2"><MapPin className="h-3 w-3 text-primary" />{s.city}</span>
-                  <span className="font-medium">${t.toLocaleString()}</span>
-                </div>
-              );
-            })}
-            {trip.stops.length === 0 && <p className="text-sm text-muted-foreground">No stops yet.</p>}
-          </div>
-        </div>
       </Card>
     </div>
   );
 }
 
-function Donut({ items, total }: { items: { label: string; value: number; color: string }[]; total: number }) {
-  const r = 60, c = 2 * Math.PI * r;
-  let acc = 0;
-  const colors: Record<string, string> = {
-    'bg-primary': 'hsl(var(--primary))',
-    'bg-accent': 'hsl(var(--accent))',
-    'bg-success': 'hsl(var(--success))',
-    'bg-warning': 'hsl(var(--warning))',
-  };
+function KpiCard({ label, value, accent }: { label: string; value: string; accent?: boolean }) {
   return (
-    <svg width="160" height="160" viewBox="0 0 160 160" className="shrink-0">
-      <circle cx="80" cy="80" r={r} fill="none" stroke="hsl(var(--muted))" strokeWidth="20" />
-      {items.map((it, i) => {
-        const frac = it.value / total;
-        const dash = c * frac;
-        const offset = c * (1 - acc);
-        acc += frac;
-        return (
-          <circle key={i} cx="80" cy="80" r={r} fill="none" stroke={colors[it.color]}
-            strokeWidth="20" strokeDasharray={`${dash} ${c - dash}`} strokeDashoffset={offset}
-            transform="rotate(-90 80 80)" />
-        );
-      })}
-      <text x="80" y="78" textAnchor="middle" className="fill-foreground font-display font-bold" fontSize="16">${Math.round(total).toLocaleString()}</text>
-      <text x="80" y="96" textAnchor="middle" className="fill-muted-foreground" fontSize="10">total</text>
-    </svg>
+    <Card className={`p-4 ${accent ? 'bg-gradient-hero text-primary-foreground' : ''}`}>
+      <div className={`text-xs uppercase tracking-wider ${accent ? 'opacity-80' : 'text-muted-foreground'}`}>{label}</div>
+      <div className="font-display text-2xl font-bold">{value}</div>
+    </Card>
+  );
+}
+
+function Mini({ label, value, color }: { label: string; value: number; color: string }) {
+  return (
+    <div className="rounded-lg border border-border bg-muted/30 p-3">
+      <div className="flex items-center gap-2 text-xs text-muted-foreground">
+        <span className="h-2 w-2 rounded-full" style={{ background: color }} />
+        {label}
+      </div>
+      <div className="mt-1 font-display text-lg font-bold">${value.toLocaleString()}</div>
+    </div>
   );
 }
 
