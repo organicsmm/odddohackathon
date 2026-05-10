@@ -4,6 +4,7 @@ import {
   Star, Globe, Compass, Wand2, ShieldCheck, ChevronRight,
 } from 'lucide-react';
 import ImageGallery from '@/components/ui/image-gallery';
+import { HeroSlider } from '@/components/HeroSlider';
 import { Display, Eyebrow, Heading, Lead, Muted } from "@/components/ui/typography";
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
