@@ -128,7 +128,17 @@ export default function TripDetail() {
             )}
           </dl>
 
-          <div className="flex flex-wrap gap-2">
+          <div className="flex flex-wrap items-center gap-2">
+            <Select value={displayCurrency} onValueChange={(v) => setDisplayCurrency(v as CurrencyCode)}>
+              <SelectTrigger className="h-8 w-[140px] gap-1.5 text-xs" aria-label="Display currency">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent className="max-h-72">
+                {CURRENCIES.map(c => (
+                  <SelectItem key={c.code} value={c.code} className="text-xs">{c.symbol} {c.code} — {c.name}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
             <Button variant="ghost" size="sm" className="gap-1.5" onClick={() => {
               update({ isPublic: !trip.isPublic });
               toast.success(trip.isPublic ? 'Trip is now private' : 'Trip is now public');
