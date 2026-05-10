@@ -105,12 +105,12 @@ export default function TripDetail() {
           <span className="tabular-nums">{new Date(trip.endDate).toLocaleDateString(undefined, { day: 'numeric', month: 'short', year: 'numeric' })}</span>
         </div>
 
-        <h1 className="mt-3 font-display text-5xl font-extrabold leading-[1.02] tracking-tight md:text-7xl">
+        <Display as="h1" className="mt-3" weight="bold">
           {trip.name}
-        </h1>
+        </Display>
 
         {trip.description && (
-          <p className="mt-4 max-w-2xl text-lg leading-relaxed text-muted-foreground">{trip.description}</p>
+          <Lead className="mt-4 max-w-2xl" muted>{trip.description}</Lead>
         )}
 
         {/* meta strip + actions */}
