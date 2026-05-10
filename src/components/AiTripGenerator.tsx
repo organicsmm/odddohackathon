@@ -525,7 +525,18 @@ function StopEditor({
 
 /* ------------------------------ FIELD ------------------------------ */
 
-function Field({ label, error, children, icon }: { label: string; error?: string; children: React.ReactNode; icon?: React.ReactNode }) {
+interface FieldProps {
+  /** Field label rendered above the control. */
+  label: string;
+  /** Validation error message; when present, renders below the control. */
+  error?: string;
+  /** The control(s) the field wraps. */
+  children: React.ReactNode;
+  /** Optional leading icon shown next to the label. */
+  icon?: React.ReactNode;
+}
+
+function Field({ label, error, children, icon }: FieldProps) {
   return (
     <div className="space-y-1">
       <Label className="flex items-center gap-1 text-xs font-medium text-muted-foreground">{icon}{label}</Label>
