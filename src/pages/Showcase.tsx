@@ -94,6 +94,238 @@ function Swatch({ token, label }: { token: string; label?: string }) {
   );
 }
 
+/* -------------------------------------------------------------------------- */
+/*  Playground                                                                */
+/* -------------------------------------------------------------------------- */
+
+type ButtonVariant = 'default' | 'premium' | 'hero' | 'glass' | 'secondary' | 'outline' | 'ghost' | 'link' | 'destructive';
+type ButtonSize = 'sm' | 'default' | 'lg' | 'icon';
+type CardVariant = 'default' | 'premium' | 'glass' | 'aurora';
+type BadgeVariant = 'default' | 'secondary' | 'outline' | 'destructive' | 'gradient' | 'glass';
+type IconKey = 'none' | 'sparkles' | 'star' | 'heart' | 'arrow' | 'plus' | 'trash';
+
+const ICONS: Record<IconKey, { node: React.ReactNode; jsx: string } | null> = {
+  none: null,
+  sparkles: { node: <Sparkles className="h-4 w-4" />, jsx: '<Sparkles className="h-4 w-4" />' },
+  star: { node: <Star className="h-4 w-4" />, jsx: '<Star className="h-4 w-4" />' },
+  heart: { node: <Heart className="h-4 w-4" />, jsx: '<Heart className="h-4 w-4" />' },
+  arrow: { node: <ArrowRight className="h-4 w-4" />, jsx: '<ArrowRight className="h-4 w-4" />' },
+  plus: { node: <Plus className="h-4 w-4" />, jsx: '<Plus className="h-4 w-4" />' },
+  trash: { node: <Trash2 className="h-4 w-4" />, jsx: '<Trash2 className="h-4 w-4" />' },
+};
+
+function Field({ label, children }: { label: string; children: React.ReactNode }) {
+  return (
+    <div className="space-y-1.5">
+      <Label className="text-[11px] font-semibold uppercase tracking-[0.12em] text-muted-foreground">{label}</Label>
+      {children}
+    </div>
+  );
+}
+
+function SelectField<T extends string>({
+  label, value, onChange, options,
+}: { label: string; value: T; onChange: (v: T) => void; options: readonly T[] }) {
+  return (
+    <Field label={label}>
+      <Select value={value} onValueChange={(v) => onChange(v as T)}>
+        <SelectTrigger className="h-9"><SelectValue /></SelectTrigger>
+        <SelectContent>
+          {options.map((o) => <SelectItem key={o} value={o}>{o}</SelectItem>)}
+        </SelectContent>
+      </Select>
+    </Field>
+  );
+}
+
+function ToggleField({ label, value, onChange }: { label: string; value: boolean; onChange: (v: boolean) => void }) {
+  return (
+    <div className="flex items-center justify-between rounded-lg border border-border/60 bg-card/40 px-3 py-2">
+      <Label className="text-xs font-medium text-foreground/80">{label}</Label>
+      <Switch checked={value} onCheckedChange={onChange} />
+    </div>
+  );
+}
+
+function PreviewStage({ children }: { children: React.ReactNode }) {
+  return (
+    <div className="grid min-h-[180px] place-items-center rounded-xl border border-dashed border-border/60 bg-muted/30 p-6">
+      {children}
+    </div>
+  );
+}
+
+function ButtonPlayground() {
+  const [variant, setVariant] = useState<ButtonVariant>('premium');
+  const [size, setSize] = useState<ButtonSize>('default');
+  const [label, setLabel] = useState('Click me');
+  const [icon, setIcon] = useState<IconKey>('sparkles');
+  const [iconPos, setIconPos] = useState<'left' | 'right'>('left');
+  const [disabled, setDisabled] = useState(false);
+
+  const iconNode = ICONS[icon]?.node ?? null;
+  const iconJsx = ICONS[icon]?.jsx ?? '';
+  const isIconOnly = size === 'icon';
+
+  const code = isIconOnly
+    ? `<Button variant="${variant}" size="icon" aria-label="${label}"${disabled ? ' disabled' : ''}>\n  ${iconJsx || '<Star className="h-4 w-4" />'}\n</Button>`
+    : `<Button variant="${variant}" size="${size}"${disabled ? ' disabled' : ''}>${
+        iconJsx && iconPos === 'left' ? `\n  ${iconJsx} ${label}\n` : ''
+      }${
+        iconJsx && iconPos === 'right' ? `\n  ${label} ${iconJsx}\n` : ''
+      }${!iconJsx ? label : ''}</Button>`;
+
+  return (
+    <div className="grid gap-5 lg:grid-cols-[280px_1fr]">
+      <div className="space-y-3">
+        <SelectField label="variant" value={variant} onChange={setVariant} options={['default', 'premium', 'hero', 'glass', 'secondary', 'outline', 'ghost', 'link', 'destructive']} />
+        <SelectField label="size" value={size} onChange={setSize} options={['sm', 'default', 'lg', 'icon']} />
+        <Field label="label">
+          <Input value={label} onChange={(e) => setLabel(e.target.value)} className="h-9" />
+        </Field>
+        <SelectField label="icon" value={icon} onChange={setIcon} options={['none', 'sparkles', 'star', 'heart', 'arrow', 'plus', 'trash']} />
+        {!isIconOnly && icon !== 'none' && (
+          <SelectField label="icon position" value={iconPos} onChange={setIconPos} options={['left', 'right']} />
+        )}
+        <ToggleField label="disabled" value={disabled} onChange={setDisabled} />
+      </div>
+
+      <div className="space-y-3">
+        <PreviewStage>
+          {isIconOnly ? (
+            <Button variant={variant} size="icon" aria-label={label} disabled={disabled}>
+              {iconNode ?? <Star className="h-4 w-4" />}
+            </Button>
+          ) : (
+            <Button variant={variant} size={size} disabled={disabled}>
+              {iconNode && iconPos === 'left' && iconNode}
+              {label}
+              {iconNode && iconPos === 'right' && iconNode}
+            </Button>
+          )}
+        </PreviewStage>
+        <Snippet>{code}</Snippet>
+      </div>
+    </div>
+  );
+}
+
+function CardPlayground() {
+  const [variant, setVariant] = useState<CardVariant>('premium');
+  const [eyebrow, setEyebrow] = useState('Featured');
+  const [title, setTitle] = useState('Plan smarter');
+  const [body, setBody] = useState('One source of truth for the trip.');
+  const [padding, setPadding] = useState<'p-4' | 'p-6' | 'p-8'>('p-6');
+  const [showCta, setShowCta] = useState(true);
+
+  const code = `<Card variant="${variant}" className="${padding}">
+  <Eyebrow tone="primary">${eyebrow}</Eyebrow>
+  <Heading level={3} className="mt-1">${title}</Heading>
+  <Muted variant="small" className="mt-2">${body}</Muted>${showCta ? `\n  <Button variant="premium" size="sm" className="mt-4">\n    Learn more <ArrowRight className="h-4 w-4" />\n  </Button>` : ''}
+</Card>`;
+
+  return (
+    <div className="grid gap-5 lg:grid-cols-[280px_1fr]">
+      <div className="space-y-3">
+        <SelectField label="variant" value={variant} onChange={setVariant} options={['default', 'premium', 'glass', 'aurora']} />
+        <SelectField label="padding" value={padding} onChange={setPadding} options={['p-4', 'p-6', 'p-8']} />
+        <Field label="eyebrow"><Input value={eyebrow} onChange={(e) => setEyebrow(e.target.value)} className="h-9" /></Field>
+        <Field label="title"><Input value={title} onChange={(e) => setTitle(e.target.value)} className="h-9" /></Field>
+        <Field label="body"><Input value={body} onChange={(e) => setBody(e.target.value)} className="h-9" /></Field>
+        <ToggleField label="show CTA" value={showCta} onChange={setShowCta} />
+      </div>
+
+      <div className="space-y-3">
+        <PreviewStage>
+          <Card variant={variant} className={`${padding} w-full max-w-md`}>
+            <Eyebrow tone="primary">{eyebrow}</Eyebrow>
+            <Heading level={3} className="mt-1">{title}</Heading>
+            <Muted variant="small" className="mt-2">{body}</Muted>
+            {showCta && (
+              <Button variant="premium" size="sm" className="mt-4">
+                Learn more <ArrowRight className="h-4 w-4" />
+              </Button>
+            )}
+          </Card>
+        </PreviewStage>
+        <Snippet>{code}</Snippet>
+      </div>
+    </div>
+  );
+}
+
+function BadgePlayground() {
+  const [variant, setVariant] = useState<BadgeVariant>('gradient');
+  const [label, setLabel] = useState('AI-generated');
+  const [icon, setIcon] = useState<IconKey>('sparkles');
+
+  const iconNode = ICONS[icon]?.node ?? null;
+  const iconJsx = ICONS[icon]?.jsx?.replace('h-4 w-4', 'mr-1 h-3 w-3') ?? '';
+
+  const code = `<Badge variant="${variant}">${iconJsx ? `\n  ${iconJsx}\n  ${label}\n` : label}</Badge>`;
+
+  return (
+    <div className="grid gap-5 lg:grid-cols-[280px_1fr]">
+      <div className="space-y-3">
+        <SelectField label="variant" value={variant} onChange={setVariant} options={['default', 'secondary', 'outline', 'destructive', 'gradient', 'glass']} />
+        <Field label="label"><Input value={label} onChange={(e) => setLabel(e.target.value)} className="h-9" /></Field>
+        <SelectField label="icon" value={icon} onChange={setIcon} options={['none', 'sparkles', 'star', 'heart', 'arrow', 'plus', 'trash']} />
+      </div>
+
+      <div className="space-y-3">
+        <PreviewStage>
+          <Badge variant={variant}>
+            {iconNode && <span className="mr-1 inline-flex [&>svg]:h-3 [&>svg]:w-3">{iconNode}</span>}
+            {label}
+          </Badge>
+        </PreviewStage>
+        <Snippet>{code}</Snippet>
+      </div>
+    </div>
+  );
+}
+
+function Playground() {
+  const [tab, setTab] = useState<'button' | 'card' | 'badge'>('button');
+  const tabs: Array<{ id: typeof tab; label: string }> = [
+    { id: 'button', label: 'Button' },
+    { id: 'card', label: 'Card' },
+    { id: 'badge', label: 'Badge' },
+  ];
+
+  return (
+    <Card variant="premium" className="space-y-5 p-6">
+      <div className="flex items-center justify-between">
+        <div className="inline-flex items-center gap-2 rounded-full border border-border/60 bg-muted/40 p-1">
+          {tabs.map((t) => (
+            <button
+              key={t.id}
+              onClick={() => setTab(t.id)}
+              className={`rounded-full px-3 py-1.5 text-xs font-medium transition-smooth focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background ${
+                tab === t.id ? 'bg-card text-foreground shadow-soft' : 'text-muted-foreground hover:text-foreground'
+              }`}
+              aria-pressed={tab === t.id}
+            >
+              {t.label}
+            </button>
+          ))}
+        </div>
+        <Muted variant="small" className="hidden sm:inline-flex items-center gap-1.5">
+          <SlidersHorizontal className="h-3.5 w-3.5" /> Live preview + JSX
+        </Muted>
+      </div>
+
+      {tab === 'button' && <ButtonPlayground />}
+      {tab === 'card' && <CardPlayground />}
+      {tab === 'badge' && <BadgePlayground />}
+    </Card>
+  );
+}
+
+/* -------------------------------------------------------------------------- */
+/*  Showcase                                                                  */
+/* -------------------------------------------------------------------------- */
+
 function Showcase() {
   const [openDefault, setOpenDefault] = useState(false);
   const [openPremium, setOpenPremium] = useState(false);
