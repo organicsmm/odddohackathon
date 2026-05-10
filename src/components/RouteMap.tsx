@@ -51,6 +51,9 @@ export default function RouteMap({ stops, onSelectStop, highlightedStopId }: { s
   const [zoom, setZoom] = useState(1);
   const [center, setCenter] = useState<[number, number]>([0, 20]);
   const [resolved, setResolved] = useState<Record<string, [number, number]>>({});
+  const [showNumbers, setShowNumbers] = useState(true);
+  const [dashedPaths, setDashedPaths] = useState(true);
+  const [highlightEnds, setHighlightEnds] = useState(true);
 
   const lookup = (city: string): [number, number] | null =>
     getCoords(city) ?? resolved[city.trim().toLowerCase()] ?? null;
