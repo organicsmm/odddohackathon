@@ -125,7 +125,7 @@ function Field({ label, children }: { label: string; children: React.ReactNode }
 
 function SelectField<T extends string>({
   label, value, onChange, options,
-}: { label: string; value: T; onChange: (v: T) => void; options: readonly T[] }) {
+}: { label: string; value: T; onChange: React.Dispatch<React.SetStateAction<T>>; options: readonly T[] }) {
   return (
     <Field label={label}>
       <Select value={value} onValueChange={(v) => onChange(v as T)}>
