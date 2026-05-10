@@ -280,8 +280,9 @@ function SortableStopCard(props: {
   onRemove: (id: string) => void;
   onUpdate: (id: string, p: Partial<Stop>) => void;
   onSetDuration: (id: string, days: number) => void;
+  highlighted?: boolean;
 }) {
-  const { stop } = props;
+  const { stop, highlighted } = props;
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id: stop.id });
   const style = {
     transform: CSS.Transform.toString(transform),
@@ -290,7 +291,12 @@ function SortableStopCard(props: {
     zIndex: isDragging ? 10 : 'auto' as const,
   };
   return (
-    <div ref={setNodeRef} style={style}>
+    <div
+      ref={setNodeRef}
+      id={`stop-${stop.id}`}
+      style={style}
+      className={`scroll-mt-24 rounded-2xl transition-shadow ${highlighted ? 'ring-4 ring-primary/60 shadow-glow' : ''}`}
+    >
       <StopCard {...props} dragHandle={{ ...attributes, ...listeners }} />
     </div>
   );
