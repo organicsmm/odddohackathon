@@ -972,7 +972,7 @@ function CategoryGoal({ label, color, spent, goal, currency, onChange }: {
           <>
             <span className="tabular-nums text-muted-foreground">{Math.round(pct)}% used</span>
             <span className={`tabular-nums font-medium ${over ? 'text-destructive' : 'text-success'}`}>
-              {over ? `Over by $${Math.round(remaining).toLocaleString()}` : `$${Math.round(remaining).toLocaleString()} left`}
+              {over ? `Over by ${formatMoney(remaining, currency)}` : `${formatMoney(remaining, currency)} left`}
             </span>
           </>
         ) : (
