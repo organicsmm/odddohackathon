@@ -271,11 +271,11 @@ export default function Landing() {
                   <span className="h-px flex-1 bg-border" />
                   <span className="font-mono text-[10px] uppercase tracking-[0.22em] text-muted-foreground">{d.days} days</span>
                 </div>
-                <h3 className="mt-2 font-display text-2xl font-bold tracking-tight">
+                <Heading level={3} className="mt-2 !text-2xl tracking-tight">
                   <Link to={cta} className="bg-[linear-gradient(currentColor,currentColor)] bg-[length:0%_1px] bg-no-repeat bg-left-bottom transition-[background-size] duration-500 hover:bg-[length:100%_1px]">
                     {d.city}
                   </Link>
-                </h3>
+                </Heading>
                 <p className="mt-1 text-sm text-muted-foreground italic">"{d.kicker}."</p>
                 <div className="mt-3 flex items-center justify-between text-xs">
                   <span className="text-muted-foreground">From <span className="font-display text-base font-bold tabular-nums text-foreground">${d.price.toLocaleString()}</span> <span className="text-muted-foreground/80">/ person</span></span>
