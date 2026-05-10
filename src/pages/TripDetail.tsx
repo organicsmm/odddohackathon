@@ -47,6 +47,19 @@ export default function TripDetail() {
   const navigate = useNavigate();
   const { user } = useAuth();
   const [trip, setTrip] = useState<Trip | undefined>(getTrip(id!));
+  const [activeTab, setActiveTab] = useState('itinerary');
+  const [highlightedStopId, setHighlightedStopId] = useState<string | null>(null);
+
+  const focusStop = (stopId: string) => {
+    setActiveTab('itinerary');
+    setHighlightedStopId(stopId);
+    // wait for tab/list render then scroll
+    setTimeout(() => {
+      const el = document.getElementById(`stop-${stopId}`);
+      el?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }, 80);
+    setTimeout(() => setHighlightedStopId(null), 2200);
+  };
 
   useEffect(() => {
     if (!trip) navigate('/app/trips', { replace: true });
@@ -133,9 +146,11 @@ export default function TripDetail() {
       </header>
 
       {trip.stops.length > 0 && <RouteTimeline stops={trip.stops} />}
-      {trip.stops.length > 0 && <RouteMap stops={trip.stops} />}
+      {trip.stops.length > 0 && (
+        <RouteMap stops={trip.stops} onSelectStop={focusStop} highlightedStopId={highlightedStopId} />
+      )}
 
-      <Tabs defaultValue="itinerary" className="w-full">
+      <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
         <TabsList className="grid w-full grid-cols-2 sm:grid-cols-5 sm:w-auto">
           <TabsTrigger value="itinerary"><MapIcon className="h-4 w-4 mr-1" />Itinerary</TabsTrigger>
           <TabsTrigger value="budget"><Wallet className="h-4 w-4 mr-1" />Budget</TabsTrigger>
@@ -144,7 +159,7 @@ export default function TripDetail() {
           <TabsTrigger value="settings">Settings</TabsTrigger>
         </TabsList>
 
-        <TabsContent value="itinerary" className="mt-6"><Itinerary trip={trip} update={update} /></TabsContent>
+        <TabsContent value="itinerary" className="mt-6"><Itinerary trip={trip} update={update} highlightedStopId={highlightedStopId} /></TabsContent>
         <TabsContent value="budget" className="mt-6"><BudgetView trip={trip} update={update} /></TabsContent>
         <TabsContent value="packing" className="mt-6"><Packing trip={trip} update={update} /></TabsContent>
         <TabsContent value="notes" className="mt-6"><Notes trip={trip} update={update} /></TabsContent>
@@ -156,7 +171,7 @@ export default function TripDetail() {
 
 /* ------------------- ITINERARY ------------------- */
 
-function Itinerary({ trip, update }: { trip: Trip; update: (p: Partial<Trip> | ((t: Trip) => Trip)) => void }) {
+function Itinerary({ trip, update, highlightedStopId }: { trip: Trip; update: (p: Partial<Trip> | ((t: Trip) => Trip)) => void; highlightedStopId?: string | null }) {
   const [view, setView] = useState<'list' | 'calendar'>('list');
 
   const addStop = (p: { city: string; country: string; startDate: string; endDate: string }) => {
@@ -246,6 +261,7 @@ function Itinerary({ trip, update }: { trip: Trip; update: (p: Partial<Trip> | (
                   <SortableStopCard
                     key={s.id} stop={s} index={i}
                     onRemove={removeStop} onUpdate={updateStop} onSetDuration={setDuration}
+                    highlighted={highlightedStopId === s.id}
                   />
                 ))}
               </div>
@@ -264,8 +280,9 @@ function SortableStopCard(props: {
   onRemove: (id: string) => void;
   onUpdate: (id: string, p: Partial<Stop>) => void;
   onSetDuration: (id: string, days: number) => void;
+  highlighted?: boolean;
 }) {
-  const { stop } = props;
+  const { stop, highlighted } = props;
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id: stop.id });
   const style = {
     transform: CSS.Transform.toString(transform),
@@ -274,7 +291,12 @@ function SortableStopCard(props: {
     zIndex: isDragging ? 10 : 'auto' as const,
   };
   return (
-    <div ref={setNodeRef} style={style}>
+    <div
+      ref={setNodeRef}
+      id={`stop-${stop.id}`}
+      style={style}
+      className={`scroll-mt-24 rounded-2xl transition-shadow ${highlighted ? 'ring-4 ring-primary/60 shadow-glow' : ''}`}
+    >
       <StopCard {...props} dragHandle={{ ...attributes, ...listeners }} />
     </div>
   );
