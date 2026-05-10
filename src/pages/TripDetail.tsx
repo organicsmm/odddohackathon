@@ -2,8 +2,11 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { useEffect, useMemo, useState } from 'react';
 import {
   Calendar, MapPin, Plus, Trash2, Share2, Globe, Lock, GripVertical,
-  Wallet, ListChecks, StickyNote, MapIcon, ChevronLeft, Clock, Printer,
+  Wallet, ListChecks, StickyNote, MapIcon, ChevronLeft, Clock, Download,
+  FileText, FileSpreadsheet, Printer,
 } from 'lucide-react';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuSeparator } from '@/components/ui/dropdown-menu';
+import { exportTripPDF, exportTripCSV } from '@/lib/export';
 import { useAuth } from '@/contexts/AuthContext';
 import { getTrip, upsertTrip, uid, tripCost, stopDays, tripDays, resequenceStops } from '@/lib/store';
 import type { Trip, Stop, Activity, Note, PackItem } from '@/lib/types';
