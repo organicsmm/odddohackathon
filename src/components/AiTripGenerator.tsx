@@ -153,6 +153,7 @@ export default function AiTripGenerator({ trigger }: { trigger?: React.ReactNode
             onRegenerate={() => { setStep('form'); }}
           />
         ) : null}
+        </div>
       </DialogContent>
     </Dialog>
   );
