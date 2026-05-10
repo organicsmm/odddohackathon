@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { ArrowRight, Calendar, MapPin, Wallet, Share2, ListChecks, Users, Plane } from 'lucide-react';
+import { ArrowRight, Calendar, MapPin, Wallet, Share2, ListChecks, Users, Plane, Sparkles } from 'lucide-react';
 import heroImg from '@/assets/hero-travel.jpg';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/contexts/AuthContext';
