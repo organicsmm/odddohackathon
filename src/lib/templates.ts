@@ -81,6 +81,8 @@ export const TEMPLATES: TripTemplate[] = [
     tagline: 'Tokyo neon to Kyoto temples',
     days: 10,
     estimate: 2600,
+    cover: cover('1493976040374-85c8e12f0c0e'),
+    countries: ['Japan'],
     build: () => ({
       name: 'Japan Discovery',
       description: '10 days across Tokyo, Kyoto and Osaka.',
