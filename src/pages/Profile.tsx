@@ -88,7 +88,7 @@ export default function Profile() {
 
       <div className="space-y-4">
         <Card variant="aurora" className="p-6 text-primary-foreground">
-          <div className="text-xs uppercase tracking-wider opacity-90">Your travel stats</div>
+          <Eyebrow className="opacity-90">Your travel stats</Eyebrow>
           <div className="mt-2 font-display text-4xl font-extrabold tabular-nums">{tripCount}</div>
           <div className="text-sm opacity-90">trips planned</div>
           <div className="mt-3 font-display text-3xl font-bold tabular-nums">{user.saved.length}</div>
