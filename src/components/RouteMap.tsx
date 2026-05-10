@@ -121,7 +121,24 @@ export default function RouteMap({ stops, onSelectStop, highlightedStopId }: { s
             </p>
           </div>
         </div>
-        <div className="flex gap-1">
+        <div className="flex flex-wrap items-center gap-1">
+          <div className="mr-1 flex gap-1 rounded-lg border border-border bg-muted/40 p-0.5">
+            <Button
+              size="icon" variant={showNumbers ? 'secondary' : 'ghost'}
+              className="h-7 w-7" onClick={() => setShowNumbers(v => !v)}
+              aria-label="Toggle numbered pins" title="Numbered pins"
+            ><Hash className="h-3.5 w-3.5" /></Button>
+            <Button
+              size="icon" variant={dashedPaths ? 'secondary' : 'ghost'}
+              className="h-7 w-7" onClick={() => setDashedPaths(v => !v)}
+              aria-label="Toggle dashed paths" title="Dashed route paths"
+            ><Route className="h-3.5 w-3.5" /></Button>
+            <Button
+              size="icon" variant={highlightEnds ? 'secondary' : 'ghost'}
+              className="h-7 w-7" onClick={() => setHighlightEnds(v => !v)}
+              aria-label="Toggle start/end highlight" title="Highlight start & end"
+            ><Flag className="h-3.5 w-3.5" /></Button>
+          </div>
           <Button size="icon" variant="ghost" onClick={() => setZoom(z => Math.min(z * 1.5, 16))} aria-label="Zoom in"><ZoomIn className="h-4 w-4" /></Button>
           <Button size="icon" variant="ghost" onClick={() => setZoom(z => Math.max(z / 1.5, 1))} aria-label="Zoom out"><ZoomOut className="h-4 w-4" /></Button>
           <Button size="icon" variant="ghost" onClick={fitView} aria-label="Fit"><Maximize2 className="h-4 w-4" /></Button>
