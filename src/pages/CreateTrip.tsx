@@ -37,9 +37,10 @@ export default function CreateTrip() {
   const submit = (e: React.FormEvent) => {
     e.preventDefault();
     try {
+      const inrBudget = budget ? Number(budget) : undefined;
       const data = schema.parse({
         name, description, startDate, endDate,
-        budget: budget ? Number(budget) : undefined,
+        budget: inrBudget !== undefined ? inrBudget / getRate('INR') : undefined,
         cover,
       });
       if (new Date(data.endDate) < new Date(data.startDate)) throw new Error('End date must be after start date');
