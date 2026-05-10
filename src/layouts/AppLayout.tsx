@@ -51,6 +51,7 @@ export default function AppLayout() {
             ))}
           </nav>
           <div className="flex items-center gap-2">
+            {import.meta.env.DEV && <BuildStatusBadge />}
             <span className="hidden text-sm text-muted-foreground sm:inline">Hi, {user.name.split(' ')[0]}</span>
             <Button variant="ghost" size="icon" onClick={() => { logout(); navigate('/login'); }} aria-label="Log out">
               <LogOut className="h-4 w-4" />
