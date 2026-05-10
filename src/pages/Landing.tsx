@@ -65,13 +65,22 @@ export default function Landing() {
         </div>
       </header>
 
-      {/* HERO — centered intro + cinematic travel marquee */}
+      {/* HERO — cinematic travel marquee as background */}
       <section className="relative overflow-hidden">
-        {/* aurora backdrop */}
-        <div aria-hidden className="absolute inset-0 bg-gradient-aurora opacity-70" />
+        {/* travel marquee backdrop */}
+        <div aria-hidden className="absolute inset-0">
+          <div className="absolute inset-0 flex flex-col justify-center gap-6 opacity-40 [mask-image:radial-gradient(ellipse_at_center,black_30%,transparent_75%)]">
+            <TravelMarquee />
+          </div>
+          {/* legibility overlays */}
+          <div className="absolute inset-0 bg-background/55" />
+          <div className="absolute inset-0 bg-gradient-to-b from-background/40 via-background/20 to-background" />
+        </div>
+        {/* aurora glow */}
+        <div aria-hidden className="absolute inset-0 bg-gradient-aurora opacity-50" />
         <div aria-hidden className="absolute -top-40 left-1/2 h-[480px] w-[480px] -translate-x-1/2 rounded-full bg-primary/15 blur-[160px]" />
 
-        <div className="relative container flex flex-col items-center justify-center text-center pt-20 pb-10 md:pt-28 md:pb-14">
+        <div className="relative container flex flex-col items-center justify-center text-center pt-24 pb-24 md:pt-36 md:pb-32">
           <div className="mx-auto max-w-4xl animate-fade-in">
             <Badge variant="glass" className="border-border/60 mx-auto">
               <Sparkles className="h-3 w-3 text-accent" /> New · AI Trip Generator
