@@ -58,6 +58,7 @@ export type Trip = {
   packing: PackItem[];
   notes: Note[];
   budget?: number;
+  categoryBudgets?: { transport?: number; stay?: number; meals?: number; activities?: number };
   invites?: TripInvite[];
   sharedWith?: string[]; // emails with private access
   createdAt: string;
