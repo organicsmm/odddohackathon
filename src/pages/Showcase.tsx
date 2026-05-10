@@ -452,8 +452,20 @@ function Playground() {
 function Showcase() {
   const [openDefault, setOpenDefault] = useState(false);
   const [openPremium, setOpenPremium] = useState(false);
+  const [query, setQuery] = useState('');
+  const [category, setCategory] = useState<Category | 'all'>('all');
+
+  const visibleIds = useMemo(
+    () => new Set(SECTIONS.filter((s) => sectionMatches(s, query, category)).map((s) => s.id)),
+    [query, category],
+  );
+  const filterValue = useMemo(
+    () => ({ query, category, matches: (id: string) => visibleIds.has(id) }),
+    [query, category, visibleIds],
+  );
 
   return (
+    <FilterContext.Provider value={filterValue}>
     <div className="min-h-screen bg-background">
       {/* Hero */}
       <header className="relative overflow-hidden border-b border-border/60">
