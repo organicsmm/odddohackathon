@@ -200,22 +200,60 @@ export default function TripDetail() {
         </div>
       )}
 
-      <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-        <TabsList className="grid w-full grid-cols-2 sm:grid-cols-5 sm:w-auto">
-          <TabsTrigger value="itinerary"><MapIcon className="h-4 w-4 mr-1" />Itinerary</TabsTrigger>
-          <TabsTrigger value="budget"><Wallet className="h-4 w-4 mr-1" />Budget</TabsTrigger>
-          <TabsTrigger value="packing"><ListChecks className="h-4 w-4 mr-1" />Packing</TabsTrigger>
-          <TabsTrigger value="notes"><StickyNote className="h-4 w-4 mr-1" />Notes</TabsTrigger>
-          <TabsTrigger value="settings">Settings</TabsTrigger>
-        </TabsList>
+      <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full animate-fade-up" style={{ animationDelay: '200ms' } as React.CSSProperties}>
+        <div className="border-b border-border/60">
+          <TabsList className="h-auto w-full justify-start gap-1 bg-transparent p-0 sm:w-auto">
+            <EditorialTab value="itinerary" icon={<MapIcon className="h-3.5 w-3.5" />}>Itinerary</EditorialTab>
+            <EditorialTab value="budget" icon={<Wallet className="h-3.5 w-3.5" />}>Budget</EditorialTab>
+            <EditorialTab value="packing" icon={<ListChecks className="h-3.5 w-3.5" />}>Packing</EditorialTab>
+            <EditorialTab value="notes" icon={<StickyNote className="h-3.5 w-3.5" />}>Notes</EditorialTab>
+            <EditorialTab value="settings">Settings</EditorialTab>
+          </TabsList>
+        </div>
 
-        <TabsContent value="itinerary" className="mt-6"><Itinerary trip={trip} update={update} highlightedStopId={highlightedStopId} /></TabsContent>
-        <TabsContent value="budget" className="mt-6"><BudgetView trip={trip} update={update} /></TabsContent>
-        <TabsContent value="packing" className="mt-6"><Packing trip={trip} update={update} /></TabsContent>
-        <TabsContent value="notes" className="mt-6"><Notes trip={trip} update={update} /></TabsContent>
-        <TabsContent value="settings" className="mt-6"><Settings trip={trip} update={update} onDelete={() => navigate('/app/trips')} /></TabsContent>
+        <TabsContent value="itinerary" className="mt-8 animate-fade-in"><Itinerary trip={trip} update={update} highlightedStopId={highlightedStopId} /></TabsContent>
+        <TabsContent value="budget" className="mt-8 animate-fade-in"><BudgetView trip={trip} update={update} /></TabsContent>
+        <TabsContent value="packing" className="mt-8 animate-fade-in"><Packing trip={trip} update={update} /></TabsContent>
+        <TabsContent value="notes" className="mt-8 animate-fade-in"><Notes trip={trip} update={update} /></TabsContent>
+        <TabsContent value="settings" className="mt-8 animate-fade-in"><Settings trip={trip} update={update} onDelete={() => navigate('/app/trips')} /></TabsContent>
       </Tabs>
     </div>
+  );
+}
+
+/* ───────── editorial helpers ───────── */
+
+function HeroStat({ label, value, accent, tone }: { label: string; value: string; accent?: boolean; tone?: 'success' | 'destructive' }) {
+  const valueClass =
+    tone === 'destructive' ? 'text-destructive'
+    : tone === 'success' ? 'text-success'
+    : accent ? 'text-foreground'
+    : 'text-foreground';
+  return (
+    <div className="flex flex-col">
+      <dt className="text-[10px] font-semibold uppercase tracking-[0.16em] text-muted-foreground">{label}</dt>
+      <dd className={`mt-1 font-display text-2xl font-bold tabular-nums leading-none ${valueClass}`}>{value}</dd>
+    </div>
+  );
+}
+
+function SectionLabel({ children }: { children: React.ReactNode }) {
+  return (
+    <div className="flex items-center gap-3">
+      <span className="h-px flex-none w-8 bg-border" />
+      <span className="text-[11px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">{children}</span>
+    </div>
+  );
+}
+
+function EditorialTab({ value, icon, children }: { value: string; icon?: React.ReactNode; children: React.ReactNode }) {
+  return (
+    <TabsTrigger
+      value={value}
+      className="relative h-10 rounded-none border-0 bg-transparent px-3 text-sm font-medium text-muted-foreground shadow-none transition-colors hover:text-foreground data-[state=active]:bg-transparent data-[state=active]:text-foreground data-[state=active]:shadow-none after:absolute after:inset-x-2 after:-bottom-px after:h-[2px] after:rounded-full after:bg-foreground after:scale-x-0 after:transition-transform after:duration-300 data-[state=active]:after:scale-x-100"
+    >
+      {icon}{icon && <span className="ml-1.5" />}{children}
+    </TabsTrigger>
   );
 }
 
