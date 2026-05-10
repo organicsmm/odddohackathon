@@ -197,7 +197,7 @@ export default function RouteMap({ stops, onSelectStop, highlightedStopId }: { s
             <Plane className="h-4 w-4" />
           </span>
           <div>
-            <h3 className="font-display text-lg font-bold leading-tight">Route map</h3>
+            <Heading level={3} className="!text-lg leading-tight">Route map</Heading>
             <p className="text-xs text-muted-foreground">{subtitle}</p>
           </div>
         </div>
