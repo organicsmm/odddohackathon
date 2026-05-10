@@ -132,6 +132,7 @@ function climateFallback(city: string, startDate: string, endDate: string, known
       tempMax, tempMin,
       precipProb: seed * 10,
       icon, label,
+      source: 'climate',
     });
   }
   return out;
