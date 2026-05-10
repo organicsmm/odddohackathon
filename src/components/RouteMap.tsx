@@ -422,6 +422,12 @@ export default function RouteMap({ stops, onSelectStop, highlightedStopId }: { s
               </div>
               <div className="mt-1.5 flex items-center gap-1.5 text-[10px]">
                 <span
+                  role="status"
+                  aria-label={
+                    p.confidence === 'exact'
+                      ? `Confidence: exact. ${p.source === 'builtin' ? 'Pinpointed from built-in city database.' : `Geocoder match: ${p.matchedName ?? p.stop.city}${p.country ? ', ' + p.country : ''}.`}`
+                      : `Confidence: approximate. Best-effort match: ${p.matchedName ?? 'unknown'}${p.country ? ', ' + p.country : ''}. Verify the marker.`
+                  }
                   className={`inline-flex items-center gap-1 rounded-full px-1.5 py-0.5 font-semibold uppercase tracking-wider ${
                     p.confidence === 'exact'
                       ? 'bg-success/10 text-success'
@@ -435,7 +441,7 @@ export default function RouteMap({ stops, onSelectStop, highlightedStopId }: { s
                         : `Best-effort match: ${p.matchedName ?? '—'}${p.country ? ', ' + p.country : ''}. Verify the marker.`
                   }
                 >
-                  <span className={`h-1.5 w-1.5 rounded-full ${p.confidence === 'exact' ? 'bg-success' : 'bg-warning'}`} />
+                  <span aria-hidden="true" className={`h-1.5 w-1.5 rounded-full ${p.confidence === 'exact' ? 'bg-success' : 'bg-warning'}`} />
                   {p.confidence === 'exact' ? 'Exact' : 'Approx.'}
                 </span>
                 <span className="text-muted-foreground">
