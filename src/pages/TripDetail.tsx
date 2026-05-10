@@ -1151,7 +1151,7 @@ function Notes({ trip, update }: { trip: Trip; update: (p: Partial<Trip> | ((t: 
   return (
     <div className="grid gap-6 lg:grid-cols-[320px_1fr]">
       <Card className="h-fit p-6">
-        <h3 className="font-display text-lg font-bold">New note</h3>
+        <Heading level={3} className="!text-lg">New note</Heading>
         <form onSubmit={add} className="mt-3 space-y-3">
           <Input value={title} onChange={e => setTitle(e.target.value)} placeholder="Title" />
           <Textarea value={body} onChange={e => setBody(e.target.value)} placeholder="Anything to remember..." rows={5} />
