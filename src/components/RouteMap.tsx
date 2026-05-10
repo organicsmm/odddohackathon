@@ -65,22 +65,27 @@ export default function RouteMap({ stops, onSelectStop, highlightedStopId }: { s
     let cancelled = false;
     const missingCities = stops
       .map(s => s.city)
-      .filter(c => !getCoords(c) && !(c.trim().toLowerCase() in resolved));
+      .filter(c => !getCoords(c) && !(c.trim().toLowerCase() in resolved) && !(c.trim().toLowerCase() in failed));
     if (missingCities.length === 0) return;
 
+    setPendingCount(missingCities.length);
     (async () => {
       const updates: Record<string, [number, number]> = {};
+      const fails: Record<string, true> = {};
       for (const city of missingCities) {
         const c = await geocodeCity(city);
-        if (c) updates[city.trim().toLowerCase()] = c;
+        const key = city.trim().toLowerCase();
+        if (c) updates[key] = c;
+        else fails[key] = true;
+        if (!cancelled) setPendingCount(n => Math.max(0, n - 1));
       }
-      if (!cancelled && Object.keys(updates).length) {
-        setResolved(prev => ({ ...prev, ...updates }));
-      }
+      if (cancelled) return;
+      if (Object.keys(updates).length) setResolved(prev => ({ ...prev, ...updates }));
+      if (Object.keys(fails).length) setFailed(prev => ({ ...prev, ...fails }));
     })();
 
     return () => { cancelled = true; };
-  }, [stops, resolved]);
+  }, [stops, resolved, failed]);
 
   const plotted: PlottedStop[] = useMemo(() => {
     return stops
