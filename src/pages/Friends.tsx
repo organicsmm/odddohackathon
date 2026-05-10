@@ -61,8 +61,9 @@ export default function Friends() {
   return (
     <div className="space-y-8">
       <header>
-        <h1 className="font-display text-3xl font-extrabold md:text-4xl">Friends</h1>
-        <p className="mt-1 text-muted-foreground">Build your travel circle and share trips privately via invite links.</p>
+        <Eyebrow tone="primary">Travel circle</Eyebrow>
+        <Heading level={1} className="mt-1" weight="bold">Friends</Heading>
+        <Lead muted className="mt-1">Build your travel circle and share trips privately via invite links.</Lead>
       </header>
 
       <div className="grid gap-6 lg:grid-cols-[360px_1fr]">
