@@ -3,13 +3,15 @@ import { useEffect, useMemo, useState } from 'react';
 import {
   Calendar, MapPin, Plus, Trash2, Share2, Globe, Lock, GripVertical,
   Wallet, ListChecks, StickyNote, MapIcon, ChevronLeft, Clock, Download,
-  FileText, FileSpreadsheet, Printer,
+  FileText, FileSpreadsheet, Printer, Users, Copy, X, Mail,
 } from 'lucide-react';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuSeparator } from '@/components/ui/dropdown-menu';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogDescription } from '@/components/ui/dialog';
+import { Select as USelect, SelectContent as USelectContent, SelectItem as USelectItem, SelectTrigger as USelectTrigger, SelectValue as USelectValue } from '@/components/ui/select';
 import { exportTripPDF, exportTripCSV } from '@/lib/export';
 import { useAuth } from '@/contexts/AuthContext';
-import { getTrip, upsertTrip, uid, tripCost, stopDays, tripDays, resequenceStops } from '@/lib/store';
-import type { Trip, Stop, Activity, Note, PackItem } from '@/lib/types';
+import { getTrip, upsertTrip, uid, tripCost, stopDays, tripDays, resequenceStops, createInvite, revokeInvite, unshareWith } from '@/lib/store';
+import type { Trip, Stop, Activity, Note, PackItem, Friend } from '@/lib/types';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
