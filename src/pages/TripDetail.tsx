@@ -118,11 +118,11 @@ export default function TripDetail() {
           <dl className="flex flex-wrap items-center gap-x-8 gap-y-3">
             <HeroStat label="Duration" value={`${tripDays(trip)} days`} />
             <HeroStat label="Stops" value={trip.stops.length.toString()} />
-            <HeroStat label="Estimated" value={fmtUsd(cost.total)} accent />
+            <HeroStat label="Estimated" value={fmtMoney(cost.total)} accent />
             {trip.budget && (
               <HeroStat
                 label={overBudget ? 'Over budget' : 'Remaining'}
-                value={fmtUsd(Math.abs(trip.budget - cost.total))}
+                value={fmtMoney(Math.abs(trip.budget - cost.total))}
                 tone={overBudget ? 'destructive' : 'success'}
               />
             )}
@@ -180,7 +180,7 @@ export default function TripDetail() {
           <div className="mt-6 animate-fade-up" style={{ animationDelay: '120ms' }}>
             <div className="flex items-end justify-between text-xs text-muted-foreground">
               <span className="font-medium">{Math.round(budgetPct)}% of budget</span>
-              <span className="tabular-nums">{fmtUsd(cost.total)} <span className="text-border">/</span> {fmtUsd(trip.budget)}</span>
+              <span className="tabular-nums">{fmtMoney(cost.total)} <span className="text-border">/</span> {fmtMoney(trip.budget)}</span>
             </div>
             <div className="mt-2 h-[3px] w-full overflow-hidden rounded-full bg-muted">
               <div
