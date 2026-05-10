@@ -50,6 +50,8 @@ function MarqueeRow({ items, direction = "left", rotate = 0 }: RowProps) {
               src={item.src}
               alt={item.caption}
               loading="lazy"
+              decoding="async"
+              {...({ fetchpriority: "low" } as Record<string, string>)}
               className="h-full w-full object-cover"
             />
             <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/55 to-transparent p-4">
