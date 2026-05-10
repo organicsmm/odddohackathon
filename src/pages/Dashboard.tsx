@@ -193,22 +193,22 @@ export default function Dashboard() {
 
 function Stat({ icon: Icon, label, value }: { icon: React.ComponentType<{ className?: string }>; label: string; value: string }) {
   return (
-    <div className="rounded-2xl bg-white/15 p-4 backdrop-blur-md ring-1 ring-white/15">
-      <div className="flex items-center gap-2 text-[10px] font-semibold uppercase tracking-[0.16em] opacity-80">
+    <div className="bg-card p-5">
+      <div className="flex items-center gap-2 text-[11px] font-medium uppercase tracking-[0.08em] text-muted-foreground">
         <Icon className="h-3.5 w-3.5" /> {label}
       </div>
-      <div className="mt-1.5 font-display text-3xl font-extrabold tabular-nums">{value}</div>
+      <div className="mt-2 text-2xl font-semibold tabular-nums tracking-tight text-foreground">{value}</div>
     </div>
   );
 }
 
 function SectionHeader({ title, eyebrow, link, icon: Icon }: { title: string; eyebrow?: string; link?: string; icon?: React.ComponentType<{ className?: string }> }) {
   return (
-    <div className="mb-5 flex items-end justify-between">
+    <div className="mb-4 flex items-end justify-between">
       <div>
         {eyebrow && <Eyebrow>{eyebrow}</Eyebrow>}
-        <Heading level={2} className="mt-1 !text-2xl flex items-center gap-2">
-          {Icon && <Icon className="h-5 w-5 text-accent" />}
+        <Heading level={2} className="mt-1 !text-xl flex items-center gap-2">
+          {Icon && <Icon className="h-5 w-5 text-muted-foreground" />}
           {title}
         </Heading>
       </div>
@@ -219,13 +219,13 @@ function SectionHeader({ title, eyebrow, link, icon: Icon }: { title: string; ey
 
 function EmptyState() {
   return (
-    <Card variant="aurora" className="p-10 text-center">
-      <span className="mx-auto mb-3 grid h-14 w-14 place-items-center rounded-2xl bg-card shadow-ring">
-        <Compass className="h-6 w-6 text-primary" />
+    <Card className="p-10 text-center">
+      <span className="mx-auto mb-3 grid h-12 w-12 place-items-center rounded-lg bg-secondary">
+        <Compass className="h-5 w-5 text-muted-foreground" />
       </span>
-      <Heading level={3} className="!text-xl">No upcoming trips yet</Heading>
+      <Heading level={3} className="!text-lg">No upcoming trips yet</Heading>
       <Muted className="mt-1">Create your first trip to start planning.</Muted>
-      <Button asChild variant="premium" className="mt-5"><Link to="/app/new"><Plus className="h-4 w-4" /> Create your first trip</Link></Button>
+      <Button asChild className="mt-5"><Link to="/app/new"><Plus className="h-4 w-4" /> Create your first trip</Link></Button>
     </Card>
   );
 }
