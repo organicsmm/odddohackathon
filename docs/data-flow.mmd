@@ -5,7 +5,7 @@ sequenceDiagram
     participant Store as Local Store
     participant DB as Supabase DB (RLS)
     participant Edge as Edge Function
-    participant AI as Lovable AI Gateway
+    participant AI as AI Gateway
 
     Note over U,UI: Sign up / Log in
     U->>UI: Enter credentials
@@ -20,7 +20,7 @@ sequenceDiagram
     DB-->>Store: ok
 
     Note over U,AI: AI Trip Generator
-    U->>UI: Enter prompt "5 days in Goa, beach vibe"
+    U->>UI: Enter prompt
     UI->>Edge: invoke generate-trip
     Edge->>AI: prompt + system instructions
     AI-->>Edge: structured itinerary JSON

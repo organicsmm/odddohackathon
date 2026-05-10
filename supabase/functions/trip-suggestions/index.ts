@@ -33,7 +33,9 @@ Deno.serve(async (req) => {
       });
     }
 
-    const apiKey = Deno.env.get("LOVABLE_API_KEY");
+    const apiKey = Deno.env.get("AI_GATEWAY_KEY");
+    const baseUrl = Deno.env.get("AI_GATEWAY_URL") ?? "https://api.openai.com/v1";
+    const model = Deno.env.get("AI_MODEL") ?? "gpt-4o-mini";
     if (!apiKey) {
       return new Response(JSON.stringify({ error: "AI gateway not configured" }), {
         status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" },
@@ -47,15 +49,14 @@ Deno.serve(async (req) => {
       "Give me real-time, destination-specific suggestions.",
     ].filter(Boolean).join("\n");
 
-    const res = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+    const res = await fetch(`${baseUrl}/chat/completions`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        "Lovable-API-Key": apiKey,
-        "X-Lovable-AIG-SDK": "fetch",
+        "Authorization": `Bearer ${apiKey}`,
       },
       body: JSON.stringify({
-        model: "google/gemini-3-flash-preview",
+        model,
         stream: true,
         messages: [
           { role: "system", content: SYSTEM },

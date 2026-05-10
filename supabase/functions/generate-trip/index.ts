@@ -1,4 +1,4 @@
-// AI Trip Generator – uses Lovable AI Gateway via OpenAI-compatible API.
+// AI Trip Generator – calls an OpenAI-compatible AI gateway.
 // Returns a structured trip itinerary (stops + activities) from a free-form prompt.
 
 const corsHeaders = {
@@ -39,20 +39,21 @@ Deno.serve(async (req) => {
       return new Response(JSON.stringify({ error: "Missing prompt" }), { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } });
     }
 
-    const apiKey = Deno.env.get("LOVABLE_API_KEY");
+    const apiKey = Deno.env.get("AI_GATEWAY_KEY");
+    const baseUrl = Deno.env.get("AI_GATEWAY_URL") ?? "https://api.openai.com/v1";
+    const model = Deno.env.get("AI_MODEL") ?? "gpt-4o-mini";
     if (!apiKey) {
       return new Response(JSON.stringify({ error: "AI gateway not configured" }), { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } });
     }
 
-    const res = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+    const res = await fetch(`${baseUrl}/chat/completions`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        "Lovable-API-Key": apiKey,
-        "X-Lovable-AIG-SDK": "fetch",
+        "Authorization": `Bearer ${apiKey}`,
       },
       body: JSON.stringify({
-        model: "google/gemini-3-flash-preview",
+        model,
         messages: [
           { role: "system", content: SYSTEM },
           { role: "user", content: prompt },

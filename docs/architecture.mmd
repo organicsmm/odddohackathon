@@ -7,7 +7,7 @@ graph TB
         AuthCtx[AuthContext]
     end
 
-    subgraph Cloud["Lovable Cloud - Supabase"]
+    subgraph Cloud["Supabase Backend"]
         Auth[Supabase Auth<br/>email + Google OAuth]
         DB[(Postgres + RLS)]
         Edge1[Edge Function<br/>generate-trip]
@@ -15,8 +15,8 @@ graph TB
     end
 
     subgraph AI["AI Layer"]
-        Gateway[Lovable AI Gateway]
-        Gemini[Google Gemini 2.5<br/>Flash / Pro]
+        Gateway[OpenAI-compatible<br/>AI Gateway]
+        Gemini[Google Gemini<br/>Flash / Pro]
     end
 
     subgraph Tables["Database Tables"]
@@ -43,12 +43,3 @@ graph TB
     DB --- T2
     DB --- T3
     DB --- T4
-
-    classDef cloud fill:#1e40af,stroke:#1e3a8a,color:#fff
-    classDef ai fill:#7c3aed,stroke:#5b21b6,color:#fff
-    classDef client fill:#0891b2,stroke:#0e7490,color:#fff
-    classDef table fill:#334155,stroke:#1e293b,color:#fff
-    class Auth,DB,Edge1,Edge2 cloud
-    class Gateway,Gemini ai
-    class UI,Router,Store,Query,AuthCtx client
-    class T1,T2,T3,T4 table
