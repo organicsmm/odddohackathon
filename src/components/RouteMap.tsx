@@ -278,7 +278,12 @@ export default function RouteMap({ stops, onSelectStop, highlightedStopId }: { s
                   style={{ default: { cursor: 'pointer' }, hover: { cursor: 'pointer' }, pressed: { cursor: 'pointer' } }}
                 >
                   {/* pulse ring */}
-                  <circle r={isHover || isSelected ? 14 : 10} fill={fill} fillOpacity={isSelected ? 0.35 : 0.18}>
+                  <circle
+                    r={isHover || isSelected ? 14 : 10}
+                    fill={fill}
+                    fillOpacity={isSelected ? 0.35 : 0.18}
+                    style={{ transition: 'fill 300ms ease, fill-opacity 300ms ease, r 300ms ease' }}
+                  >
                     <animate attributeName="r" values="8;16;8" dur="2.4s" repeatCount="indefinite" />
                     <animate attributeName="fill-opacity" values="0.25;0;0.25" dur="2.4s" repeatCount="indefinite" />
                   </circle>
@@ -289,10 +294,25 @@ export default function RouteMap({ stops, onSelectStop, highlightedStopId }: { s
                     stroke="white"
                     strokeWidth={1.8}
                     strokeDasharray={p.confidence === 'approximate' ? '2 1.5' : undefined}
+                    style={{ transition: 'fill 300ms ease, r 300ms ease, stroke 300ms ease' }}
                   />
-                  {isSelected && (
-                    <circle r={11} fill="none" stroke={ringColor} strokeWidth={2} strokeDasharray="3 2" />
-                  )}
+                  {/* selection ring: always rendered so it can fade in/out smoothly */}
+                  <circle
+                    r={11}
+                    fill="none"
+                    stroke={ringColor}
+                    strokeWidth={2}
+                    strokeDasharray="3 2"
+                    style={{
+                      opacity: isSelected ? 1 : 0,
+                      transform: isSelected ? 'scale(1)' : 'scale(0.7)',
+                      transformOrigin: 'center',
+                      transformBox: 'fill-box',
+                      transition: 'opacity 300ms ease, transform 300ms cubic-bezier(0.34, 1.56, 0.64, 1)',
+                    }}
+                  >
+                    <animate attributeName="stroke-dashoffset" from="0" to="10" dur="1.2s" repeatCount="indefinite" />
+                  </circle>
                   {/* tiny "?" badge for approximate */}
                   {p.confidence === 'approximate' && (
                     <g transform="translate(6,-6)">
