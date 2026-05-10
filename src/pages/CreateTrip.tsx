@@ -87,8 +87,8 @@ export default function CreateTrip() {
           </div>
           <div className="grid gap-4 sm:grid-cols-2">
             <div className="space-y-1.5">
-              <Label htmlFor="budget">Budget (USD)</Label>
-              <Input id="budget" type="number" min={0} value={budget} onChange={e => setBudget(e.target.value)} placeholder="2000" />
+              <Label htmlFor="budget">Budget (INR)</Label>
+              <Input id="budget" type="number" min={0} value={budget} onChange={e => setBudget(e.target.value)} placeholder="150000" />
             </div>
             <div className="space-y-1.5">
               <Label htmlFor="cover">Cover image URL</Label>
