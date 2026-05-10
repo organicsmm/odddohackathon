@@ -17,6 +17,7 @@ import Friends from "./pages/Friends";
 import AcceptInvite from "./pages/AcceptInvite";
 import NotFound from "./pages/NotFound.tsx";
 import Showcase from "./pages/Showcase";
+import TypographyPreview from "./pages/TypographyPreview";
 
 const queryClient = new QueryClient();
 
