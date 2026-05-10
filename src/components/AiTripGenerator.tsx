@@ -117,20 +117,27 @@ export default function AiTripGenerator({ trigger }: { trigger?: React.ReactNode
           </Button>
         )}
       </DialogTrigger>
-      <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
-        <DialogHeader>
-          <DialogTitle className="font-display text-2xl flex items-center gap-2">
-            <span className="grid h-9 w-9 place-items-center rounded-xl bg-gradient-hero shadow-glow">
-              <Wand2 className="h-5 w-5 text-primary-foreground" />
-            </span>
-            {step === 'form' ? 'AI Trip Generator' : 'Review & edit your trip'}
+      <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto p-0">
+        <DialogHeader className="border-b border-border/60 px-8 pt-7 pb-5">
+          <div className="flex items-center justify-between">
+            <div className="text-[10px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
+              {step === 'form' ? 'New itinerary' : 'Step 2 of 2'}
+            </div>
+            <div className="flex items-center gap-1.5 text-[10px] font-medium uppercase tracking-wider text-muted-foreground">
+              <span className="h-1.5 w-1.5 rounded-full bg-primary" />
+              AI assisted
+            </div>
+          </div>
+          <DialogTitle className="mt-2 font-display text-3xl font-bold tracking-tight">
+            {step === 'form' ? 'Plan your next trip' : 'Review & refine'}
           </DialogTitle>
-          <DialogDescription>
+          <DialogDescription className="mt-1 text-sm text-muted-foreground">
             {step === 'form'
-              ? 'Tell us your destination and budget — Lovable AI crafts a complete multi-city itinerary in seconds.'
-              : 'Tweak stops, activities and costs, then save when it looks right.'}
+              ? 'Share where you want to go and your budget. We\'ll draft a complete multi-city itinerary in seconds.'
+              : 'Adjust stops, activities and costs before saving to your trips.'}
           </DialogDescription>
         </DialogHeader>
+        <div className="px-8 py-6">
 
         {step === 'form' ? (
           <FormStep
