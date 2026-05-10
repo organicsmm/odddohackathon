@@ -570,7 +570,7 @@ function CostInput({ label, value, onChange }: { label: string; value: number; o
   );
 }
 
-function CalendarView({ trip }: { trip: Trip }) {
+function CalendarView({ trip, currency }: { trip: Trip; currency: CurrencyCode }) {
   type DayEntry = {
     date: string;
     stop?: Stop;
