@@ -60,6 +60,10 @@ export default function RouteMap({ stops, onSelectStop, highlightedStopId }: { s
   const [center, setCenter] = useState<[number, number]>([0, 20]);
   const [resolved, setResolved] = useState<Record<string, GeoResult>>({});
   const [failed, setFailed] = useState<Record<string, true>>({});
+  const [pendingCount, setPendingCount] = useState(0);
+  const [showNumbers, setShowNumbers] = useState(true);
+  const [dashedPaths, setDashedPaths] = useState(true);
+  const [highlightEnds, setHighlightEnds] = useState(true);
 
   const lookupMeta = (city: string): GeoResult | null => {
     const builtin = getCoords(city);
