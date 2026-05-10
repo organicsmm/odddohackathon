@@ -41,6 +41,7 @@ const App = () => (
               <Route path="friends" element={<Friends />} />
               <Route path="profile" element={<Profile />} />
             </Route>
+            <Route path="/showcase" element={<Showcase />} />
             <Route path="/dashboard" element={<Navigate to="/app" replace />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
