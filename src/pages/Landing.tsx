@@ -294,9 +294,9 @@ export default function Landing() {
         <Card variant="aurora" className="overflow-hidden p-10 md:p-14 text-center">
           <div className="mx-auto max-w-3xl">
             <Compass className="mx-auto h-8 w-8 text-primary" />
-            <p className="mt-4 font-display text-2xl md:text-3xl font-bold leading-snug text-balance">
+            <Lead as="p" className="mt-4 !text-2xl md:!text-3xl !font-bold leading-snug text-balance">
               "It's like a private travel concierge with the polish of a luxury magazine. We planned three trips in a weekend."
-            </p>
+            </Lead>
             <div className="mt-6 inline-flex items-center gap-3">
               <span className="grid h-10 w-10 place-items-center rounded-full bg-gradient-hero text-primary-foreground font-bold">A</span>
               <div className="text-left">
