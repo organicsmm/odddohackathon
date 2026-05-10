@@ -114,14 +114,115 @@ supabase/
 
 ---
 
-## 🗃️ Database Schema (high level)
+## 🧰 Use Case → Technology Used
 
-- `profiles` — user profile, language, plan (Free/Pro/Premium), notes
-- `user_roles` — role-based access (`admin`, `user`) — separate table to prevent privilege escalation
-- `trips` — cloud-synced trips (user_id, dates, full JSON payload)
-- `has_role()` — `SECURITY DEFINER` function used inside RLS policies to avoid recursion
+| Use Case / Feature | Technology Used |
+|---|---|
+| User authentication (email + Google OAuth) | **Supabase Auth** + `AuthContext` (React Context) |
+| Role-based admin panel | `user_roles` table + `has_role()` SECURITY DEFINER + RLS |
+| Multi-city itinerary builder | React state + `lib/store.ts` + cloud sync to `trips` |
+| Cloud trip persistence & cross-device sync | **Supabase Postgres** `trips` table (JSONB payload) |
+| Public / shared trip view | `shareId` field + RLS read policy + `/share/:id` route |
+| Friends & invites | Token-based invites stored on trip JSON, accepted via `/invite/:token` |
+| AI Trip Generator | Edge function `generate-trip` → **Lovable AI Gateway** (Gemini 2.5 Flash) |
+| Real-time destination suggestions | Edge function `trip-suggestions` → Lovable AI Gateway |
+| Multi-currency conversion | `lib/currency.ts` + open.er-api.com live FX (24 h cached) |
+| Budget breakdown + charts | Pure TS `tripCost()` + Recharts |
+| Cinematic UI | Tailwind v3 + HSL design tokens + Radix / shadcn primitives |
+| Routing + lazy loading | React Router v6 + `React.lazy` + `Suspense` |
+| Server state caching | TanStack Query (60 s stale, no focus refetch) |
+| Offline-first behavior | LocalStorage mirror in `lib/store.ts` + cloud upsert on change |
+| Admin user management | RLS "Admins update/delete any" + admin-only UI guards |
+| Type safety end-to-end | TypeScript 5 + auto-generated `supabase/types.ts` |
 
-All sensitive tables protected with strict RLS policies.
+---
+
+## 🗃️ Database Schema
+
+Four tables, all protected by Row-Level Security (RLS).
+
+### `profiles`
+| Column | Type | Notes |
+|---|---|---|
+| `id` | uuid PK | `gen_random_uuid()` |
+| `user_id` | uuid | Links to `auth.users.id` |
+| `email` | text | |
+| `display_name` | text | |
+| `avatar_url` | text | |
+| `plan` | text | `free` \| `pro` \| `premium` |
+| `plan_expires_at` | timestamptz | Subscription expiry |
+| `banned` | boolean | Admin moderation |
+| `notes` | text | Admin-only notes |
+
+### `user_roles`
+**Separate table** to prevent privilege escalation — never store roles on `profiles`.
+
+| Column | Type | Notes |
+|---|---|---|
+| `id` | uuid PK | |
+| `user_id` | uuid | Links to `auth.users.id` |
+| `role` | `app_role` enum | `admin` \| `user` |
+
+### `trips`
+Cloud-synced trip data; JSONB payload mirrors local store.
+
+| Column | Type | Notes |
+|---|---|---|
+| `id` | uuid PK | |
+| `user_id` | uuid | Owner |
+| `client_trip_id` | text | Local store ID for upsert |
+| `name`, `start_date`, `end_date` | text / date | |
+| `data` | jsonb | Full trip object (stops, packing, notes, budget, invites) |
+
+### `site_settings`
+Key-value site-wide config (e.g. `admin_emails` whitelist). Public read, admin-only write.
+
+### Database Functions
+- **`has_role(_user_id, _role)`** — `SECURITY DEFINER`, used inside RLS to safely check roles without recursion.
+- **`handle_new_user()`** — Trigger on `auth.users` insert; creates profile, assigns default `user` role, auto-promotes to `admin` if email is in `site_settings.admin_emails`.
+- **`tg_set_updated_at()`** — Generic `updated_at` touch trigger.
+
+---
+
+## 🛡️ Row-Level Security (RLS)
+
+Every table has RLS **enabled**.
+
+**`profiles`** — Authenticated users read all; users insert/update only their own; admins update/delete any.
+**`user_roles`** — Users view own roles; admins fully manage all roles.
+**`trips`** — Users full CRUD on their own trips; admins SELECT / UPDATE / DELETE any.
+**`site_settings`** — Public read; admin-only write.
+
+> All admin checks go through `has_role(auth.uid(), 'admin')` — never trust the client.
+
+---
+
+## ⚡ Edge Functions (Serverless, Deno)
+
+### `generate-trip`
+- **Purpose:** Generate complete itinerary from a free-text prompt.
+- **Input:** `{ prompt, days?, budget? }`
+- **Flow:** Verify auth → Lovable AI Gateway (Gemini 2.5 Flash) → structured JSON (stops, activities, packing).
+
+### `trip-suggestions`
+- **Purpose:** Real-time contextual recommendations (packing, local tips, must-see) for a destination.
+- **Input:** `{ destination, dates? }`
+- **Flow:** Build prompt → Lovable AI Gateway → suggestions stream back to `TripSuggestions.tsx`.
+
+### Edge Function Secrets
+`LOVABLE_API_KEY`, `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY`, `SUPABASE_ANON_KEY`, `SUPABASE_PUBLISHABLE_KEY`.
+
+---
+
+## 🤖 AI Integration
+
+| Aspect | Details |
+|---|---|
+| Provider | **Lovable AI Gateway** (no user API key needed) |
+| Default model | `google/gemini-2.5-flash` — fast, multimodal, low-cost |
+| Heavy-prompt fallback | `google/gemini-2.5-pro` |
+| Where called | Edge functions only — keys never exposed to browser |
+| UI integration | `AiTripGenerator.tsx`, `TripSuggestions.tsx` |
 
 ---
 
