@@ -790,7 +790,7 @@ function BudgetView({ trip, update, currency }: { trip: Trip; update: (p: Partia
                   <li key={i.name} className="flex items-center gap-3 text-sm">
                     <span className="h-3 w-3 rounded-full" style={{ background: COLORS[i.name as keyof typeof COLORS] }} />
                     <span className="flex-1">{i.name}</span>
-                    <span className="font-medium">${i.value.toLocaleString()}</span>
+                    <span className="font-medium">{formatMoney(i.value, currency)}</span>
                     <span className="w-12 text-right text-muted-foreground">{Math.round((i.value / total) * 100)}%</span>
                   </li>
                 ))}
