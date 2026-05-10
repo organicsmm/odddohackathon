@@ -1,11 +1,11 @@
 import { useNavigate, useParams } from 'react-router-dom';
 import { useEffect, useMemo, useState } from 'react';
 import {
-  Calendar, MapPin, Plus, Trash2, ArrowUp, ArrowDown, Share2, Globe, Lock,
+  Calendar, MapPin, Plus, Trash2, Share2, Globe, Lock, GripVertical,
   Wallet, ListChecks, StickyNote, MapIcon, ChevronLeft, Clock, Printer,
 } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
-import { getTrip, upsertTrip, uid, tripCost, stopDays, tripDays } from '@/lib/store';
+import { getTrip, upsertTrip, uid, tripCost, stopDays, tripDays, resequenceStops } from '@/lib/store';
 import type { Trip, Stop, Activity, Note, PackItem } from '@/lib/types';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
