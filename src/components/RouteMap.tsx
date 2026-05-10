@@ -508,31 +508,51 @@ export default function RouteMap({ stops, onSelectStop, highlightedStopId }: { s
         {/* Legend */}
         <div
           role="region"
-          aria-label="Map legend"
-          className="pointer-events-none absolute bottom-3 left-3 rounded-lg border border-border/60 bg-card/90 px-2.5 py-1.5 text-[10px] shadow-soft backdrop-blur"
+          aria-label="Map legend — explains what each marker style means"
+          tabIndex={0}
+          className="pointer-events-auto absolute bottom-3 left-3 rounded-lg border border-border/60 bg-card/90 px-2.5 py-1.5 text-[10px] shadow-soft backdrop-blur outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
         >
-          <div className="mb-1 font-semibold uppercase tracking-wider text-muted-foreground">Legend</div>
-          <ul className="flex flex-wrap items-center gap-x-3 gap-y-1" role="list">
+          <h3 id="legend-marker-heading" className="mb-1 font-semibold uppercase tracking-wider text-muted-foreground">Legend</h3>
+          <ul
+            className="flex flex-wrap items-center gap-x-3 gap-y-1"
+            role="list"
+            aria-labelledby="legend-marker-heading"
+          >
             {highlightEnds && (
-              <li className="inline-flex items-center gap-1.5">
-                <span role="img" aria-label="Green dot" className="h-2.5 w-2.5 rounded-full border border-white/80" style={{ background: 'hsl(var(--success))' }} />
+              <li
+                tabIndex={0}
+                aria-label="Green dot marker indicates the start of the trip"
+                className="inline-flex items-center gap-1.5 rounded-sm outline-none focus-visible:ring-2 focus-visible:ring-ring"
+              >
+                <span aria-hidden="true" className="h-2.5 w-2.5 rounded-full border border-white/80" style={{ background: 'hsl(var(--success))' }} />
                 <span className="text-foreground/80">Start</span>
               </li>
             )}
             {highlightEnds && (
-              <li className="inline-flex items-center gap-1.5">
-                <span role="img" aria-label="Accent dot" className="h-2.5 w-2.5 rounded-full border border-white/80" style={{ background: 'hsl(var(--accent))' }} />
+              <li
+                tabIndex={0}
+                aria-label="Accent-colored dot marker indicates the end of the trip"
+                className="inline-flex items-center gap-1.5 rounded-sm outline-none focus-visible:ring-2 focus-visible:ring-ring"
+              >
+                <span aria-hidden="true" className="h-2.5 w-2.5 rounded-full border border-white/80" style={{ background: 'hsl(var(--accent))' }} />
                 <span className="text-foreground/80">End</span>
               </li>
             )}
-            <li className="inline-flex items-center gap-1.5">
-              <span role="img" aria-label="Primary dot" className="h-2.5 w-2.5 rounded-full border border-white/80" style={{ background: 'hsl(var(--primary))' }} />
+            <li
+              tabIndex={0}
+              aria-label="Primary-colored dot marker indicates a regular stop along the route"
+              className="inline-flex items-center gap-1.5 rounded-sm outline-none focus-visible:ring-2 focus-visible:ring-ring"
+            >
+              <span aria-hidden="true" className="h-2.5 w-2.5 rounded-full border border-white/80" style={{ background: 'hsl(var(--primary))' }} />
               <span className="text-foreground/80">Stop</span>
             </li>
-            <li className="inline-flex items-center gap-1.5">
+            <li
+              tabIndex={0}
+              aria-label="Dashed animated ring indicates the currently selected stop"
+              className="inline-flex items-center gap-1.5 rounded-sm outline-none focus-visible:ring-2 focus-visible:ring-ring"
+            >
               <span
-                role="img"
-                aria-label="Dashed ring"
+                aria-hidden="true"
                 className="h-3 w-3 rounded-full"
                 style={{ border: '1.5px dashed hsl(var(--ring))' }}
               />
@@ -540,25 +560,32 @@ export default function RouteMap({ stops, onSelectStop, highlightedStopId }: { s
             </li>
           </ul>
           <div className="mt-1.5 border-t border-border/60 pt-1.5">
-            <div className="mb-1 font-semibold uppercase tracking-wider text-muted-foreground">Confidence</div>
-            <ul className="flex flex-wrap items-center gap-x-3 gap-y-1" role="list">
+            <h3 id="legend-confidence-heading" className="mb-1 font-semibold uppercase tracking-wider text-muted-foreground">Confidence</h3>
+            <ul
+              className="flex flex-wrap items-center gap-x-3 gap-y-1"
+              role="list"
+              aria-labelledby="legend-confidence-heading"
+            >
               <li
-                className="inline-flex items-center gap-1.5"
+                tabIndex={0}
+                aria-label="Exact location: solid white-ringed dot. Pinpointed from the built-in city database or a confirmed geocoder match. Estimated accuracy within 5 to 10 kilometers."
                 title="Pinpointed from the built-in city database or an exact geocoder match."
+                className="inline-flex items-center gap-1.5 rounded-sm outline-none focus-visible:ring-2 focus-visible:ring-ring"
               >
                 <span
-                  role="img"
-                  aria-label="Solid white-ringed dot"
+                  aria-hidden="true"
                   className="h-2.5 w-2.5 rounded-full border-2 border-white"
                   style={{ background: 'hsl(var(--primary))' }}
                 />
                 <span className="text-foreground/80">Exact — pinpointed location</span>
               </li>
               <li
-                className="inline-flex items-center gap-1.5"
+                tabIndex={0}
+                aria-label="Approximate location: dashed ring with a warning question-mark badge. Best-effort match — the marker may be off. Estimated accuracy radius 50 to 250 kilometers. Verify before relying on it."
                 title="Best-effort match — the marker may be off. Verify the location."
+                className="inline-flex items-center gap-1.5 rounded-sm outline-none focus-visible:ring-2 focus-visible:ring-ring"
               >
-                <span role="img" aria-label="Dashed warning ring with question mark badge" className="relative inline-flex h-3 w-3 items-center justify-center">
+                <span aria-hidden="true" className="relative inline-flex h-3 w-3 items-center justify-center">
                   <span
                     aria-hidden="true"
                     className="h-2.5 w-2.5 rounded-full"
