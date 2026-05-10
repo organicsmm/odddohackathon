@@ -452,7 +452,7 @@ function StopCard({ stop, index, onRemove, onUpdate, onSetDuration, dragHandle, 
             <span className="text-border">·</span>
             <span className="tabular-nums">{days} day{days > 1 ? 's' : ''}</span>
             <span className="text-border">·</span>
-            <span className="font-semibold tabular-nums text-foreground">${stopTotal.toLocaleString()}</span>
+            <span className="font-semibold tabular-nums text-foreground">{formatMoney(stopTotal, currency)}</span>
             <WeatherBadge city={stop.city} date={stop.startDate} />
           </div>
         </div>
