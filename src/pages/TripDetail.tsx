@@ -540,13 +540,13 @@ function StopCard({ stop, index, onRemove, onUpdate, onSetDuration, dragHandle, 
 
         {/* cost panel */}
         <aside className="space-y-3 rounded-2xl border border-border/60 bg-muted/30 p-5">
-          <h4 className="font-display text-[11px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">Costs · USD</h4>
+          <h4 className="font-display text-[11px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">Costs · entered in USD</h4>
           <CostInput label="Transport" value={stop.costs.transport} onChange={v => onUpdate(stop.id, { costs: { ...stop.costs, transport: v } })} />
           <CostInput label="Stay / night" value={stop.costs.stay} onChange={v => onUpdate(stop.id, { costs: { ...stop.costs, stay: v } })} />
           <CostInput label="Meals / day" value={stop.costs.meals} onChange={v => onUpdate(stop.id, { costs: { ...stop.costs, meals: v } })} />
           <div className="mt-3 flex items-end justify-between border-t border-border/60 pt-3">
-            <span className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">Total</span>
-            <span className="font-display text-2xl font-bold tabular-nums leading-none">${stopTotal.toLocaleString()}</span>
+            <span className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">Total · {currency}</span>
+            <span className="font-display text-2xl font-bold tabular-nums leading-none">{formatMoney(stopTotal, currency)}</span>
           </div>
         </aside>
       </div>
