@@ -10,7 +10,7 @@ export default function SharedTrip() {
   const { shareId } = useParams();
   const navigate = useNavigate();
   const { user } = useAuth();
-  const trip = getTripByShare(shareId!);
+  const trip = getTripByShareForViewer(shareId!, user?.email || null);
 
   if (!trip) {
     return (
