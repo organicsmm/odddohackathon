@@ -57,7 +57,7 @@ export default function AcceptInvite() {
         <Card variant="premium" className="p-8 text-center">
           <X className="mx-auto h-10 w-10 text-destructive" />
           <Heading level={2} className="mt-3" weight="bold">Wrong account</Heading>
-          <p className="mt-2 text-sm text-muted-foreground">This invite was sent to <strong>{invite.invitedEmail}</strong>. You're signed in as {user.email}.</p>
+          <Muted className="mt-2 text-sm">This invite was sent to <strong>{invite.invitedEmail}</strong>. You're signed in as {user.email}.</Muted>
           <Button asChild variant="outline" className="mt-6"><Link to="/app">Back to app</Link></Button>
         </Card>
       </Shell>
