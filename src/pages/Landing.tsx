@@ -218,40 +218,73 @@ export default function Landing() {
         </div>
       </section>
 
-      {/* DESTINATIONS PREVIEW */}
+      {/* DESTINATIONS PREVIEW — editorial / human */}
       <section id="destinations" className="container py-16 md:py-24">
-        <div className="flex items-end justify-between flex-wrap gap-4">
+        <div className="flex items-end justify-between flex-wrap gap-4 border-b border-border/60 pb-6">
           <div>
-            <Eyebrow>Inspiration</Eyebrow>
-            <Heading level={2} className="mt-2 !text-4xl">Trending destinations</Heading>
+            <Eyebrow>Field notes · Vol. 01</Eyebrow>
+            <Heading level={2} className="mt-2 !text-4xl md:!text-5xl tracking-tight">Places worth the long flight.</Heading>
+            <Muted className="mt-2 max-w-xl">Hand-picked by travelers who actually went. Real photos, real prices, no stock-image gloss.</Muted>
           </div>
-          <Button asChild variant="ghost"><Link to={cta}>Explore all <ArrowRight className="h-4 w-4" /></Link></Button>
+          <Button asChild variant="ghost"><Link to={cta}>The full index <ArrowRight className="h-4 w-4" /></Link></Button>
         </div>
-        <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+
+        <div className="mt-10 grid gap-x-8 gap-y-12 sm:grid-cols-2 lg:grid-cols-3">
           {[
-            { city: 'Kyoto', country: 'Japan', tag: 'Cultural', tone: 'from-rose-400 to-orange-400' },
-            { city: 'Lisbon', country: 'Portugal', tag: 'City break', tone: 'from-amber-300 to-pink-400' },
-            { city: 'Reykjavík', country: 'Iceland', tag: 'Adventure', tone: 'from-sky-400 to-indigo-500' },
-            { city: 'Bali', country: 'Indonesia', tag: 'Relax', tone: 'from-emerald-400 to-teal-500' },
-            { city: 'Cape Town', country: 'South Africa', tag: 'Wild', tone: 'from-orange-400 to-red-500' },
-            { city: 'Queenstown', country: 'New Zealand', tag: 'Mountain', tone: 'from-cyan-400 to-blue-600' },
+            { city: 'Kyoto', country: 'Japan', tag: 'Cultural', kicker: 'Temples, tea & quiet alleys', days: 7, price: 1850, img: 'https://images.unsplash.com/photo-1545569341-9eb8b30979d9?auto=format&fit=crop&w=1200&q=70' },
+            { city: 'Lisbon', country: 'Portugal', tag: 'City break', kicker: 'Tiles, trams, pastéis de nata', days: 5, price: 1100, img: 'https://images.unsplash.com/photo-1555881400-74d7acaacd8b?auto=format&fit=crop&w=1200&q=70' },
+            { city: 'Reykjavík', country: 'Iceland', tag: 'Adventure', kicker: 'Aurora chases & black sand', days: 6, price: 2400, img: 'https://images.unsplash.com/photo-1504829857797-ddff29c27927?auto=format&fit=crop&w=1200&q=70' },
+            { city: 'Bali', country: 'Indonesia', tag: 'Relax', kicker: 'Rice terraces, slow mornings', days: 8, price: 1500, img: 'https://images.unsplash.com/photo-1537996194471-e657df975ab4?auto=format&fit=crop&w=1200&q=70' },
+            { city: 'Cape Town', country: 'South Africa', tag: 'Wild', kicker: 'Table Mountain to wine country', days: 9, price: 2100, img: 'https://images.unsplash.com/photo-1580060839134-75a5edca2e99?auto=format&fit=crop&w=1200&q=70' },
+            { city: 'Queenstown', country: 'New Zealand', tag: 'Mountain', kicker: 'Lakeside lodges & alpine air', days: 7, price: 2600, img: 'https://images.unsplash.com/photo-1589553416260-f586c8f1514f?auto=format&fit=crop&w=1200&q=70' },
           ].map((d, i) => (
-            <Card key={d.city} variant="premium" className="group overflow-hidden p-0 transition-spring hover:-translate-y-1 hover:shadow-elegant animate-fade-up" style={{ animationDelay: `${i * 60}ms` }}>
-              <div className={`relative aspect-[16/10] bg-gradient-to-br ${d.tone}`}>
-                <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,rgba(255,255,255,0.3),transparent_60%)]" />
-                <div className="absolute left-4 top-4">
-                  <Badge variant="glass" className="!bg-white/25 !text-white border-white/30">{d.tag}</Badge>
+            <article
+              key={d.city}
+              className="group animate-fade-up"
+              style={{ animationDelay: `${i * 60}ms` }}
+            >
+              {/* Polaroid-ish photo */}
+              <Link to={cta} className="block overflow-hidden rounded-sm bg-muted ring-1 ring-border/60 shadow-soft transition-spring group-hover:shadow-elegant group-hover:-translate-y-0.5">
+                <div className="relative aspect-[4/5] overflow-hidden">
+                  <img
+                    src={d.img}
+                    alt={`${d.city}, ${d.country}`}
+                    loading="lazy"
+                    className="absolute inset-0 h-full w-full object-cover transition-spring duration-700 group-hover:scale-[1.04]"
+                  />
+                  <div aria-hidden className="absolute inset-0 bg-gradient-to-t from-black/55 via-black/0 to-black/10" />
+                  {/* film grain hint */}
+                  <div aria-hidden className="absolute inset-0 mix-blend-overlay opacity-20 [background-image:radial-gradient(rgba(255,255,255,0.6)_1px,transparent_1px)] [background-size:3px_3px]" />
+                  <div className="absolute left-3 top-3 inline-flex items-center gap-1.5 rounded-full bg-white/85 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.16em] text-foreground backdrop-blur">
+                    <span className="h-1 w-1 rounded-full bg-primary" /> {d.tag}
+                  </div>
+                  <div className="absolute bottom-3 right-3 rounded-full bg-black/55 px-2 py-0.5 font-mono text-[10px] tabular-nums text-white backdrop-blur">
+                    No. {String(i + 1).padStart(2, '0')} / 06
+                  </div>
                 </div>
-                <div className="absolute bottom-4 left-4 right-4 text-white">
-                  <div className="font-display text-2xl font-extrabold drop-shadow">{d.city}</div>
-                  <div className="text-xs opacity-90">{d.country}</div>
+              </Link>
+
+              {/* Editorial caption */}
+              <div className="mt-4 px-1">
+                <div className="flex items-baseline gap-3">
+                  <span className="font-mono text-[10px] uppercase tracking-[0.22em] text-muted-foreground">{d.country}</span>
+                  <span className="h-px flex-1 bg-border" />
+                  <span className="font-mono text-[10px] uppercase tracking-[0.22em] text-muted-foreground">{d.days} days</span>
+                </div>
+                <h3 className="mt-2 font-display text-2xl font-bold tracking-tight">
+                  <Link to={cta} className="bg-[linear-gradient(currentColor,currentColor)] bg-[length:0%_1px] bg-no-repeat bg-left-bottom transition-[background-size] duration-500 hover:bg-[length:100%_1px]">
+                    {d.city}
+                  </Link>
+                </h3>
+                <p className="mt-1 text-sm text-muted-foreground italic">"{d.kicker}."</p>
+                <div className="mt-3 flex items-center justify-between text-xs">
+                  <span className="text-muted-foreground">From <span className="font-display text-base font-bold tabular-nums text-foreground">${d.price.toLocaleString()}</span> <span className="text-muted-foreground/80">/ person</span></span>
+                  <Link to={cta} className="inline-flex items-center gap-1 font-semibold text-foreground hover:text-primary transition-smooth">
+                    Read the route <ArrowRight className="h-3.5 w-3.5" />
+                  </Link>
                 </div>
               </div>
-              <div className="flex items-center justify-between p-4">
-                <Muted className="text-xs">7-day itinerary from $1,200</Muted>
-                <ChevronRight className="h-4 w-4 text-muted-foreground transition-spring group-hover:translate-x-1 group-hover:text-primary" />
-              </div>
-            </Card>
+            </article>
           ))}
         </div>
       </section>
