@@ -769,7 +769,7 @@ function BudgetView({ trip, update, currency }: { trip: Trip; update: (p: Partia
           <header className="flex items-center justify-between gap-3 border-b border-border/60 bg-gradient-aurora px-6 py-4">
             <div>
               <div className="text-[10px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">Composition</div>
-              <h3 className="font-display text-lg font-bold leading-tight">Cost by category</h3>
+              <Heading level={3} className="!text-lg leading-tight">Cost by category</Heading>
             </div>
             <span className="rounded-full bg-card px-2.5 py-1 text-[11px] font-semibold tabular-nums shadow-ring">
               {formatMoney(cost.total, currency)}
