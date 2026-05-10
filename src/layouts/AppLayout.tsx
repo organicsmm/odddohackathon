@@ -4,6 +4,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { logout } from '@/lib/store';
 import { Button } from '@/components/ui/button';
 import { useEffect } from 'react';
+import BuildStatusBadge from '@/components/dev/BuildStatusBadge';
 
 const links = [
   { to: '/app', label: 'Home', icon: LayoutDashboard, end: true },
@@ -51,6 +52,7 @@ export default function AppLayout() {
             ))}
           </nav>
           <div className="flex items-center gap-2">
+            {import.meta.env.DEV && <BuildStatusBadge />}
             <span className="hidden text-sm text-muted-foreground sm:inline">Hi, {user.name.split(' ')[0]}</span>
             <Button variant="ghost" size="icon" onClick={() => { logout(); navigate('/login'); }} aria-label="Log out">
               <LogOut className="h-4 w-4" />
