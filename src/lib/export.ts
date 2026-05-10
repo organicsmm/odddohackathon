@@ -41,12 +41,13 @@ export function exportTripPDF(trip: Trip, currency: CurrencyCode = 'USD') {
   doc.setFont('helvetica', 'normal');
   doc.setFontSize(10);
   const summaryRows: [string, string][] = [
-    ['Total estimated cost', `$${cost.total.toLocaleString()}`],
-    ['Budget', trip.budget ? `$${trip.budget.toLocaleString()}` : 'Not set'],
-    ['Transport', `$${cost.transport.toLocaleString()}`],
-    ['Stay', `$${cost.stay.toLocaleString()}`],
-    ['Meals', `$${cost.meals.toLocaleString()}`],
-    ['Activities', `$${cost.activities.toLocaleString()}`],
+    ['Total estimated cost', fmt(cost.total)],
+    ['Budget', trip.budget ? fmt(trip.budget) : 'Not set'],
+    ['Transport', fmt(cost.transport)],
+    ['Stay', fmt(cost.stay)],
+    ['Meals', fmt(cost.meals)],
+    ['Activities', fmt(cost.activities)],
+    ['Currency', currency],
   ];
   autoTable(doc, {
     startY: y,
