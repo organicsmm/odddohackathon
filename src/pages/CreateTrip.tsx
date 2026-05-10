@@ -10,6 +10,7 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { toast } from 'sonner';
 import { Plane } from 'lucide-react';
+import { Heading, Lead, Eyebrow } from '@/components/ui/typography';
 
 const schema = z.object({
   name: z.string().trim().min(2, 'Name too short').max(80),
