@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { ComposableMap, Geographies, Geography, Marker, Line, ZoomableGroup } from 'react-simple-maps';
 import { Plane, MapPin, ZoomIn, ZoomOut, Maximize2, Hash, Route, Flag } from 'lucide-react';
 import type { Stop } from '@/lib/types';
@@ -297,14 +297,37 @@ export default function RouteMap({ stops, onSelectStop, highlightedStopId }: { s
               const labelText = showNumbers
                 ? `${p.index + 1}. ${p.stop.city}`
                 : p.stop.city;
+              const confidenceLabel =
+                p.confidence === 'exact'
+                  ? `Exact location from ${p.source === 'builtin' ? 'built-in city database' : 'geocoder'}.`
+                  : `Approximate location — best-effort match${p.matchedName ? ` to ${p.matchedName}` : ''}. Verify the marker.`;
+              const stopAriaLabel =
+                `Stop ${p.index + 1} of ${stops.length}: ${p.stop.city}${p.stop.country ? ', ' + p.stop.country : ''}. ` +
+                `${isStart ? 'Start of trip. ' : ''}${isEnd ? 'End of trip. ' : ''}` +
+                `${isSelected ? 'Currently selected. ' : ''}` +
+                confidenceLabel +
+                ' Press Enter to select.';
               return (
                 <Marker
                   key={p.stop.id}
                   coordinates={p.coords}
                   onMouseEnter={() => setHover(p.stop.id)}
                   onMouseLeave={() => setHover(null)}
+                  onFocus={() => setHover(p.stop.id)}
+                  onBlur={() => setHover(prev => (prev === p.stop.id ? null : prev))}
                   onClick={() => onSelectStop?.(p.stop.id)}
-                  style={{ default: { cursor: 'pointer' }, hover: { cursor: 'pointer' }, pressed: { cursor: 'pointer' } }}
+                  onKeyDown={(e: React.KeyboardEvent) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      onSelectStop?.(p.stop.id);
+                    }
+                  }}
+                  tabIndex={0}
+                  role="button"
+                  aria-label={stopAriaLabel}
+                  aria-pressed={isSelected}
+                  style={{ default: { cursor: 'pointer', outline: 'none' }, hover: { cursor: 'pointer' }, pressed: { cursor: 'pointer' } }}
                 >
                   {/* pulse ring */}
                   <circle
@@ -385,7 +408,12 @@ export default function RouteMap({ stops, onSelectStop, highlightedStopId }: { s
           const inLeg = prev ? { km: distanceKm(prev.coords, p.coords) } : null;
           const outLeg = next ? { km: distanceKm(p.coords, next.coords) } : null;
           return (
-            <div className="pointer-events-none absolute left-4 top-4 max-w-xs rounded-xl border border-border bg-card/95 p-3 shadow-elegant backdrop-blur">
+            <div
+              role="tooltip"
+              aria-live="polite"
+              id={`route-stop-tooltip-${p.stop.id}`}
+              className="pointer-events-none absolute left-4 top-4 max-w-xs rounded-xl border border-border bg-card/95 p-3 shadow-elegant backdrop-blur"
+            >
               <div className="flex items-center gap-2 text-xs text-muted-foreground">
                 <MapPin className="h-3 w-3" /> Stop {p.index + 1} of {stops.length}
               </div>
@@ -399,6 +427,12 @@ export default function RouteMap({ stops, onSelectStop, highlightedStopId }: { s
               </div>
               <div className="mt-1.5 flex items-center gap-1.5 text-[10px]">
                 <span
+                  role="status"
+                  aria-label={
+                    p.confidence === 'exact'
+                      ? `Confidence: exact. ${p.source === 'builtin' ? 'Pinpointed from built-in city database.' : `Geocoder match: ${p.matchedName ?? p.stop.city}${p.country ? ', ' + p.country : ''}.`}`
+                      : `Confidence: approximate. Best-effort match: ${p.matchedName ?? 'unknown'}${p.country ? ', ' + p.country : ''}. Verify the marker.`
+                  }
                   className={`inline-flex items-center gap-1 rounded-full px-1.5 py-0.5 font-semibold uppercase tracking-wider ${
                     p.confidence === 'exact'
                       ? 'bg-success/10 text-success'
@@ -412,7 +446,7 @@ export default function RouteMap({ stops, onSelectStop, highlightedStopId }: { s
                         : `Best-effort match: ${p.matchedName ?? '—'}${p.country ? ', ' + p.country : ''}. Verify the marker.`
                   }
                 >
-                  <span className={`h-1.5 w-1.5 rounded-full ${p.confidence === 'exact' ? 'bg-success' : 'bg-warning'}`} />
+                  <span aria-hidden="true" className={`h-1.5 w-1.5 rounded-full ${p.confidence === 'exact' ? 'bg-success' : 'bg-warning'}`} />
                   {p.confidence === 'exact' ? 'Exact' : 'Approx.'}
                 </span>
                 <span className="text-muted-foreground">
@@ -447,52 +481,61 @@ export default function RouteMap({ stops, onSelectStop, highlightedStopId }: { s
         })()}
 
         {/* Legend */}
-        <div className="pointer-events-none absolute bottom-3 left-3 rounded-lg border border-border/60 bg-card/90 px-2.5 py-1.5 text-[10px] shadow-soft backdrop-blur">
+        <div
+          role="region"
+          aria-label="Map legend"
+          className="pointer-events-none absolute bottom-3 left-3 rounded-lg border border-border/60 bg-card/90 px-2.5 py-1.5 text-[10px] shadow-soft backdrop-blur"
+        >
           <div className="mb-1 font-semibold uppercase tracking-wider text-muted-foreground">Legend</div>
-          <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
+          <ul className="flex flex-wrap items-center gap-x-3 gap-y-1" role="list">
             {highlightEnds && (
-              <span className="inline-flex items-center gap-1.5">
-                <span className="h-2.5 w-2.5 rounded-full border border-white/80" style={{ background: 'hsl(var(--success))' }} />
+              <li className="inline-flex items-center gap-1.5">
+                <span role="img" aria-label="Green dot" className="h-2.5 w-2.5 rounded-full border border-white/80" style={{ background: 'hsl(var(--success))' }} />
                 <span className="text-foreground/80">Start</span>
-              </span>
+              </li>
             )}
             {highlightEnds && (
-              <span className="inline-flex items-center gap-1.5">
-                <span className="h-2.5 w-2.5 rounded-full border border-white/80" style={{ background: 'hsl(var(--accent))' }} />
+              <li className="inline-flex items-center gap-1.5">
+                <span role="img" aria-label="Accent dot" className="h-2.5 w-2.5 rounded-full border border-white/80" style={{ background: 'hsl(var(--accent))' }} />
                 <span className="text-foreground/80">End</span>
-              </span>
+              </li>
             )}
-            <span className="inline-flex items-center gap-1.5">
-              <span className="h-2.5 w-2.5 rounded-full border border-white/80" style={{ background: 'hsl(var(--primary))' }} />
+            <li className="inline-flex items-center gap-1.5">
+              <span role="img" aria-label="Primary dot" className="h-2.5 w-2.5 rounded-full border border-white/80" style={{ background: 'hsl(var(--primary))' }} />
               <span className="text-foreground/80">Stop</span>
-            </span>
-            <span className="inline-flex items-center gap-1.5">
+            </li>
+            <li className="inline-flex items-center gap-1.5">
               <span
+                role="img"
+                aria-label="Dashed ring"
                 className="h-3 w-3 rounded-full"
                 style={{ border: '1.5px dashed hsl(var(--ring))' }}
               />
               <span className="text-foreground/80">Selected</span>
-            </span>
-          </div>
+            </li>
+          </ul>
           <div className="mt-1.5 border-t border-border/60 pt-1.5">
             <div className="mb-1 font-semibold uppercase tracking-wider text-muted-foreground">Confidence</div>
-            <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
-              <span
+            <ul className="flex flex-wrap items-center gap-x-3 gap-y-1" role="list">
+              <li
                 className="inline-flex items-center gap-1.5"
                 title="Pinpointed from the built-in city database or an exact geocoder match."
               >
                 <span
+                  role="img"
+                  aria-label="Solid white-ringed dot"
                   className="h-2.5 w-2.5 rounded-full border-2 border-white"
                   style={{ background: 'hsl(var(--primary))' }}
                 />
-                <span className="text-foreground/80">Exact</span>
-              </span>
-              <span
+                <span className="text-foreground/80">Exact — pinpointed location</span>
+              </li>
+              <li
                 className="inline-flex items-center gap-1.5"
                 title="Best-effort match — the marker may be off. Verify the location."
               >
-                <span className="relative inline-flex h-3 w-3 items-center justify-center">
+                <span role="img" aria-label="Dashed warning ring with question mark badge" className="relative inline-flex h-3 w-3 items-center justify-center">
                   <span
+                    aria-hidden="true"
                     className="h-2.5 w-2.5 rounded-full"
                     style={{
                       background: 'hsl(var(--primary))',
@@ -500,15 +543,16 @@ export default function RouteMap({ stops, onSelectStop, highlightedStopId }: { s
                     }}
                   />
                   <span
+                    aria-hidden="true"
                     className="absolute -right-1 -top-1 grid h-2.5 w-2.5 place-items-center rounded-full text-[6px] font-bold text-white"
                     style={{ background: 'hsl(var(--warning))' }}
                   >
                     ?
                   </span>
                 </span>
-                <span className="text-foreground/80">Approx.</span>
-              </span>
-            </div>
+                <span className="text-foreground/80">Approx. — best-effort match</span>
+              </li>
+            </ul>
           </div>
         </div>
 
