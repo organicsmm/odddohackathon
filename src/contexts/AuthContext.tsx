@@ -1,12 +1,17 @@
 import { createContext, useContext, useEffect, useState, ReactNode, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import type { Session, User as SbUser } from '@supabase/supabase-js';
+import { getExtras, setSessionEmail } from '@/lib/store';
+import type { Friend } from '@/lib/types';
 
 export type AppUser = {
   id: string;
   email: string;
   name: string;
   avatar_url?: string;
+  language: 'en' | 'hi' | 'es';
+  saved: string[];
+  friends: Friend[];
 };
 
 type AuthCtx = {
@@ -24,13 +29,17 @@ const Ctx = createContext<AuthCtx>({
 });
 
 const toAppUser = (u: SbUser | null | undefined): AppUser | null => {
-  if (!u) return null;
+  if (!u || !u.email) return null;
   const meta = (u.user_metadata || {}) as Record<string, unknown>;
+  const ex = getExtras(u.email);
   return {
     id: u.id,
-    email: u.email || '',
-    name: (meta.full_name as string) || (meta.name as string) || (u.email?.split('@')[0] ?? 'User'),
-    avatar_url: meta.avatar_url as string | undefined,
+    email: u.email,
+    name: ex.name || (meta.full_name as string) || (meta.name as string) || u.email.split('@')[0],
+    avatar_url: (ex as { avatar_url?: string }).avatar_url || (meta.avatar_url as string | undefined),
+    language: ex.language || 'en',
+    saved: ex.saved || [],
+    friends: ex.friends || [],
   };
 };
 
