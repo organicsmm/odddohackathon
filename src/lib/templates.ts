@@ -14,8 +14,12 @@ export type TripTemplate = {
   tagline: string;
   days: number;
   estimate: number;
+  cover: string;
+  countries: string[];
   build: () => Pick<Trip, 'name' | 'description' | 'startDate' | 'endDate' | 'budget' | 'stops'>;
 };
+
+const cover = (id: string) => `https://images.unsplash.com/photo-${id}?auto=format&fit=crop&w=1000&q=70`;
 
 const offsetDate = (days: number) => {
   const d = new Date();
@@ -31,6 +35,8 @@ export const TEMPLATES: TripTemplate[] = [
     tagline: 'Whitewashed villages and Aegean sunsets',
     days: 8,
     estimate: 1850,
+    cover: cover('1570077188670-e3a8d69ac5ff'),
+    countries: ['Greece'],
     build: () => ({
       name: 'Greek Island Hop',
       description: '8 days exploring Athens, Mykonos and Santorini.',
@@ -75,6 +81,8 @@ export const TEMPLATES: TripTemplate[] = [
     tagline: 'Tokyo neon to Kyoto temples',
     days: 10,
     estimate: 2600,
+    cover: cover('1493976040374-85c8e12f0c0e'),
+    countries: ['Japan'],
     build: () => ({
       name: 'Japan Discovery',
       description: '10 days across Tokyo, Kyoto and Osaka.',
@@ -121,6 +129,8 @@ export const TEMPLATES: TripTemplate[] = [
     tagline: 'Lisbon to Barcelona via Madrid',
     days: 9,
     estimate: 1700,
+    cover: cover('1583422409516-2895a77efded'),
+    countries: ['Portugal', 'Spain'],
     build: () => ({
       name: 'Iberian Tapas Tour',
       description: '9 day food + culture tour through Portugal & Spain.',
@@ -167,6 +177,8 @@ export const TEMPLATES: TripTemplate[] = [
     tagline: 'Delhi · Agra · Jaipur',
     days: 6,
     estimate: 950,
+    cover: cover('1599661046289-e31897846e41'),
+    countries: ['India'],
     build: () => ({
       name: 'Golden Triangle India',
       description: '6 days through Delhi, Agra and Jaipur — palaces, monuments and street food.',

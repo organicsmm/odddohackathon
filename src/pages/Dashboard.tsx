@@ -125,14 +125,26 @@ export default function Dashboard() {
               className="group relative overflow-hidden p-0 transition-smooth hover:border-foreground/20 hover:shadow-soft cursor-pointer animate-fade-up"
               style={{ animationDelay: `${i * 40}ms` }}
             >
-              <div className="relative aspect-[3/4] bg-secondary p-4">
-                <div className="text-[10px] font-semibold uppercase tracking-[0.12em] text-muted-foreground">
-                  {c.region}
+              <div className="relative aspect-[3/4] overflow-hidden bg-secondary">
+                <img
+                  src={c.image}
+                  alt={`${c.city}, ${c.country}`}
+                  loading="lazy"
+                  className="absolute inset-0 h-full w-full object-cover transition-spring group-hover:scale-105"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/25 to-black/10" />
+                <div className="absolute left-3 top-3">
+                  <Badge variant="glass" className="!bg-white/25 !text-white border-white/30 text-[9px] uppercase tracking-[0.12em]">
+                    {c.region}
+                  </Badge>
                 </div>
-                <div className="absolute bottom-4 left-4 right-4">
-                  <div className="text-base font-semibold tracking-tight text-foreground">{c.city}</div>
-                  <div className="mt-0.5 flex items-center gap-1 text-[11px] text-muted-foreground">
+                <div className="absolute bottom-3 left-3 right-3 text-white">
+                  <div className="text-base font-semibold tracking-tight drop-shadow">{c.city}</div>
+                  <div className="mt-0.5 flex items-center gap-1 text-[11px] opacity-90">
                     <MapPin className="h-3 w-3" /> {c.country}
+                  </div>
+                  <div className="mt-1 text-[10px] uppercase tracking-[0.1em] opacity-75">
+                    Best · {c.bestMonths}
                   </div>
                 </div>
               </div>
@@ -160,27 +172,41 @@ export default function Dashboard() {
               className="text-left animate-fade-up"
               style={{ animationDelay: `${i * 50}ms` }}
             >
-              <Card className="group relative h-full p-5 transition-smooth hover:border-foreground/20 hover:shadow-soft">
-                <div className="flex items-start justify-between">
-                  <span className="grid h-11 w-11 place-items-center rounded-lg bg-secondary text-2xl">
-                    {t.emoji}
-                  </span>
-                  <span className="grid h-7 w-7 place-items-center rounded-full text-muted-foreground transition-smooth group-hover:bg-secondary group-hover:text-foreground">
+              <Card className="group relative h-full overflow-hidden p-0 transition-smooth hover:border-foreground/20 hover:shadow-soft">
+                <div className="relative aspect-[16/10] overflow-hidden bg-secondary">
+                  <img
+                    src={t.cover}
+                    alt={t.title}
+                    loading="lazy"
+                    className="absolute inset-0 h-full w-full object-cover transition-spring group-hover:scale-105"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/55 via-black/15 to-transparent" />
+                  <div className="absolute left-3 top-3 flex items-center gap-2">
+                    <span className="grid h-9 w-9 place-items-center rounded-lg bg-white/90 text-xl shadow-soft backdrop-blur">
+                      {t.emoji}
+                    </span>
+                    <Badge variant="glass" className="!bg-white/25 !text-white border-white/30 text-[9px] uppercase tracking-[0.12em]">
+                      {t.countries.join(' · ')}
+                    </Badge>
+                  </div>
+                  <span className="absolute right-3 top-3 grid h-7 w-7 place-items-center rounded-full bg-white/90 text-foreground shadow-soft backdrop-blur transition-smooth group-hover:bg-white">
                     <ChevronRight className="h-4 w-4" />
                   </span>
                 </div>
 
-                <Heading level={3} className="mt-4 !text-base">{t.title}</Heading>
-                <Muted className="mt-1 text-sm line-clamp-2">{t.tagline}</Muted>
+                <div className="p-5">
+                  <Heading level={3} className="!text-base">{t.title}</Heading>
+                  <Muted className="mt-1 text-sm line-clamp-2">{t.tagline}</Muted>
 
-                <div className="mt-5 flex items-center justify-between border-t border-border pt-3 text-xs">
-                  <span className="inline-flex items-center gap-1.5 text-muted-foreground">
-                    <Calendar className="h-3.5 w-3.5" /> {t.days} days
-                  </span>
-                  <span className="font-medium tabular-nums text-foreground">
-                    <span className="mr-1 text-muted-foreground">from</span>
-                    ${t.estimate.toLocaleString()}
-                  </span>
+                  <div className="mt-4 flex items-center justify-between border-t border-border pt-3 text-xs">
+                    <span className="inline-flex items-center gap-1.5 text-muted-foreground">
+                      <Calendar className="h-3.5 w-3.5" /> {t.days} days
+                    </span>
+                    <span className="font-medium tabular-nums text-foreground">
+                      <span className="mr-1 text-muted-foreground">from</span>
+                      ${t.estimate.toLocaleString()}
+                    </span>
+                  </div>
                 </div>
               </Card>
             </button>
