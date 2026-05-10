@@ -35,6 +35,8 @@ export const TEMPLATES: TripTemplate[] = [
     tagline: 'Whitewashed villages and Aegean sunsets',
     days: 8,
     estimate: 1850,
+    cover: cover('1570077188670-e3a8d69ac5ff'),
+    countries: ['Greece'],
     build: () => ({
       name: 'Greek Island Hop',
       description: '8 days exploring Athens, Mykonos and Santorini.',
