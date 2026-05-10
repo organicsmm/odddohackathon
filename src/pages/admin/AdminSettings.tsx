@@ -35,7 +35,7 @@ export default function AdminSettings() {
   }, []);
 
   const upsert = async (key: string, value: unknown) => {
-    const { error } = await supabase.from('site_settings').upsert({ key, value, updated_at: new Date().toISOString() });
+    const { error } = await supabase.from('site_settings').upsert({ key, value: value as never, updated_at: new Date().toISOString() });
     if (error) throw error;
   };
 
