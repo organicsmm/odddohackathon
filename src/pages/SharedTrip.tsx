@@ -90,7 +90,7 @@ export default function SharedTrip() {
 
   const cost = tripCost(trip);
   const days = tripDays(trip);
-  const currency = trip.displayCurrency ?? 'USD';
+  const currency = 'USD' as const;
   const url = typeof window !== 'undefined' ? window.location.href : '';
 
   // JSON-LD structured data for the share preview
