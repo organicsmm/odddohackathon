@@ -50,6 +50,9 @@ export default function TripDetail() {
   const [trip, setTrip] = useState<Trip | undefined>(getTrip(id!));
   const [activeTab, setActiveTab] = useState('itinerary');
   const [highlightedStopId, setHighlightedStopId] = useState<string | null>(null);
+  const [exportCurrency, setExportCurrency] = useState<CurrencyCode>('USD');
+
+  useEffect(() => { refreshRates(); }, []);
 
   const focusStop = (stopId: string) => {
     setActiveTab('itinerary');
