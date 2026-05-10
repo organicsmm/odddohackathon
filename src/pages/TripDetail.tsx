@@ -343,7 +343,7 @@ function Itinerary({ trip, update, highlightedStopId, currency }: { trip: Trip; 
 
       {trip.stops.length === 0 && (
         <div className="rounded-2xl border border-dashed border-border bg-muted/30 p-12 text-center">
-          <h3 className="text-xl font-display font-semibold">No stops yet</h3>
+          <Heading level={3} className="!text-xl">No stops yet</Heading>
           <p className="mt-1 text-muted-foreground">Add cities to start building your route.</p>
         </div>
       )}
