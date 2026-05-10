@@ -923,15 +923,17 @@ function KpiCard({ label, value, accent }: { label: string; value: string; accen
   );
 }
 
-function CategoryGoal({ label, color, spent, goal, onChange }: {
+function CategoryGoal({ label, color, spent, goal, currency, onChange }: {
   label: string; color: string; spent: number;
   goal?: number;
+  currency: CurrencyCode;
   onChange: (v: number | undefined) => void;
 }) {
   const hasGoal = typeof goal === 'number' && goal > 0;
   const pct = hasGoal ? Math.min(100, (spent / goal!) * 100) : 0;
   const over = hasGoal && spent > goal!;
   const remaining = hasGoal ? Math.abs(goal! - spent) : 0;
+  const sym = CURRENCIES.find(c => c.code === currency)?.symbol ?? '$';
 
   return (
     <div className="rounded-xl border border-border/60 bg-muted/20 p-3">
@@ -941,16 +943,17 @@ function CategoryGoal({ label, color, spent, goal, onChange }: {
           {label}
         </div>
         <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
-          <span className="tabular-nums font-medium text-foreground">${Math.round(spent).toLocaleString()}</span>
+          <span className="tabular-nums font-medium text-foreground">{formatMoney(spent, currency)}</span>
           <span className="text-border">/</span>
           <div className="relative">
             <span className="pointer-events-none absolute left-2 top-1/2 -translate-y-1/2 text-xs text-muted-foreground">$</span>
             <Input
               type="number" min={0}
               value={goal ?? ''}
-              placeholder="goal"
+              placeholder="USD"
               onChange={e => onChange(e.target.value ? Number(e.target.value) : undefined)}
               className="h-7 w-24 border-border/60 bg-background/60 pl-5 text-right text-xs tabular-nums"
+              title="Goal entered in USD"
             />
           </div>
         </div>
