@@ -223,8 +223,8 @@ export default function TripDetail() {
           </TabsList>
         </div>
 
-        <TabsContent value="itinerary" className="mt-8 animate-fade-in"><Itinerary trip={trip} update={update} highlightedStopId={highlightedStopId} /></TabsContent>
-        <TabsContent value="budget" className="mt-8 animate-fade-in"><BudgetView trip={trip} update={update} /></TabsContent>
+        <TabsContent value="itinerary" className="mt-8 animate-fade-in"><Itinerary trip={trip} update={update} highlightedStopId={highlightedStopId} currency={displayCurrency} /></TabsContent>
+        <TabsContent value="budget" className="mt-8 animate-fade-in"><BudgetView trip={trip} update={update} currency={displayCurrency} /></TabsContent>
         <TabsContent value="packing" className="mt-8 animate-fade-in"><Packing trip={trip} update={update} /></TabsContent>
         <TabsContent value="notes" className="mt-8 animate-fade-in"><Notes trip={trip} update={update} /></TabsContent>
         <TabsContent value="settings" className="mt-8 animate-fade-in"><Settings trip={trip} update={update} onDelete={() => navigate('/app/trips')} /></TabsContent>
