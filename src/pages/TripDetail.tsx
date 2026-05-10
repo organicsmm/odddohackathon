@@ -308,6 +308,10 @@ function StopCard({ stop, index, onRemove, onUpdate, onSetDuration, dragHandle }
         </div>
       </div>
 
+      <div className="px-5 pt-5">
+        <WeatherForecast city={stop.city} startDate={stop.startDate} endDate={stop.endDate} />
+      </div>
+
       <div className="grid gap-4 p-5 md:grid-cols-[1fr_240px]">
         <div className="space-y-3">
           <div className="flex flex-wrap items-center gap-3">
