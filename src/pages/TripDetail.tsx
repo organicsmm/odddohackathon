@@ -888,20 +888,20 @@ function BudgetView({ trip, update, currency }: { trip: Trip; update: (p: Partia
                   {barData.map(r => (
                     <tr key={r.city}>
                       <td className="py-2 font-medium flex items-center gap-2"><MapPin className="h-3 w-3 text-primary" />{r.city}</td>
-                      <td className="py-2 text-right">${r.Transport.toLocaleString()}</td>
-                      <td className="py-2 text-right">${r.Stay.toLocaleString()}</td>
-                      <td className="py-2 text-right">${r.Meals.toLocaleString()}</td>
-                      <td className="py-2 text-right">${r.Activities.toLocaleString()}</td>
-                      <td className="py-2 text-right font-semibold">${r.total.toLocaleString()}</td>
+                      <td className="py-2 text-right tabular-nums">{formatMoney(r.Transport, currency)}</td>
+                      <td className="py-2 text-right tabular-nums">{formatMoney(r.Stay, currency)}</td>
+                      <td className="py-2 text-right tabular-nums">{formatMoney(r.Meals, currency)}</td>
+                      <td className="py-2 text-right tabular-nums">{formatMoney(r.Activities, currency)}</td>
+                      <td className="py-2 text-right font-semibold tabular-nums">{formatMoney(r.total, currency)}</td>
                     </tr>
                   ))}
                   <tr className="border-t-2 border-border">
                     <td className="py-2 font-semibold">Total</td>
-                    <td className="py-2 text-right font-semibold">${cost.transport.toLocaleString()}</td>
-                    <td className="py-2 text-right font-semibold">${cost.stay.toLocaleString()}</td>
-                    <td className="py-2 text-right font-semibold">${cost.meals.toLocaleString()}</td>
-                    <td className="py-2 text-right font-semibold">${cost.activities.toLocaleString()}</td>
-                    <td className="py-2 text-right font-bold text-primary">${cost.total.toLocaleString()}</td>
+                    <td className="py-2 text-right font-semibold tabular-nums">{formatMoney(cost.transport, currency)}</td>
+                    <td className="py-2 text-right font-semibold tabular-nums">{formatMoney(cost.stay, currency)}</td>
+                    <td className="py-2 text-right font-semibold tabular-nums">{formatMoney(cost.meals, currency)}</td>
+                    <td className="py-2 text-right font-semibold tabular-nums">{formatMoney(cost.activities, currency)}</td>
+                    <td className="py-2 text-right font-bold text-primary tabular-nums">{formatMoney(cost.total, currency)}</td>
                   </tr>
                 </tbody>
               </table>
