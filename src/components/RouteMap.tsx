@@ -481,33 +481,39 @@ export default function RouteMap({ stops, onSelectStop, highlightedStopId }: { s
         })()}
 
         {/* Legend */}
-        <div className="pointer-events-none absolute bottom-3 left-3 rounded-lg border border-border/60 bg-card/90 px-2.5 py-1.5 text-[10px] shadow-soft backdrop-blur">
+        <div
+          role="region"
+          aria-label="Map legend"
+          className="pointer-events-none absolute bottom-3 left-3 rounded-lg border border-border/60 bg-card/90 px-2.5 py-1.5 text-[10px] shadow-soft backdrop-blur"
+        >
           <div className="mb-1 font-semibold uppercase tracking-wider text-muted-foreground">Legend</div>
-          <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
+          <ul className="flex flex-wrap items-center gap-x-3 gap-y-1" role="list">
             {highlightEnds && (
-              <span className="inline-flex items-center gap-1.5">
-                <span className="h-2.5 w-2.5 rounded-full border border-white/80" style={{ background: 'hsl(var(--success))' }} />
+              <li className="inline-flex items-center gap-1.5">
+                <span role="img" aria-label="Green dot" className="h-2.5 w-2.5 rounded-full border border-white/80" style={{ background: 'hsl(var(--success))' }} />
                 <span className="text-foreground/80">Start</span>
-              </span>
+              </li>
             )}
             {highlightEnds && (
-              <span className="inline-flex items-center gap-1.5">
-                <span className="h-2.5 w-2.5 rounded-full border border-white/80" style={{ background: 'hsl(var(--accent))' }} />
+              <li className="inline-flex items-center gap-1.5">
+                <span role="img" aria-label="Accent dot" className="h-2.5 w-2.5 rounded-full border border-white/80" style={{ background: 'hsl(var(--accent))' }} />
                 <span className="text-foreground/80">End</span>
-              </span>
+              </li>
             )}
-            <span className="inline-flex items-center gap-1.5">
-              <span className="h-2.5 w-2.5 rounded-full border border-white/80" style={{ background: 'hsl(var(--primary))' }} />
+            <li className="inline-flex items-center gap-1.5">
+              <span role="img" aria-label="Primary dot" className="h-2.5 w-2.5 rounded-full border border-white/80" style={{ background: 'hsl(var(--primary))' }} />
               <span className="text-foreground/80">Stop</span>
-            </span>
-            <span className="inline-flex items-center gap-1.5">
+            </li>
+            <li className="inline-flex items-center gap-1.5">
               <span
+                role="img"
+                aria-label="Dashed ring"
                 className="h-3 w-3 rounded-full"
                 style={{ border: '1.5px dashed hsl(var(--ring))' }}
               />
               <span className="text-foreground/80">Selected</span>
-            </span>
-          </div>
+            </li>
+          </ul>
           <div className="mt-1.5 border-t border-border/60 pt-1.5">
             <div className="mb-1 font-semibold uppercase tracking-wider text-muted-foreground">Confidence</div>
             <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
