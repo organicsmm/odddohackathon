@@ -1,0 +1,17 @@
+#!/usr/bin/env sh
+# Pre-commit hook: block commits that introduce TypeScript or ESLint errors.
+# Bypass with `git commit --no-verify` only in emergencies.
+
+set -e
+
+echo "→ tsc --noEmit"
+npx --no-install tsc --noEmit
+
+if [ -f "eslint.config.js" ] || [ -f ".eslintrc" ] || [ -f ".eslintrc.js" ] || [ -f ".eslintrc.cjs" ] || [ -f ".eslintrc.json" ]; then
+  echo "→ eslint ."
+  npx --no-install eslint . --max-warnings=0
+else
+  echo "→ eslint config not found, skipping"
+fi
+
+echo "✓ pre-commit checks passed"
