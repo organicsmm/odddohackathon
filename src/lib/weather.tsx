@@ -95,6 +95,7 @@ export async function fetchForecast(city: string, startDate: string, endDate: st
         precipProb: Math.round(data.daily.precipitation_probability_max[i] ?? 0),
         icon: dec.icon,
         label: dec.label,
+        source: 'forecast',
       };
     });
   } catch {
