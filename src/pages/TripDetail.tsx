@@ -385,7 +385,7 @@ function SortableStopCard(props: {
       ref={setNodeRef}
       id={`stop-${stop.id}`}
       style={style}
-      className={`scroll-mt-24 rounded-2xl transition-shadow ${highlighted ? 'ring-4 ring-primary/60 shadow-glow' : ''}`}
+      className={`scroll-mt-24 rounded-3xl transition-all duration-500 ${highlighted ? 'ring-2 ring-foreground/80 ring-offset-4 ring-offset-background' : ''}`}
     >
       <StopCard {...props} dragHandle={{ ...attributes, ...listeners }} />
     </div>
@@ -409,86 +409,131 @@ function StopCard({ stop, index, onRemove, onUpdate, onSetDuration, dragHandle }
   const addActivity = (a: Activity) => onUpdate(stop.id, { activities: [...stop.activities, a] });
   const removeActivity = (aid: string) => onUpdate(stop.id, { activities: stop.activities.filter(a => a.id !== aid) });
 
-  return (
-    <Card className="overflow-hidden border-border/60 shadow-soft">
-      <div className="bg-gradient-ocean p-5 text-primary-foreground">
-        <div className="flex flex-wrap items-start justify-between gap-3">
-          <div>
-            <div className="text-xs uppercase tracking-wider opacity-80">Stop {index + 1}</div>
-            <h3 className="font-display text-2xl font-bold flex items-center gap-2"><MapPin className="h-5 w-5" /> {stop.city}, <span className="opacity-80 font-normal text-lg">{stop.country}</span></h3>
-            <div className="mt-1 flex flex-wrap items-center gap-2 text-xs opacity-90">
-              <span>{new Date(stop.startDate).toLocaleDateString()} → {new Date(stop.endDate).toLocaleDateString()} · {days} day{days > 1 ? 's' : ''}</span>
-              <WeatherBadge city={stop.city} date={stop.startDate} />
-            </div>
-          </div>
-          <div className="flex items-center gap-1">
-            <button
-              {...dragHandle}
-              type="button"
-              aria-label="Drag to reorder"
-              className="cursor-grab active:cursor-grabbing rounded-md p-2 text-primary-foreground hover:bg-white/20 touch-none"
-            >
-              <GripVertical className="h-5 w-5" />
-            </button>
-            <div className="flex items-center gap-1 rounded-md bg-white/15 px-2 py-1 text-xs">
-              <Clock className="h-3 w-3" />
-              <input
-                type="number"
-                min={1}
-                max={60}
-                value={days}
-                onChange={e => onSetDuration(stop.id, Number(e.target.value) || 1)}
-                className="w-10 bg-transparent text-center font-semibold outline-none"
-              />
-              <span>day{days > 1 ? 's' : ''}</span>
-            </div>
-            <Button size="icon" variant="ghost" className="text-primary-foreground hover:bg-white/20" onClick={() => onRemove(stop.id)}><Trash2 className="h-4 w-4" /></Button>
-          </div>
+  const startFmt = new Date(stop.startDate).toLocaleDateString(undefined, { day: 'numeric', month: 'short' });
+  const endFmt = new Date(stop.endDate).toLocaleDateString(undefined, { day: 'numeric', month: 'short' });
 
+  return (
+    <Card className="group overflow-hidden border border-border/60 bg-card shadow-[0_1px_0_0_hsl(var(--border)/0.6)] transition-all duration-500 hover:shadow-soft">
+      {/* editorial header */}
+      <div className="relative grid grid-cols-[auto_1fr_auto] gap-5 border-b border-border/60 px-6 py-6 md:px-8">
+        {/* huge index numeral */}
+        <div className="flex flex-col items-start">
+          <span className="font-display text-[11px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">Stop</span>
+          <span className="font-display text-5xl font-extrabold leading-none tabular-nums text-foreground/90 transition-colors group-hover:text-foreground md:text-6xl">
+            {String(index + 1).padStart(2, '0')}
+          </span>
+        </div>
+
+        {/* title block */}
+        <div className="min-w-0 self-end">
+          <h3 className="font-display text-3xl font-bold leading-tight tracking-tight md:text-4xl">
+            {stop.city}
+            <span className="ml-2 text-base font-normal text-muted-foreground">{stop.country}</span>
+          </h3>
+          <div className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1.5 text-xs text-muted-foreground">
+            <span className="inline-flex items-center gap-1.5 tabular-nums">
+              <Calendar className="h-3 w-3" /> {startFmt} <span className="text-border">→</span> {endFmt}
+            </span>
+            <span className="text-border">·</span>
+            <span className="tabular-nums">{days} day{days > 1 ? 's' : ''}</span>
+            <span className="text-border">·</span>
+            <span className="font-semibold tabular-nums text-foreground">${stopTotal.toLocaleString()}</span>
+            <WeatherBadge city={stop.city} date={stop.startDate} />
+          </div>
+        </div>
+
+        {/* controls */}
+        <div className="flex items-start gap-1.5 self-start">
+          <div className="flex items-center gap-1 rounded-lg border border-border bg-muted/40 px-2 py-1 text-xs">
+            <Clock className="h-3 w-3 text-muted-foreground" />
+            <input
+              type="number" min={1} max={60} value={days}
+              onChange={e => onSetDuration(stop.id, Number(e.target.value) || 1)}
+              className="w-9 bg-transparent text-center font-semibold tabular-nums outline-none"
+            />
+            <span className="text-muted-foreground">d</span>
+          </div>
+          <button
+            {...dragHandle}
+            type="button"
+            aria-label="Drag to reorder"
+            className="cursor-grab rounded-md p-2 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground active:cursor-grabbing"
+          >
+            <GripVertical className="h-4 w-4" />
+          </button>
+          <Button size="icon" variant="ghost" className="text-muted-foreground hover:text-destructive" onClick={() => onRemove(stop.id)}>
+            <Trash2 className="h-4 w-4" />
+          </Button>
         </div>
       </div>
 
-      <div className="px-5 pt-5">
+      {/* weather strip */}
+      <div className="px-6 pt-6 md:px-8">
         <WeatherForecast city={stop.city} startDate={stop.startDate} endDate={stop.endDate} />
       </div>
 
-      <div className="grid gap-4 p-5 md:grid-cols-[1fr_240px]">
-        <div className="space-y-3">
-          <div className="flex flex-wrap items-center gap-3">
-            <h4 className="font-display font-semibold">Activities</h4>
-            <ActivitySearchDialog onAdd={addActivity} trigger={<Button size="sm" variant="soft"><Plus className="h-4 w-4" /> Add activity</Button>} />
+      {/* body */}
+      <div className="grid gap-8 px-6 py-6 md:grid-cols-[1fr_260px] md:px-8 md:py-8">
+        <div className="space-y-4">
+          <div className="flex items-center justify-between gap-3 border-b border-border/60 pb-3">
+            <h4 className="font-display text-[11px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">Activities</h4>
+            <ActivitySearchDialog onAdd={addActivity} trigger={
+              <Button size="sm" variant="ghost" className="-mr-2 h-7 gap-1 text-xs"><Plus className="h-3.5 w-3.5" /> Add</Button>
+            } />
           </div>
-          {stop.activities.length === 0 && <p className="text-sm text-muted-foreground">No activities yet — add some inspiration!</p>}
-          <div className="space-y-2">
-            {stop.activities.map(a => (
-              <div key={a.id} className="flex items-center justify-between rounded-xl border border-border bg-card p-3">
-                <div className="flex items-center gap-3">
-                  <span className="grid h-9 w-9 place-items-center rounded-lg bg-accent-soft text-accent">
-                    <Clock className="h-4 w-4" />
-                  </span>
-                  <div>
-                    <div className="font-medium">{a.name}</div>
-                    <div className="text-xs text-muted-foreground">{a.category} · {a.durationHours}h · ${a.cost}</div>
+          {stop.activities.length === 0 ? (
+            <p className="py-2 text-sm text-muted-foreground">Nothing planned yet — a free day in {stop.city}.</p>
+          ) : (
+            <ul className="divide-y divide-border/60">
+              {stop.activities.map((a, ai) => (
+                <li
+                  key={a.id}
+                  className="group/row flex items-center justify-between gap-3 py-3 animate-fade-in"
+                  style={{ animationDelay: `${ai * 40}ms` }}
+                >
+                  <div className="flex min-w-0 items-center gap-3">
+                    <span className="grid h-9 w-9 flex-none place-items-center rounded-lg border border-border bg-muted/40 text-foreground/70">
+                      <Clock className="h-4 w-4" />
+                    </span>
+                    <div className="min-w-0">
+                      <div className="truncate font-medium leading-tight">{a.name}</div>
+                      <div className="mt-0.5 text-xs text-muted-foreground">
+                        <span className="capitalize">{a.category}</span>
+                        <span className="mx-1.5 text-border">·</span>
+                        <span className="tabular-nums">{a.durationHours}h</span>
+                        <span className="mx-1.5 text-border">·</span>
+                        <span className="tabular-nums">${a.cost}</span>
+                      </div>
+                    </div>
                   </div>
-                </div>
-                <div className="flex items-center gap-2">
-                  <Input type="time" value={a.time || ''} onChange={e => onUpdate(stop.id, { activities: stop.activities.map(x => x.id === a.id ? { ...x, time: e.target.value } : x) })} className="w-28" />
-                  <Button size="icon" variant="ghost" onClick={() => removeActivity(a.id)}><Trash2 className="h-4 w-4 text-destructive" /></Button>
-                </div>
-              </div>
-            ))}
-          </div>
+                  <div className="flex items-center gap-1.5">
+                    <Input
+                      type="time"
+                      value={a.time || ''}
+                      onChange={e => onUpdate(stop.id, { activities: stop.activities.map(x => x.id === a.id ? { ...x, time: e.target.value } : x) })}
+                      className="h-8 w-24 border-border/60 text-xs tabular-nums"
+                    />
+                    <Button size="icon" variant="ghost" className="h-8 w-8 opacity-0 transition-opacity group-hover/row:opacity-100" onClick={() => removeActivity(a.id)}>
+                      <Trash2 className="h-3.5 w-3.5 text-destructive" />
+                    </Button>
+                  </div>
+                </li>
+              ))}
+            </ul>
+          )}
         </div>
 
-        <div className="space-y-3 rounded-xl bg-muted/40 p-4">
-          <h4 className="font-display font-semibold text-sm">Stop costs (USD)</h4>
+        {/* cost panel */}
+        <aside className="space-y-3 rounded-2xl border border-border/60 bg-muted/30 p-5">
+          <h4 className="font-display text-[11px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">Costs · USD</h4>
           <CostInput label="Transport" value={stop.costs.transport} onChange={v => onUpdate(stop.id, { costs: { ...stop.costs, transport: v } })} />
           <CostInput label="Stay / night" value={stop.costs.stay} onChange={v => onUpdate(stop.id, { costs: { ...stop.costs, stay: v } })} />
           <CostInput label="Meals / day" value={stop.costs.meals} onChange={v => onUpdate(stop.id, { costs: { ...stop.costs, meals: v } })} />
-          <div className="border-t border-border pt-3 text-sm">
-            <div className="flex justify-between"><span className="text-muted-foreground">Stop total</span><span className="font-display font-bold text-primary">${stopTotal.toLocaleString()}</span></div>
+          <div className="mt-3 flex items-end justify-between border-t border-border/60 pt-3">
+            <span className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">Total</span>
+            <span className="font-display text-2xl font-bold tabular-nums leading-none">${stopTotal.toLocaleString()}</span>
           </div>
-        </div>
+        </aside>
       </div>
     </Card>
   );
