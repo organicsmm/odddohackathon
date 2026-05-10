@@ -6,7 +6,6 @@ import {
 import ImageGallery from '@/components/ui/image-gallery';
 import { HeroSlider } from '@/components/HeroSlider';
 import { TravelMarquee } from '@/components/TravelMarquee';
-import { HeroBackgroundMarquee } from '@/components/HeroBackgroundMarquee';
 import { Display, Eyebrow, Heading, Lead, Muted } from "@/components/ui/typography";
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -71,9 +70,6 @@ export default function Landing() {
         {/* aurora backdrop */}
         <div aria-hidden className="absolute inset-0 bg-gradient-aurora opacity-70" />
         <div aria-hidden className="absolute -top-40 left-1/2 h-[480px] w-[480px] -translate-x-1/2 rounded-full bg-primary/15 blur-[160px]" />
-
-        {/* Cinematic travel image marquee — sits behind hero content */}
-        <HeroBackgroundMarquee />
 
         <div className="relative z-10 container flex flex-col items-center justify-center text-center pt-20 pb-10 md:pt-28 md:pb-14">
           <div className="mx-auto max-w-4xl animate-fade-in">
