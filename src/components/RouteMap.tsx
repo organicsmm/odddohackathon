@@ -473,13 +473,42 @@ export default function RouteMap({ stops, onSelectStop, highlightedStopId }: { s
               />
               <span className="text-foreground/80">Selected</span>
             </span>
-            <span className="inline-flex items-center gap-1.5">
+          </div>
+          <div className="mt-1.5 border-t border-border/60 pt-1.5">
+            <div className="mb-1 font-semibold uppercase tracking-wider text-muted-foreground">Confidence</div>
+            <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
               <span
-                className="h-2.5 w-2.5 rounded-full border border-white/80"
-                style={{ background: 'hsl(var(--primary))', borderStyle: 'dashed', borderColor: 'hsl(var(--warning))' }}
-              />
-              <span className="text-foreground/80">Approx.</span>
-            </span>
+                className="inline-flex items-center gap-1.5"
+                title="Pinpointed from the built-in city database or an exact geocoder match."
+              >
+                <span
+                  className="h-2.5 w-2.5 rounded-full border-2 border-white"
+                  style={{ background: 'hsl(var(--primary))' }}
+                />
+                <span className="text-foreground/80">Exact</span>
+              </span>
+              <span
+                className="inline-flex items-center gap-1.5"
+                title="Best-effort match — the marker may be off. Verify the location."
+              >
+                <span className="relative inline-flex h-3 w-3 items-center justify-center">
+                  <span
+                    className="h-2.5 w-2.5 rounded-full"
+                    style={{
+                      background: 'hsl(var(--primary))',
+                      border: '1.5px dashed hsl(var(--warning))',
+                    }}
+                  />
+                  <span
+                    className="absolute -right-1 -top-1 grid h-2.5 w-2.5 place-items-center rounded-full text-[6px] font-bold text-white"
+                    style={{ background: 'hsl(var(--warning))' }}
+                  >
+                    ?
+                  </span>
+                </span>
+                <span className="text-foreground/80">Approx.</span>
+              </span>
+            </div>
           </div>
         </div>
 
