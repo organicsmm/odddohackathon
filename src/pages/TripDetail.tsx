@@ -1164,7 +1164,7 @@ function Notes({ trip, update }: { trip: Trip; update: (p: Partial<Trip> | ((t: 
           <Card key={n.id} className="p-5">
             <div className="flex items-start justify-between gap-3">
               <div className="min-w-0 flex-1">
-                <h4 className="font-display font-semibold">{n.title}</h4>
+                <Heading level={4} className="!text-base">{n.title}</Heading>
                 <p className="mt-1 whitespace-pre-wrap text-sm text-muted-foreground">{n.body}</p>
                 <p className="mt-2 text-xs text-muted-foreground">{new Date(n.createdAt).toLocaleString()}</p>
               </div>
