@@ -214,6 +214,13 @@ export default function TripDetail() {
         </div>
       )}
 
+      <div className="animate-fade-up" style={{ animationDelay: '180ms' }}>
+        <SectionLabel>AI suggestions</SectionLabel>
+        <div className="mt-4">
+          <TripSuggestions trip={trip} />
+        </div>
+      </div>
+
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full animate-fade-up" style={{ animationDelay: '200ms' } as React.CSSProperties}>
         <div className="border-b border-border/60">
           <TabsList className="h-auto w-full justify-start gap-1 bg-transparent p-0 sm:w-auto">
