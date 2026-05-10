@@ -53,6 +53,24 @@ function fmtKm(km: number): string {
   return `${Math.round(km).toLocaleString()} km`;
 }
 
+// Estimated accuracy radius (km) for a plotted stop. Heuristic based on data source & match quality.
+function accuracyRadiusKm(p: { confidence: GeoConfidence; source: 'builtin' | 'geocoder'; matchedName?: string; stop: Stop }): number {
+  if (p.confidence === 'exact') {
+    return p.source === 'builtin' ? 5 : 10;
+  }
+  const matched = (p.matchedName ?? '').toLowerCase();
+  const city = p.stop.city.toLowerCase();
+  if (matched && matched !== city && matched.includes((city.split(/[\s,]/)[0] ?? ''))) return 50;
+  if (matched) return 100;
+  return 250;
+}
+
+function fmtRadius(km: number): string {
+  if (km < 10) return `±${km} km`;
+  if (km < 100) return `±${Math.round(km / 5) * 5} km`;
+  return `±${Math.round(km / 10) * 10} km`;
+}
+
 
 export default function RouteMap({ stops, onSelectStop, highlightedStopId }: { stops: Stop[]; onSelectStop?: (id: string) => void; highlightedStopId?: string | null }) {
   const [hover, setHover] = useState<string | null>(null);
