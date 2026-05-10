@@ -2,8 +2,11 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { useEffect, useMemo, useState } from 'react';
 import {
   Calendar, MapPin, Plus, Trash2, Share2, Globe, Lock, GripVertical,
-  Wallet, ListChecks, StickyNote, MapIcon, ChevronLeft, Clock, Printer,
+  Wallet, ListChecks, StickyNote, MapIcon, ChevronLeft, Clock, Download,
+  FileText, FileSpreadsheet, Printer,
 } from 'lucide-react';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuSeparator } from '@/components/ui/dropdown-menu';
+import { exportTripPDF, exportTripCSV } from '@/lib/export';
 import { useAuth } from '@/contexts/AuthContext';
 import { getTrip, upsertTrip, uid, tripCost, stopDays, tripDays, resequenceStops } from '@/lib/store';
 import type { Trip, Stop, Activity, Note, PackItem } from '@/lib/types';
@@ -80,7 +83,23 @@ export default function TripDetail() {
               navigator.clipboard.writeText(url);
               toast.success('Share link copied!');
             }}><Share2 className="h-4 w-4" /> Copy link</Button>
-            <Button variant="secondary" onClick={() => window.print()}><Printer className="h-4 w-4" /> Print</Button>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="secondary"><Download className="h-4 w-4" /> Export</Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-52">
+                <DropdownMenuItem onClick={() => { exportTripPDF(trip); toast.success('PDF downloaded'); }}>
+                  <FileText className="h-4 w-4 mr-2" /> Download PDF summary
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => { exportTripCSV(trip); toast.success('CSV downloaded'); }}>
+                  <FileSpreadsheet className="h-4 w-4 mr-2" /> Cost breakdown CSV
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem onClick={() => window.print()}>
+                  <Printer className="h-4 w-4 mr-2" /> Print page
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
           </div>
         </div>
 
