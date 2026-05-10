@@ -68,7 +68,12 @@ export default function AppLayout() {
                 {user.name?.split(' ')[0] || user.email?.split('@')[0]}
               </span>
             </div>
-            <Button variant="ghost" size="icon" onClick={() => { logout(); navigate('/login'); }} aria-label="Log out">
+            {isAdmin && (
+              <Button asChild variant="outline" size="sm" className="hidden sm:inline-flex">
+                <Link to="/admin"><Shield className="h-4 w-4" /> Admin</Link>
+              </Button>
+            )}
+            <Button variant="ghost" size="icon" onClick={async () => { await signOut(); navigate('/login'); }} aria-label="Log out">
               <LogOut className="h-4 w-4" />
             </Button>
           </div>
