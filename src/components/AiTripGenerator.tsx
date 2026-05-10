@@ -265,9 +265,20 @@ function FormStep(props: {
   );
 }
 
-function FormField({
-  icon, label, hint, right, children,
-}: { icon?: React.ReactNode; label: string; hint?: string; right?: React.ReactNode; children: React.ReactNode }) {
+interface FormFieldProps {
+  /** Optional leading icon shown next to the label. */
+  icon?: React.ReactNode;
+  /** Field label (always rendered). */
+  label: string;
+  /** Optional inline hint shown after the label. */
+  hint?: string;
+  /** Optional right-aligned slot (e.g. live value). */
+  right?: React.ReactNode;
+  /** The control(s) the field wraps. */
+  children: React.ReactNode;
+}
+
+function FormField({ icon, label, hint, right, children }: FormFieldProps) {
   return (
     <div className="space-y-2">
       <div className="flex items-end justify-between gap-2">
@@ -514,7 +525,18 @@ function StopEditor({
 
 /* ------------------------------ FIELD ------------------------------ */
 
-function Field({ label, error, children, icon }: { label: string; error?: string; children: React.ReactNode; icon?: React.ReactNode }) {
+interface FieldProps {
+  /** Field label rendered above the control. */
+  label: string;
+  /** Validation error message; when present, renders below the control. */
+  error?: string;
+  /** The control(s) the field wraps. */
+  children: React.ReactNode;
+  /** Optional leading icon shown next to the label. */
+  icon?: React.ReactNode;
+}
+
+function Field({ label, error, children, icon }: FieldProps) {
   return (
     <div className="space-y-1">
       <Label className="flex items-center gap-1 text-xs font-medium text-muted-foreground">{icon}{label}</Label>
