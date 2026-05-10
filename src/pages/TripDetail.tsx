@@ -804,11 +804,26 @@ function BudgetView({ trip, update }: { trip: Trip; update: (p: Partial<Trip>) =
             <p className="mt-3 text-xs text-muted-foreground">Set a target to track your spending.</p>
           )}
 
-          <div className="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-4">
-            <Mini label="Transport" value={cost.transport} color={COLORS.Transport} />
-            <Mini label="Stay" value={cost.stay} color={COLORS.Stay} />
-            <Mini label="Meals" value={cost.meals} color={COLORS.Meals} />
-            <Mini label="Activities" value={cost.activities} color={COLORS.Activities} />
+          <div className="mt-6 space-y-1">
+            <h4 className="font-display text-[11px] font-semibold uppercase tracking-[0.16em] text-muted-foreground">Category goals</h4>
+            <p className="text-xs text-muted-foreground">Set a target per category to track each one independently.</p>
+          </div>
+          <div className="mt-3 space-y-3">
+            {([
+              { key: 'transport', label: 'Transport', spent: cost.transport, color: COLORS.Transport },
+              { key: 'stay',      label: 'Stay',      spent: cost.stay,      color: COLORS.Stay },
+              { key: 'meals',     label: 'Meals',     spent: cost.meals,     color: COLORS.Meals },
+              { key: 'activities',label: 'Activities',spent: cost.activities,color: COLORS.Activities },
+            ] as const).map(c => (
+              <CategoryGoal
+                key={c.key}
+                label={c.label}
+                color={c.color}
+                spent={c.spent}
+                goal={trip.categoryBudgets?.[c.key]}
+                onChange={(v) => update({ categoryBudgets: { ...(trip.categoryBudgets || {}), [c.key]: v } })}
+              />
+            ))}
           </div>
         </Card>
       </div>
@@ -889,14 +904,59 @@ function KpiCard({ label, value, accent }: { label: string; value: string; accen
   );
 }
 
-function Mini({ label, value, color }: { label: string; value: number; color: string }) {
+function CategoryGoal({ label, color, spent, goal, onChange }: {
+  label: string; color: string; spent: number;
+  goal?: number;
+  onChange: (v: number | undefined) => void;
+}) {
+  const hasGoal = typeof goal === 'number' && goal > 0;
+  const pct = hasGoal ? Math.min(100, (spent / goal!) * 100) : 0;
+  const over = hasGoal && spent > goal!;
+  const remaining = hasGoal ? Math.abs(goal! - spent) : 0;
+
   return (
-    <div className="rounded-lg border border-border bg-muted/30 p-3">
-      <div className="flex items-center gap-2 text-xs text-muted-foreground">
-        <span className="h-2 w-2 rounded-full" style={{ background: color }} />
-        {label}
+    <div className="rounded-xl border border-border/60 bg-muted/20 p-3">
+      <div className="flex items-center justify-between gap-3">
+        <div className="flex items-center gap-2 text-sm font-medium">
+          <span className="h-2 w-2 rounded-full" style={{ background: color }} />
+          {label}
+        </div>
+        <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
+          <span className="tabular-nums font-medium text-foreground">${Math.round(spent).toLocaleString()}</span>
+          <span className="text-border">/</span>
+          <div className="relative">
+            <span className="pointer-events-none absolute left-2 top-1/2 -translate-y-1/2 text-xs text-muted-foreground">$</span>
+            <Input
+              type="number" min={0}
+              value={goal ?? ''}
+              placeholder="goal"
+              onChange={e => onChange(e.target.value ? Number(e.target.value) : undefined)}
+              className="h-7 w-24 border-border/60 bg-background/60 pl-5 text-right text-xs tabular-nums"
+            />
+          </div>
+        </div>
       </div>
-      <div className="mt-1 font-display text-lg font-bold">${value.toLocaleString()}</div>
+      <div className="mt-2 h-1.5 w-full overflow-hidden rounded-full bg-muted">
+        <div
+          className="h-full rounded-full transition-all duration-700 ease-out"
+          style={{
+            width: `${hasGoal ? pct : 0}%`,
+            background: over ? 'hsl(var(--destructive))' : color,
+          }}
+        />
+      </div>
+      <div className="mt-1.5 flex justify-between text-[11px]">
+        {hasGoal ? (
+          <>
+            <span className="tabular-nums text-muted-foreground">{Math.round(pct)}% used</span>
+            <span className={`tabular-nums font-medium ${over ? 'text-destructive' : 'text-success'}`}>
+              {over ? `Over by $${Math.round(remaining).toLocaleString()}` : `$${Math.round(remaining).toLocaleString()} left`}
+            </span>
+          </>
+        ) : (
+          <span className="text-muted-foreground">No goal set</span>
+        )}
+      </div>
     </div>
   );
 }
