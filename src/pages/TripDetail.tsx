@@ -80,11 +80,14 @@ export default function TripDetail() {
             }}>
               {trip.isPublic ? <><Globe className="h-4 w-4" /> Public</> : <><Lock className="h-4 w-4" /> Private</>}
             </Button>
-            <Button variant="secondary" onClick={() => {
-              const url = `${window.location.origin}/share/${trip.shareId}`;
-              navigator.clipboard.writeText(url);
-              toast.success('Share link copied!');
-            }}><Share2 className="h-4 w-4" /> Copy link</Button>
+            <ShareDialog trip={trip} update={update} />
+            {trip.isPublic && (
+              <Button variant="secondary" onClick={() => {
+                const url = `${window.location.origin}/share/${trip.shareId}`;
+                navigator.clipboard.writeText(url);
+                toast.success('Public link copied!');
+              }}><Share2 className="h-4 w-4" /> Copy link</Button>
+            )}
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button variant="secondary"><Download className="h-4 w-4" /> Export</Button>
