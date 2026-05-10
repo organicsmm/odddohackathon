@@ -2,9 +2,11 @@ import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import type { Trip } from './types';
 import { stopDays, tripCost, tripDays } from './store';
+import { formatMoney, convertFromUSD, type CurrencyCode } from './currency';
 
 // ============= PDF EXPORT =============
-export function exportTripPDF(trip: Trip) {
+export function exportTripPDF(trip: Trip, currency: CurrencyCode = 'USD') {
+  const fmt = (usd: number) => formatMoney(usd, currency);
   const doc = new jsPDF({ unit: 'pt', format: 'a4' });
   const pageW = doc.internal.pageSize.getWidth();
   const margin = 40;
