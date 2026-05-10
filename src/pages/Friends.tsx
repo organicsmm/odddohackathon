@@ -9,6 +9,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { Heading, Lead, Eyebrow } from '@/components/ui/typography';
 import { toast } from 'sonner';
 
 export default function Friends() {
