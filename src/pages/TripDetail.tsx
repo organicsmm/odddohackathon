@@ -541,9 +541,16 @@ function StopCard({ stop, index, onRemove, onUpdate, onSetDuration, dragHandle }
 
 function CostInput({ label, value, onChange }: { label: string; value: number; onChange: (v: number) => void }) {
   return (
-    <div>
+    <div className="flex items-center justify-between gap-3">
       <label className="text-xs text-muted-foreground">{label}</label>
-      <Input type="number" min={0} value={value} onChange={e => onChange(Number(e.target.value) || 0)} className="h-9" />
+      <div className="relative">
+        <span className="pointer-events-none absolute left-2 top-1/2 -translate-y-1/2 text-xs text-muted-foreground">$</span>
+        <Input
+          type="number" min={0} value={value}
+          onChange={e => onChange(Number(e.target.value) || 0)}
+          className="h-8 w-24 border-border/60 bg-background/60 pl-5 text-right text-sm tabular-nums"
+        />
+      </div>
     </div>
   );
 }
