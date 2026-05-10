@@ -931,6 +931,7 @@ toast('Invite sent', {
         </footer>
       </main>
     </div>
+    </FilterContext.Provider>
   );
 }
 
