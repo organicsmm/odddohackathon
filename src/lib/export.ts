@@ -77,7 +77,7 @@ export function exportTripPDF(trip: Trip, currency: CurrencyCode = 'USD') {
       `${new Date(s.startDate).toLocaleDateString()} → ${new Date(s.endDate).toLocaleDateString()}`,
       `${days}d`,
       String(s.activities.length),
-      `$${stopTotal.toLocaleString()}`,
+      fmt(stopTotal),
     ];
   });
   autoTable(doc, {
