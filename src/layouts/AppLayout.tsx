@@ -1,5 +1,5 @@
 import { Link, NavLink, Outlet, useNavigate } from 'react-router-dom';
-import { Plane, LayoutDashboard, MapPinned, Plus, User as UserIcon, LogOut } from 'lucide-react';
+import { Plane, LayoutDashboard, MapPinned, Plus, User as UserIcon, LogOut, Users } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { logout } from '@/lib/store';
 import { Button } from '@/components/ui/button';
@@ -9,6 +9,7 @@ const links = [
   { to: '/app', label: 'Home', icon: LayoutDashboard, end: true },
   { to: '/app/trips', label: 'My Trips', icon: MapPinned },
   { to: '/app/new', label: 'New Trip', icon: Plus },
+  { to: '/app/friends', label: 'Friends', icon: Users },
   { to: '/app/profile', label: 'Profile', icon: UserIcon },
 ];
 
