@@ -95,18 +95,21 @@ export default function Landing() {
           ]}
         >
           {(slide) => (
-            <div className="container relative flex h-full items-center">
-              <div className="max-w-2xl animate-fade-in" key={slide.title}>
-                <Badge variant="glass" className="border-border/60">
+            <div className="container relative flex h-full items-center justify-center text-center">
+              <div className="mx-auto max-w-4xl animate-fade-in" key={slide.title}>
+                <Badge variant="glass" className="border-border/60 mx-auto">
                   <Sparkles className="h-3 w-3 text-accent" /> {slide.eyebrow ?? "AI Trip Generator"}
                 </Badge>
-                <Display gradient={false} className="mt-5 text-balance">
-                  {slide.title}
-                </Display>
-                <Lead className="mt-5 max-w-xl">
+                <h1 className="mt-6 font-display font-black tracking-tight text-balance text-5xl leading-[1.02] md:text-7xl lg:text-[5.5rem]">
+                  <span className="block">{slide.title.split(' ').slice(0, -2).join(' ')}</span>
+                  <span className="block font-serif italic font-medium text-gradient">
+                    {slide.title.split(' ').slice(-2).join(' ')}
+                  </span>
+                </h1>
+                <Lead className="mt-6 mx-auto max-w-2xl text-lg md:text-xl">
                   {slide.subtitle}
                 </Lead>
-                <div className="mt-8 flex flex-wrap gap-3">
+                <div className="mt-9 flex flex-wrap justify-center gap-3">
                   <Button asChild size="xl" variant="premium">
                     <Link to={cta}>Start planning <ArrowRight className="h-4 w-4" /></Link>
                   </Button>
@@ -114,7 +117,7 @@ export default function Landing() {
                     <Link to={cta}>See a demo trip</Link>
                   </Button>
                 </div>
-                <div className="mt-10 flex flex-wrap items-center gap-6 text-sm text-muted-foreground">
+                <div className="mt-10 flex flex-wrap items-center justify-center gap-6 text-sm text-muted-foreground">
                   <div className="flex items-center gap-1 text-warning">
                     {Array.from({ length: 5 }).map((_, i) => <Star key={i} className="h-4 w-4 fill-warning" />)}
                     <span className="ml-1 font-semibold text-foreground">4.9</span>
