@@ -129,6 +129,8 @@ export const TEMPLATES: TripTemplate[] = [
     tagline: 'Lisbon to Barcelona via Madrid',
     days: 9,
     estimate: 1700,
+    cover: cover('1583422409516-2895a77efded'),
+    countries: ['Portugal', 'Spain'],
     build: () => ({
       name: 'Iberian Tapas Tour',
       description: '9 day food + culture tour through Portugal & Spain.',
