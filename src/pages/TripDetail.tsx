@@ -804,11 +804,26 @@ function BudgetView({ trip, update }: { trip: Trip; update: (p: Partial<Trip>) =
             <p className="mt-3 text-xs text-muted-foreground">Set a target to track your spending.</p>
           )}
 
-          <div className="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-4">
-            <Mini label="Transport" value={cost.transport} color={COLORS.Transport} />
-            <Mini label="Stay" value={cost.stay} color={COLORS.Stay} />
-            <Mini label="Meals" value={cost.meals} color={COLORS.Meals} />
-            <Mini label="Activities" value={cost.activities} color={COLORS.Activities} />
+          <div className="mt-6 space-y-1">
+            <h4 className="font-display text-[11px] font-semibold uppercase tracking-[0.16em] text-muted-foreground">Category goals</h4>
+            <p className="text-xs text-muted-foreground">Set a target per category to track each one independently.</p>
+          </div>
+          <div className="mt-3 space-y-3">
+            {([
+              { key: 'transport', label: 'Transport', spent: cost.transport, color: COLORS.Transport },
+              { key: 'stay',      label: 'Stay',      spent: cost.stay,      color: COLORS.Stay },
+              { key: 'meals',     label: 'Meals',     spent: cost.meals,     color: COLORS.Meals },
+              { key: 'activities',label: 'Activities',spent: cost.activities,color: COLORS.Activities },
+            ] as const).map(c => (
+              <CategoryGoal
+                key={c.key}
+                label={c.label}
+                color={c.color}
+                spent={c.spent}
+                goal={trip.categoryBudgets?.[c.key]}
+                onChange={(v) => update({ categoryBudgets: { ...(trip.categoryBudgets || {}), [c.key]: v } })}
+              />
+            ))}
           </div>
         </Card>
       </div>
