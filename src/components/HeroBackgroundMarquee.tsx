@@ -37,6 +37,8 @@ function BgRow({ direction = "left", speed = "120s", rotate = 0, offset = 0 }: R
               alt=""
               aria-hidden
               loading="lazy"
+              decoding="async"
+              {...({ fetchpriority: "low" } as Record<string, string>)}
               className="h-full w-full object-cover"
             />
           </div>
