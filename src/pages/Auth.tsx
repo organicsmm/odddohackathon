@@ -8,8 +8,9 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card } from '@/components/ui/card';
-import { login, signup } from '@/lib/store';
 import { useAuth } from '@/contexts/AuthContext';
+import { supabase } from '@/integrations/supabase/client';
+import { lovable } from '@/integrations/lovable';
 import { toast } from 'sonner';
 
 const loginSchema = z.object({
@@ -28,27 +29,39 @@ export default function Auth({ mode }: { mode: 'login' | 'signup' }) {
   const [password, setPassword] = useState('');
   const [busy, setBusy] = useState(false);
 
-  const onSubmit = (e: React.FormEvent) => {
+  const goNext = () => {
+    const pending = sessionStorage.getItem('traveloop:pending-invite');
+    if (pending) {
+      sessionStorage.removeItem('traveloop:pending-invite');
+      navigate(`/invite/${pending}`);
+    } else {
+      navigate('/app');
+    }
+  };
+
+  const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setBusy(true);
     try {
       if (mode === 'signup') {
         signupSchema.parse({ email, password, name });
-        signup(email, password, name);
-        toast.success('Welcome aboard ✈️');
+        const { error } = await supabase.auth.signUp({
+          email, password,
+          options: {
+            emailRedirectTo: `${window.location.origin}/app`,
+            data: { full_name: name },
+          },
+        });
+        if (error) throw error;
+        toast.success('Welcome aboard ✈️ Check your email to verify.');
       } else {
         loginSchema.parse({ email, password });
-        login(email, password);
+        const { error } = await supabase.auth.signInWithPassword({ email, password });
+        if (error) throw error;
         toast.success('Welcome back!');
       }
       refresh();
-      const pending = sessionStorage.getItem('traveloop:pending-invite');
-      if (pending) {
-        sessionStorage.removeItem('traveloop:pending-invite');
-        navigate(`/invite/${pending}`);
-      } else {
-        navigate('/app');
-      }
+      goNext();
     } catch (err: unknown) {
       const message = err instanceof z.ZodError ? err.errors[0].message : (err as Error).message;
       toast.error(message);
@@ -57,9 +70,28 @@ export default function Auth({ mode }: { mode: 'login' | 'signup' }) {
     }
   };
 
+  const onGoogle = async () => {
+    setBusy(true);
+    try {
+      const result = await lovable.auth.signInWithOAuth('google', {
+        redirect_uri: `${window.location.origin}/app`,
+      });
+      if (result.error) {
+        toast.error((result.error as Error).message || 'Google sign-in failed');
+        setBusy(false);
+        return;
+      }
+      if (result.redirected) return;
+      refresh();
+      goNext();
+    } catch (err) {
+      toast.error((err as Error).message || 'Google sign-in failed');
+      setBusy(false);
+    }
+  };
+
   return (
     <div className="grid min-h-screen lg:grid-cols-[1.1fr_1fr]">
-      {/* Editorial side */}
       <div className="relative hidden overflow-hidden lg:block">
         <img src={heroImg} alt="Tropical travel destination" className="absolute inset-0 h-full w-full object-cover" />
         <div className="absolute inset-0 bg-gradient-to-br from-primary/85 via-primary/55 to-accent/70" />
@@ -78,9 +110,8 @@ export default function Auth({ mode }: { mode: 'login' | 'signup' }) {
               Dream it.<br />Plan it.<br />Travel it.
             </Display>
             <Lead className="mt-5 max-w-md !text-primary-foreground/90">
-              Personalized multi-city itineraries, smart budgets, and shareable plans — crafted with the polish of a luxury travel magazine.
+              Personalized multi-city itineraries, smart budgets, and shareable plans.
             </Lead>
-
             <div className="mt-8 grid gap-3 max-w-md">
               {[
                 { icon: Sparkles, label: 'AI-built day-by-day itineraries' },
@@ -99,7 +130,6 @@ export default function Auth({ mode }: { mode: 'login' | 'signup' }) {
         </div>
       </div>
 
-      {/* Form side */}
       <div className="relative flex items-center justify-center bg-gradient-aurora p-6 sm:p-10">
         <div aria-hidden className="absolute inset-0 bg-gradient-subtle opacity-60" />
         <div className="relative w-full max-w-md animate-scale-in">
@@ -119,7 +149,21 @@ export default function Auth({ mode }: { mode: 'login' | 'signup' }) {
               {mode === 'login' ? 'Pick up where you left off.' : 'Start planning your next adventure in seconds.'}
             </Muted>
 
-            <form onSubmit={onSubmit} className="mt-7 space-y-4">
+            <Button variant="outline" size="lg" className="w-full mt-6" type="button" disabled={busy} onClick={onGoogle}>
+              <svg className="h-4 w-4" viewBox="0 0 24 24" aria-hidden>
+                <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+                <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.99.66-2.26 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+                <path fill="#FBBC05" d="M5.84 14.1c-.22-.66-.35-1.36-.35-2.1s.13-1.44.35-2.1V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.83z"/>
+                <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.83C6.71 7.31 9.14 5.38 12 5.38z"/>
+              </svg>
+              Continue with Google
+            </Button>
+
+            <div className="my-6 flex items-center gap-3 text-[11px] uppercase tracking-[0.18em] text-muted-foreground">
+              <span className="h-px flex-1 bg-border" /> or <span className="h-px flex-1 bg-border" />
+            </div>
+
+            <form onSubmit={onSubmit} className="space-y-4">
               {mode === 'signup' && (
                 <div className="space-y-1.5">
                   <Label htmlFor="name">Full name</Label>
@@ -131,14 +175,7 @@ export default function Auth({ mode }: { mode: 'login' | 'signup' }) {
                 <Input id="email" type="email" value={email} onChange={e => setEmail(e.target.value)} placeholder="you@traveloop.com" required autoComplete="email" />
               </div>
               <div className="space-y-1.5">
-                <div className="flex justify-between">
-                  <Label htmlFor="password">Password</Label>
-                  {mode === 'login' && (
-                    <button type="button" className="text-xs font-medium text-primary hover:underline" onClick={() => toast.info('Reset via Profile after login (demo).')}>
-                      Forgot password?
-                    </button>
-                  )}
-                </div>
+                <Label htmlFor="password">Password</Label>
                 <Input id="password" type="password" value={password} onChange={e => setPassword(e.target.value)} placeholder="••••••••" required autoComplete={mode === 'login' ? 'current-password' : 'new-password'} />
               </div>
               <Button type="submit" variant="premium" size="lg" className="w-full" disabled={busy}>
@@ -146,13 +183,6 @@ export default function Auth({ mode }: { mode: 'login' | 'signup' }) {
                 <ArrowRight className="h-4 w-4" />
               </Button>
             </form>
-
-            <div className="my-6 flex items-center gap-3 text-[11px] uppercase tracking-[0.18em] text-muted-foreground">
-              <span className="h-px flex-1 bg-border" /> or <span className="h-px flex-1 bg-border" />
-            </div>
-            <Button variant="outline" size="lg" className="w-full" type="button" onClick={() => toast.info('Social sign-in coming soon')}>
-              Continue with email link
-            </Button>
 
             <Muted className="mt-6 text-center text-sm">
               {mode === 'login' ? (
@@ -164,7 +194,7 @@ export default function Auth({ mode }: { mode: 'login' | 'signup' }) {
           </Card>
 
           <Muted className="mt-6 text-center text-xs">
-            By continuing you agree to our terms. We never share your data.
+            By continuing you agree to our terms.
           </Muted>
         </div>
       </div>
