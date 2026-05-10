@@ -133,9 +133,7 @@ export default function RouteMap({ stops, onSelectStop, highlightedStopId }: { s
           </span>
           <div>
             <h3 className="font-display text-lg font-bold leading-tight">Route map</h3>
-            <p className="text-xs text-muted-foreground">
-              {plotted.length} stops plotted{missing > 0 ? ` · ${missing} unmapped` : ''}
-            </p>
+            <p className="text-xs text-muted-foreground">{subtitle}</p>
           </div>
         </div>
         <div className="flex flex-wrap items-center gap-1">
