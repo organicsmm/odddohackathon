@@ -279,11 +279,30 @@ function StopCard({ stop, index, onRemove, onUpdate, onSetDuration, dragHandle }
               <WeatherBadge city={stop.city} date={stop.startDate} />
             </div>
           </div>
-          <div className="flex gap-1">
-            <Button size="icon" variant="ghost" className="text-primary-foreground hover:bg-white/20" disabled={index === 0} onClick={() => onMove(stop.id, -1)}><ArrowUp className="h-4 w-4" /></Button>
-            <Button size="icon" variant="ghost" className="text-primary-foreground hover:bg-white/20" disabled={index === total - 1} onClick={() => onMove(stop.id, 1)}><ArrowDown className="h-4 w-4" /></Button>
+          <div className="flex items-center gap-1">
+            <button
+              {...dragHandle}
+              type="button"
+              aria-label="Drag to reorder"
+              className="cursor-grab active:cursor-grabbing rounded-md p-2 text-primary-foreground hover:bg-white/20 touch-none"
+            >
+              <GripVertical className="h-5 w-5" />
+            </button>
+            <div className="flex items-center gap-1 rounded-md bg-white/15 px-2 py-1 text-xs">
+              <Clock className="h-3 w-3" />
+              <input
+                type="number"
+                min={1}
+                max={60}
+                value={days}
+                onChange={e => onSetDuration(stop.id, Number(e.target.value) || 1)}
+                className="w-10 bg-transparent text-center font-semibold outline-none"
+              />
+              <span>day{days > 1 ? 's' : ''}</span>
+            </div>
             <Button size="icon" variant="ghost" className="text-primary-foreground hover:bg-white/20" onClick={() => onRemove(stop.id)}><Trash2 className="h-4 w-4" /></Button>
           </div>
+
         </div>
       </div>
 
