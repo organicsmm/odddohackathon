@@ -60,7 +60,7 @@ export default function Profile() {
         </div>
 
         <div className="mt-8">
-          <h3 className="font-display text-lg font-bold flex items-center gap-2"><Heart className="h-4 w-4 text-accent" /> Saved destinations</h3>
+          <Heading level={3} weight="bold" className="flex items-center gap-2"><Heart className="h-4 w-4 text-accent" /> Saved destinations</Heading>
           {user.saved.length === 0 && <p className="mt-2 text-sm text-muted-foreground">Save destinations to inspire your next trip.</p>}
           <div className="mt-3 flex flex-wrap gap-2">
             {user.saved.map(city => (
