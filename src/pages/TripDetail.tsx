@@ -94,6 +94,8 @@ export default function TripDetail() {
         </div>
       </header>
 
+      {trip.stops.length > 0 && <RouteTimeline stops={trip.stops} />}
+
       <Tabs defaultValue="itinerary" className="w-full">
         <TabsList className="grid w-full grid-cols-2 sm:grid-cols-5 sm:w-auto">
           <TabsTrigger value="itinerary"><MapIcon className="h-4 w-4 mr-1" />Itinerary</TabsTrigger>
