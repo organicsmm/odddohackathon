@@ -53,6 +53,24 @@ function fmtKm(km: number): string {
   return `${Math.round(km).toLocaleString()} km`;
 }
 
+// Estimated accuracy radius (km) for a plotted stop. Heuristic based on data source & match quality.
+function accuracyRadiusKm(p: { confidence: GeoConfidence; source: 'builtin' | 'geocoder'; matchedName?: string; stop: Stop }): number {
+  if (p.confidence === 'exact') {
+    return p.source === 'builtin' ? 5 : 10;
+  }
+  const matched = (p.matchedName ?? '').toLowerCase();
+  const city = p.stop.city.toLowerCase();
+  if (matched && matched !== city && matched.includes((city.split(/[\s,]/)[0] ?? ''))) return 50;
+  if (matched) return 100;
+  return 250;
+}
+
+function fmtRadius(km: number): string {
+  if (km < 10) return `±${km} km`;
+  if (km < 100) return `±${Math.round(km / 5) * 5} km`;
+  return `±${Math.round(km / 10) * 10} km`;
+}
+
 
 export default function RouteMap({ stops, onSelectStop, highlightedStopId }: { stops: Stop[]; onSelectStop?: (id: string) => void; highlightedStopId?: string | null }) {
   const [hover, setHover] = useState<string | null>(null);
@@ -449,6 +467,13 @@ export default function RouteMap({ stops, onSelectStop, highlightedStopId }: { s
                   <span aria-hidden="true" className={`h-1.5 w-1.5 rounded-full ${p.confidence === 'exact' ? 'bg-success' : 'bg-warning'}`} />
                   {p.confidence === 'exact' ? 'Exact' : 'Approx.'}
                 </span>
+                <span
+                  className="inline-flex items-center rounded-full bg-muted/60 px-1.5 py-0.5 font-mono font-semibold tabular-nums text-foreground/80"
+                  aria-label={`Estimated accuracy radius ${fmtRadius(accuracyRadiusKm(p))}`}
+                  title="Estimated accuracy radius — true location likely within this distance"
+                >
+                  {fmtRadius(accuracyRadiusKm(p))}
+                </span>
                 <span className="text-muted-foreground">
                   {p.source === 'builtin' ? 'built-in' : 'geocoded'}
                   {p.matchedName && p.matchedName.toLowerCase() !== p.stop.city.toLowerCase() && (
@@ -550,7 +575,7 @@ export default function RouteMap({ stops, onSelectStop, highlightedStopId }: { s
                     ?
                   </span>
                 </span>
-                <span className="text-foreground/80">Approx. — best-effort match</span>
+                <span className="text-foreground/80">Approx. — best-effort match <span className="ml-1 rounded-full bg-warning/15 px-1.5 py-0.5 font-mono text-[9px] font-semibold text-warning-foreground">±50–250 km</span></span>
               </li>
             </ul>
           </div>
