@@ -693,7 +693,7 @@ function CalendarView({ trip, currency }: { trip: Trip; currency: CurrencyCode }
                         )}
                       </div>
                       <span className="text-xs text-muted-foreground shrink-0 flex items-center gap-1">
-                        <Clock className="h-3 w-3" />{a.durationHours}h · ${a.cost}
+                        <Clock className="h-3 w-3" />{a.durationHours}h · {formatMoney(a.cost, currency)}
                       </span>
                     </li>
                   ))}
