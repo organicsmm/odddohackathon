@@ -108,7 +108,7 @@ export function exportTripPDF(trip: Trip, currency: CurrencyCode = 'USD') {
         a.name,
         a.category,
         `${a.durationHours}h`,
-        `$${a.cost.toLocaleString()}`,
+        fmt(a.cost),
       ]),
       theme: 'grid',
       headStyles: { fillColor: [240, 240, 245], textColor: 30, fontSize: 9 },
