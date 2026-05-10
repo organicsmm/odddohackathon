@@ -735,10 +735,16 @@ function BudgetView({ trip, update }: { trip: Trip; update: (p: Partial<Trip>) =
     <div className="space-y-6">
       {/* KPI strip */}
       <div className="grid gap-3 sm:grid-cols-4">
-        <KpiCard label="Total" value={`$${cost.total.toLocaleString()}`} accent />
-        <KpiCard label="Avg / day" value={`$${Math.round(avg).toLocaleString()}`} />
-        <KpiCard label="Stops" value={trip.stops.length.toString()} />
-        <KpiCard label="Trip length" value={`${days} day${days > 1 ? 's' : ''}`} />
+        {[
+          { label: 'Total', value: `$${cost.total.toLocaleString()}`, accent: true },
+          { label: 'Avg / day', value: `$${Math.round(avg).toLocaleString()}` },
+          { label: 'Stops', value: trip.stops.length.toString() },
+          { label: 'Trip length', value: `${days} day${days > 1 ? 's' : ''}` },
+        ].map((k, i) => (
+          <div key={k.label} className="animate-fade-up" style={{ animationDelay: `${i * 80}ms` }}>
+            <KpiCard label={k.label} value={k.value} accent={k.accent} />
+          </div>
+        ))}
       </div>
 
       <div className="grid gap-6 lg:grid-cols-2">
