@@ -134,57 +134,51 @@ export function newTrip(ownerEmail: string, partial: Partial<Trip>): Trip {
   };
 }
 
-// ---- Auth (mock, localStorage based) ----
-type StoredUser = User & { password: string };
+// ---- User extras (per-email localStorage), keyed by current Supabase session email ----
+type Extras = Pick<User, 'name' | 'language' | 'saved' | 'friends'>;
+const extrasKey = (email: string) => `traveloop:extras:${email}`;
+const SESSION_EMAIL_KEY = 'traveloop:session-email';
 
-export function getUsers(): StoredUser[] {
-  try { return JSON.parse(localStorage.getItem(USERS_KEY) || '[]'); } catch { return []; }
+export function setSessionEmail(email: string | null) {
+  if (email) localStorage.setItem(SESSION_EMAIL_KEY, email);
+  else localStorage.removeItem(SESSION_EMAIL_KEY);
+  window.dispatchEvent(new Event('traveloop:auth-changed'));
 }
-function setUsers(u: StoredUser[]) { localStorage.setItem(USERS_KEY, JSON.stringify(u)); }
-
-export function signup(email: string, password: string, name: string): User {
-  const users = getUsers();
-  if (users.find(u => u.email === email)) throw new Error('Account already exists');
-  const user: StoredUser = { email, password, name, language: 'en', saved: [] };
-  users.push(user);
-  setUsers(users);
-  setSession(email);
-  return user;
+export function getSessionEmail(): string | null {
+  return localStorage.getItem(SESSION_EMAIL_KEY);
 }
-export function login(email: string, password: string): User {
-  const u = getUsers().find(x => x.email === email && x.password === password);
-  if (!u) throw new Error('Invalid email or password');
-  setSession(email);
-  return u;
+export function getExtras(email: string): Extras {
+  try { return JSON.parse(localStorage.getItem(extrasKey(email)) || '{}'); } catch { return {} as Extras; }
 }
-export function logout() { localStorage.removeItem(SESSION_KEY); window.dispatchEvent(new Event('traveloop:auth-changed')); }
-export function setSession(email: string) {
-  localStorage.setItem(SESSION_KEY, email);
+export function setExtras(email: string, patch: Partial<Extras>) {
+  const cur = getExtras(email);
+  const next = { ...cur, ...patch };
+  localStorage.setItem(extrasKey(email), JSON.stringify(next));
   window.dispatchEvent(new Event('traveloop:auth-changed'));
 }
 export function currentUser(): User | null {
-  const email = localStorage.getItem(SESSION_KEY);
+  const email = getSessionEmail();
   if (!email) return null;
-  const u = getUsers().find(x => x.email === email);
-  return u ? { email: u.email, name: u.name, language: u.language, saved: u.saved } : null;
+  const ex = getExtras(email);
+  return { email, name: ex.name || email.split('@')[0], language: ex.language || 'en', saved: ex.saved || [], friends: ex.friends || [] };
 }
 export function updateUser(patch: Partial<User>) {
-  const email = localStorage.getItem(SESSION_KEY);
+  const email = getSessionEmail();
   if (!email) return;
-  const users = getUsers();
-  const idx = users.findIndex(u => u.email === email);
-  if (idx < 0) return;
-  users[idx] = { ...users[idx], ...patch };
-  setUsers(users);
-  window.dispatchEvent(new Event('traveloop:auth-changed'));
+  setExtras(email, patch as Partial<Extras>);
 }
+export function logout() { /* legacy no-op; auth handled by Supabase */ setSessionEmail(null); }
 export function deleteAccount() {
-  const email = localStorage.getItem(SESSION_KEY);
+  const email = getSessionEmail();
   if (!email) return;
-  setUsers(getUsers().filter(u => u.email !== email));
+  localStorage.removeItem(extrasKey(email));
   saveTrips(loadTrips().filter(t => t.ownerEmail !== email));
-  logout();
+  setSessionEmail(null);
 }
+// Legacy stubs (no longer used; kept to avoid breaking imports if any remain)
+export function signup(_email: string, _password: string, _name: string): User { throw new Error('Use Supabase auth'); }
+export function login(_email: string, _password: string): User { throw new Error('Use Supabase auth'); }
+export function getUsers(): User[] { return []; }
 
 // ---- Compute helpers ----
 export function tripDays(trip: Trip): number {
