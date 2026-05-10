@@ -16,6 +16,7 @@ import SharedTrip from "./pages/SharedTrip";
 import Friends from "./pages/Friends";
 import AcceptInvite from "./pages/AcceptInvite";
 import NotFound from "./pages/NotFound.tsx";
+import Showcase from "./pages/Showcase";
 
 const queryClient = new QueryClient();
 
