@@ -83,7 +83,23 @@ export default function TripDetail() {
               navigator.clipboard.writeText(url);
               toast.success('Share link copied!');
             }}><Share2 className="h-4 w-4" /> Copy link</Button>
-            <Button variant="secondary" onClick={() => window.print()}><Printer className="h-4 w-4" /> Print</Button>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="secondary"><Download className="h-4 w-4" /> Export</Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-52">
+                <DropdownMenuItem onClick={() => { exportTripPDF(trip); toast.success('PDF downloaded'); }}>
+                  <FileText className="h-4 w-4 mr-2" /> Download PDF summary
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => { exportTripCSV(trip); toast.success('CSV downloaded'); }}>
+                  <FileSpreadsheet className="h-4 w-4 mr-2" /> Cost breakdown CSV
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem onClick={() => window.print()}>
+                  <Printer className="h-4 w-4 mr-2" /> Print page
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
           </div>
         </div>
 
