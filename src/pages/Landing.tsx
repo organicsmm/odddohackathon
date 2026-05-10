@@ -128,16 +128,15 @@ export default function Landing() {
         </HeroSlider>
       </section>
 
-        {/* Marquee of destinations */}
-        <div className="relative border-y border-border/60 bg-card/40 py-4 backdrop-blur-sm">
-          <div className="container flex flex-wrap items-center justify-center gap-x-8 gap-y-2 text-sm text-muted-foreground">
-            <span className="font-semibold uppercase tracking-[0.18em] text-[10px] text-foreground">Loved in</span>
-            {cities.map(c => (
-              <span key={c} className="inline-flex items-center gap-1 font-medium">
-                <MapPin className="h-3 w-3 text-primary/70" />{c}
-              </span>
-            ))}
-          </div>
+      {/* Marquee of destinations */}
+      <section className="relative border-y border-border/60 bg-card/40 py-4 backdrop-blur-sm">
+        <div className="container flex flex-wrap items-center justify-center gap-x-8 gap-y-2 text-sm text-muted-foreground">
+          <span className="font-semibold uppercase tracking-[0.18em] text-[10px] text-foreground">Loved in</span>
+          {cities.map(c => (
+            <span key={c} className="inline-flex items-center gap-1 font-medium">
+              <MapPin className="h-3 w-3 text-primary/70" />{c}
+            </span>
+          ))}
         </div>
       </section>
 
