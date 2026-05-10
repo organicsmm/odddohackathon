@@ -27,8 +27,11 @@ export default function ActivitySearchDialog({
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>{trigger}</DialogTrigger>
-      <DialogContent className="max-w-xl">
-        <DialogHeader><DialogTitle className="font-display">Add activity</DialogTitle></DialogHeader>
+      <DialogContent className="max-w-xl border-border/60 bg-gradient-card backdrop-blur-xl">
+        <DialogHeader>
+          <span className="text-[10px] font-semibold uppercase tracking-[0.2em] text-primary">Plan</span>
+          <DialogTitle className="font-display text-2xl font-bold tracking-tight">Add activity</DialogTitle>
+        </DialogHeader>
         <div className="space-y-4">
           <div className="grid gap-3 sm:grid-cols-[1fr_auto]">
             <div className="relative">
@@ -42,14 +45,14 @@ export default function ActivitySearchDialog({
               </SelectContent>
             </Select>
           </div>
-          <div className="max-h-72 overflow-y-auto rounded-xl border border-border">
+          <div className="max-h-72 overflow-y-auto rounded-xl border border-border/60 bg-card/40">
             {list.map((a, i) => (
-              <div key={i} className="flex items-center justify-between border-b border-border/60 p-3 last:border-0 hover:bg-muted/50">
+              <div key={i} className="flex items-center justify-between border-b border-border/40 p-3 last:border-0 transition-smooth hover:bg-muted/50">
                 <div>
                   <div className="font-medium">{a.name}</div>
                   <div className="text-xs text-muted-foreground">{a.category} · {a.durationHours}h · ${a.cost}</div>
                 </div>
-                <Button size="sm" variant="hero" onClick={() => { onAdd({ ...a, id: uid() }); setOpen(false); }}>
+                <Button size="sm" variant="premium" onClick={() => { onAdd({ ...a, id: uid() }); setOpen(false); }}>
                   <Plus className="h-4 w-4" /> Add
                 </Button>
               </div>
