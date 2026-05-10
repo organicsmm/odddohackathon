@@ -196,7 +196,7 @@ function FormStep(props: {
             </button>
           ))}
         </div>
-      </Field>
+      </FormField>
 
       <Field
         icon={<Wallet className="h-3.5 w-3.5" />}
@@ -208,22 +208,22 @@ function FormStep(props: {
         <div className="flex justify-between text-[11px] text-muted-foreground">
           <span>$500 · lean</span><span>$15,000 · luxury</span>
         </div>
-      </Field>
+      </FormField>
 
       <div className="grid grid-cols-2 gap-5">
-        <Field icon={<Calendar className="h-3.5 w-3.5" />} label="Days">
+        <FormField icon={<Calendar className="h-3.5 w-3.5" />} label="Days">
           <Input type="number" min={2} max={30} value={days}
             onChange={e => setDays(Math.max(2, Math.min(30, Number(e.target.value) || 7)))}
             disabled={busy} className="h-11 tabular-nums" />
-        </Field>
-        <Field icon={<Users className="h-3.5 w-3.5" />} label="Travelers">
+        </FormField>
+        <FormField icon={<Users className="h-3.5 w-3.5" />} label="Travelers">
           <Input type="number" min={1} max={20} value={travelers}
             onChange={e => setTravelers(Math.max(1, Math.min(20, Number(e.target.value) || 1)))}
             disabled={busy} className="h-11 tabular-nums" />
-        </Field>
+        </FormField>
       </div>
 
-      <Field label="Trip style">
+      <FormField label="Trip style">
         <div className="grid grid-cols-4 gap-2">
           {STYLES.map(s => {
             const active = style === s.id;
@@ -243,13 +243,13 @@ function FormStep(props: {
             );
           })}
         </div>
-      </Field>
+      </FormField>
 
-      <Field label="Notes" hint="Optional">
+      <FormField label="Notes" hint="Optional">
         <Textarea value={extra} onChange={e => setExtra(e.target.value.slice(0, 500))}
           placeholder="Vegetarian food, avoid flights, must include diving…"
           rows={2} disabled={busy} maxLength={500} className="resize-none" />
-      </Field>
+      </FormField>
 
       <div className="flex flex-col-reverse gap-2 border-t border-border/60 pt-5 sm:flex-row sm:items-center sm:justify-between">
         <p className="text-xs text-muted-foreground">
@@ -265,7 +265,7 @@ function FormStep(props: {
   );
 }
 
-function Field({
+function FormField({
   icon, label, hint, right, children,
 }: { icon?: React.ReactNode; label: string; hint?: string; right?: React.ReactNode; children: React.ReactNode }) {
   return (
