@@ -104,3 +104,48 @@ export function getCoords(city: string): [number, number] | null {
   const key = Object.keys(CITY_COORDS).find(k => k.toLowerCase() === city.toLowerCase());
   return key ? CITY_COORDS[key] : null;
 }
+
+/* ---------- Async geocoding fallback (Open-Meteo, no API key) ---------- */
+
+const LS_KEY = 'traveloop:geocode-cache:v1';
+
+function loadCache(): Record<string, [number, number] | null> {
+  try { return JSON.parse(localStorage.getItem(LS_KEY) || '{}'); } catch { return {}; }
+}
+function saveCache(c: Record<string, [number, number] | null>) {
+  try { localStorage.setItem(LS_KEY, JSON.stringify(c)); } catch { /* ignore quota */ }
+}
+
+const memCache: Record<string, [number, number] | null> = loadCache();
+const inflight = new Map<string, Promise<[number, number] | null>>();
+
+export async function geocodeCity(city: string): Promise<[number, number] | null> {
+  const local = getCoords(city);
+  if (local) return local;
+
+  const key = city.trim().toLowerCase();
+  if (key in memCache) return memCache[key];
+  if (inflight.has(key)) return inflight.get(key)!;
+
+  const p = (async () => {
+    try {
+      const url = `https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(city)}&count=1&language=en&format=json`;
+      const res = await fetch(url);
+      if (!res.ok) throw new Error(`geocode ${res.status}`);
+      const data = await res.json();
+      const hit = data?.results?.[0];
+      const coords: [number, number] | null = hit ? [hit.longitude, hit.latitude] : null;
+      memCache[key] = coords;
+      saveCache(memCache);
+      return coords;
+    } catch {
+      return null;
+    } finally {
+      inflight.delete(key);
+    }
+  })();
+
+  inflight.set(key, p);
+  return p;
+}
+
