@@ -26,7 +26,7 @@ export default function AcceptInvite() {
       <Shell>
         <Card variant="premium" className="p-8 text-center">
           <X className="mx-auto h-10 w-10 text-destructive" />
-          <h1 className="mt-3 font-display text-2xl font-bold tracking-tight">Invite not found</h1>
+          <Heading level={2} className="mt-3" weight="bold">Invite not found</Heading>
           <p className="mt-2 text-sm text-muted-foreground">This invite link is invalid or has been revoked.</p>
           <Button asChild variant="premium" className="mt-6"><Link to="/">Go home</Link></Button>
         </Card>
@@ -41,7 +41,7 @@ export default function AcceptInvite() {
       <Shell>
         <Card variant="aurora" className="p-8 text-center">
           <Lock className="mx-auto h-10 w-10 text-primary" />
-          <h1 className="mt-3 font-display text-2xl font-bold tracking-tight">You're invited to "{trip.name}"</h1>
+          <Heading level={2} className="mt-3" weight="bold">You're invited to "{trip.name}"</Heading>
           <p className="mt-2 text-sm text-muted-foreground">Sign in or create an account to view this private trip.</p>
           <div className="mt-6 flex justify-center gap-2">
             <Button asChild variant="premium"><Link to="/login">Log in</Link></Button>
@@ -57,7 +57,7 @@ export default function AcceptInvite() {
       <Shell>
         <Card variant="premium" className="p-8 text-center">
           <X className="mx-auto h-10 w-10 text-destructive" />
-          <h1 className="mt-3 font-display text-2xl font-bold tracking-tight">Wrong account</h1>
+          <Heading level={2} className="mt-3" weight="bold">Wrong account</Heading>
           <p className="mt-2 text-sm text-muted-foreground">This invite was sent to <strong>{invite.invitedEmail}</strong>. You're signed in as {user.email}.</p>
           <Button asChild variant="outline" className="mt-6"><Link to="/app">Back to app</Link></Button>
         </Card>
@@ -83,7 +83,7 @@ export default function AcceptInvite() {
     <Shell>
       <Card variant="aurora" className="p-8 text-center">
         <Lock className="mx-auto h-10 w-10 text-primary" />
-        <h1 className="mt-3 font-display text-2xl font-bold tracking-tight">Private trip invitation</h1>
+        <Heading level={2} className="mt-3" weight="bold">Private trip invitation</Heading>
         <p className="mt-1 text-muted-foreground">{trip.ownerEmail} invited you to view</p>
         <p className="mt-1 font-display text-xl font-semibold">"{trip.name}"</p>
         <p className="mt-2 text-sm text-muted-foreground">{trip.stops.length} stops · {new Date(trip.startDate).toLocaleDateString()} → {new Date(trip.endDate).toLocaleDateString()}</p>
