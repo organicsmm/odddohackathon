@@ -195,7 +195,7 @@ export default function RouteMap({ stops, onSelectStop, highlightedStopId }: { s
                     stroke="hsl(var(--primary))"
                     strokeWidth={1.6}
                     strokeLinecap="round"
-                    strokeDasharray="4 4"
+                    strokeDasharray={dashedPaths ? '4 4' : undefined}
                   />
                   <Marker coordinates={mid}>
                     <text
