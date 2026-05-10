@@ -516,23 +516,26 @@ export default function RouteMap({ stops, onSelectStop, highlightedStopId }: { s
           </ul>
           <div className="mt-1.5 border-t border-border/60 pt-1.5">
             <div className="mb-1 font-semibold uppercase tracking-wider text-muted-foreground">Confidence</div>
-            <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
-              <span
+            <ul className="flex flex-wrap items-center gap-x-3 gap-y-1" role="list">
+              <li
                 className="inline-flex items-center gap-1.5"
                 title="Pinpointed from the built-in city database or an exact geocoder match."
               >
                 <span
+                  role="img"
+                  aria-label="Solid white-ringed dot"
                   className="h-2.5 w-2.5 rounded-full border-2 border-white"
                   style={{ background: 'hsl(var(--primary))' }}
                 />
-                <span className="text-foreground/80">Exact</span>
-              </span>
-              <span
+                <span className="text-foreground/80">Exact — pinpointed location</span>
+              </li>
+              <li
                 className="inline-flex items-center gap-1.5"
                 title="Best-effort match — the marker may be off. Verify the location."
               >
-                <span className="relative inline-flex h-3 w-3 items-center justify-center">
+                <span role="img" aria-label="Dashed warning ring with question mark badge" className="relative inline-flex h-3 w-3 items-center justify-center">
                   <span
+                    aria-hidden="true"
                     className="h-2.5 w-2.5 rounded-full"
                     style={{
                       background: 'hsl(var(--primary))',
@@ -540,15 +543,16 @@ export default function RouteMap({ stops, onSelectStop, highlightedStopId }: { s
                     }}
                   />
                   <span
+                    aria-hidden="true"
                     className="absolute -right-1 -top-1 grid h-2.5 w-2.5 place-items-center rounded-full text-[6px] font-bold text-white"
                     style={{ background: 'hsl(var(--warning))' }}
                   >
                     ?
                   </span>
                 </span>
-                <span className="text-foreground/80">Approx.</span>
-              </span>
-            </div>
+                <span className="text-foreground/80">Approx. — best-effort match</span>
+              </li>
+            </ul>
           </div>
         </div>
 
