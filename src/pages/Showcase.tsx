@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
+import { toast } from 'sonner';
 import {
   Sparkles, Plane, Star, Heart, Plus, ArrowRight, Trash2, Code2,
 } from 'lucide-react';
