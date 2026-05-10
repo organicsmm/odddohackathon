@@ -442,10 +442,10 @@ function StopCard({ stop, index, onRemove, onUpdate, onSetDuration, dragHandle, 
 
         {/* title block */}
         <div className="min-w-0 self-end">
-          <h3 className="font-display text-3xl font-bold leading-tight tracking-tight md:text-4xl">
+          <Heading level={3} className="!text-3xl leading-tight tracking-tight md:!text-4xl">
             {stop.city}
             <span className="ml-2 text-base font-normal text-muted-foreground">{stop.country}</span>
-          </h3>
+          </Heading>
           <div className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1.5 text-xs text-muted-foreground">
             <span className="inline-flex items-center gap-1.5 tabular-nums">
               <Calendar className="h-3 w-3" /> {startFmt} <span className="text-border">→</span> {endFmt}
