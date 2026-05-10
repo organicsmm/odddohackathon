@@ -240,13 +240,15 @@ export default function RouteMap({ stops, onSelectStop, highlightedStopId }: { s
               const isSelected = highlightedStopId === p.stop.id;
               const isStart = p.index === 0;
               const isEnd = p.index === stops.length - 1;
-              const fill = isSelected
-                ? 'hsl(var(--accent))'
-                : highlightEnds && isStart
-                  ? 'hsl(var(--success))'
-                  : highlightEnds && isEnd
-                    ? 'hsl(var(--accent))'
-                    : 'hsl(var(--primary))';
+              // Color priority: start/end highlight defines base color; selection adds a ring overlay.
+              // This avoids the prior conflict where selected and end both used --accent.
+              const baseFill = highlightEnds && isStart
+                ? 'hsl(var(--success))'
+                : highlightEnds && isEnd
+                  ? 'hsl(var(--accent))'
+                  : 'hsl(var(--primary))';
+              const fill = baseFill;
+              const ringColor = 'hsl(var(--ring))';
               const labelText = showNumbers
                 ? `${p.index + 1}. ${p.stop.city}`
                 : p.stop.city;
