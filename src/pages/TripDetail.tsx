@@ -2,7 +2,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { useEffect, useMemo, useState } from 'react';
 import {
   Calendar, MapPin, Plus, Trash2, ArrowUp, ArrowDown, Share2, Globe, Lock,
-  Wallet, ListChecks, StickyNote, MapIcon, ChevronLeft, Clock,
+  Wallet, ListChecks, StickyNote, MapIcon, ChevronLeft, Clock, Printer,
 } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { getTrip, upsertTrip, uid, tripCost, stopDays, tripDays } from '@/lib/store';
@@ -19,6 +19,8 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import CitySearchDialog from '@/components/CitySearchDialog';
 import ActivitySearchDialog from '@/components/ActivitySearchDialog';
+import RouteTimeline from '@/components/RouteTimeline';
+import { WeatherBadge } from '@/lib/weather';
 import { toast } from 'sonner';
 
 export default function TripDetail() {
