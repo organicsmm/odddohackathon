@@ -114,27 +114,31 @@ export default function RouteMap({ stops, onSelectStop, highlightedStopId }: { s
             {/* Stop markers */}
             {plotted.map(p => {
               const isHover = hover === p.stop.id;
+              const isSelected = highlightedStopId === p.stop.id;
               const isStart = p.index === 0;
               const isEnd = p.index === stops.length - 1;
-              const fill = isStart
+              const fill = isSelected
                 ? 'hsl(var(--accent))'
-                : isEnd
-                  ? 'hsl(var(--primary))'
-                  : 'hsl(var(--primary))';
+                : isStart
+                  ? 'hsl(var(--accent))'
+                  : isEnd
+                    ? 'hsl(var(--primary))'
+                    : 'hsl(var(--primary))';
               return (
                 <Marker
                   key={p.stop.id}
                   coordinates={p.coords}
                   onMouseEnter={() => setHover(p.stop.id)}
                   onMouseLeave={() => setHover(null)}
+                  onClick={() => onSelectStop?.(p.stop.id)}
                   style={{ default: { cursor: 'pointer' }, hover: { cursor: 'pointer' }, pressed: { cursor: 'pointer' } }}
                 >
                   {/* pulse ring */}
-                  <circle r={isHover ? 14 : 10} fill={fill} fillOpacity={0.18}>
+                  <circle r={isHover || isSelected ? 14 : 10} fill={fill} fillOpacity={isSelected ? 0.35 : 0.18}>
                     <animate attributeName="r" values="8;16;8" dur="2.4s" repeatCount="indefinite" />
                     <animate attributeName="fill-opacity" values="0.25;0;0.25" dur="2.4s" repeatCount="indefinite" />
                   </circle>
-                  <circle r={5.5} fill={fill} stroke="white" strokeWidth={1.8} />
+                  <circle r={isSelected ? 7.5 : 5.5} fill={fill} stroke="white" strokeWidth={isSelected ? 2.5 : 1.8} />
                   <text
                     textAnchor="middle"
                     y={-12}
