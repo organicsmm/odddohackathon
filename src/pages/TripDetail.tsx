@@ -392,52 +392,138 @@ function CostInput({ label, value, onChange }: { label: string; value: number; o
 }
 
 function CalendarView({ trip }: { trip: Trip }) {
-  // Build day map
-  const days = useMemo(() => {
-    const map: { date: string; stop?: Stop; activities: Activity[] }[] = [];
+  type DayEntry = {
+    date: string;
+    stop?: Stop;
+    dayOfStop?: number;
+    stopLength?: number;
+    activities: Activity[];
+    dailyCost: number;
+  };
+
+  const days = useMemo<DayEntry[]>(() => {
+    const map: DayEntry[] = [];
     const start = new Date(trip.startDate);
     const total = tripDays(trip);
+
+    // Pre-bucket activities round-robin across each stop's days
+    const stopBuckets = new Map<string, Activity[][]>();
+    for (const s of trip.stops) {
+      const len = Math.max(1, stopDays(s));
+      const buckets: Activity[][] = Array.from({ length: len }, () => []);
+      s.activities.forEach((a, idx) => buckets[idx % len].push(a));
+      // sort each day by time
+      buckets.forEach(b => b.sort((x, y) => (x.time || '99:99').localeCompare(y.time || '99:99')));
+      stopBuckets.set(s.id, buckets);
+    }
+
     for (let i = 0; i < total; i++) {
       const d = new Date(start);
       d.setDate(start.getDate() + i);
       const iso = d.toISOString().slice(0, 10);
       const stop = trip.stops.find(s => iso >= s.startDate && iso <= s.endDate);
-      // assign activities only to first day for simplicity
-      const activities = stop && iso === stop.startDate ? stop.activities : [];
-      map.push({ date: iso, stop, activities });
+      let activities: Activity[] = [];
+      let dayOfStop: number | undefined;
+      let stopLength: number | undefined;
+      let dailyCost = 0;
+      if (stop) {
+        const sStart = new Date(stop.startDate);
+        dayOfStop = Math.round((d.getTime() - sStart.getTime()) / 86400000) + 1;
+        stopLength = stopDays(stop);
+        activities = stopBuckets.get(stop.id)?.[dayOfStop - 1] ?? [];
+        dailyCost = (stop.costs.stay || 0) + (stop.costs.meals || 0)
+          + activities.reduce((sum, a) => sum + (a.cost || 0), 0)
+          + (dayOfStop === 1 ? (stop.costs.transport || 0) : 0);
+      }
+      map.push({ date: iso, stop, dayOfStop, stopLength, activities, dailyCost });
     }
     return map;
   }, [trip]);
 
+  if (days.length === 0) {
+    return <p className="text-sm text-muted-foreground">Set a start and end date to see the day-by-day plan.</p>;
+  }
+
   return (
-    <div className="space-y-3">
-      {days.map((d, i) => (
-        <div key={d.date} className="flex gap-4 rounded-xl border border-border bg-card p-4">
-          <div className="w-20 shrink-0 text-center">
-            <div className="text-xs text-muted-foreground">Day {i + 1}</div>
-            <div className="font-display text-2xl font-bold">{new Date(d.date).getDate()}</div>
-            <div className="text-xs text-muted-foreground">{new Date(d.date).toLocaleDateString(undefined, { month: 'short', weekday: 'short' })}</div>
+    <div className="space-y-4">
+      <div className="rounded-2xl border border-border bg-muted/30 p-4 text-sm text-muted-foreground">
+        A day-by-day plan across your {trip.stops.length} {trip.stops.length === 1 ? 'stop' : 'stops'}.
+        Activities are distributed evenly across each city's stay — drag and edit them in the List view.
+      </div>
+
+      {days.map((d, i) => {
+        const dt = new Date(d.date);
+        const isFirstDayOfStop = d.dayOfStop === 1;
+        return (
+          <div key={d.date} className="flex gap-4 rounded-2xl border border-border bg-card p-4 shadow-soft">
+            <div className="w-20 shrink-0 text-center">
+              <div className="text-xs uppercase tracking-wider text-muted-foreground">Day {i + 1}</div>
+              <div className="font-display text-3xl font-bold leading-none mt-1">{dt.getDate()}</div>
+              <div className="text-xs text-muted-foreground mt-1">
+                {dt.toLocaleDateString(undefined, { weekday: 'short' })}
+              </div>
+              <div className="text-xs text-muted-foreground">
+                {dt.toLocaleDateString(undefined, { month: 'short' })}
+              </div>
+            </div>
+            <div className="flex-1 border-l border-border pl-4 min-w-0">
+              {d.stop ? (
+                <div className="flex flex-wrap items-center justify-between gap-2">
+                  <div className="min-w-0">
+                    <div className="font-display font-semibold flex items-center gap-2 truncate">
+                      <MapPin className="h-4 w-4 text-primary shrink-0" />
+                      {d.stop.city}, {d.stop.country}
+                    </div>
+                    <div className="text-xs text-muted-foreground mt-0.5">
+                      Day {d.dayOfStop} of {d.stopLength}
+                      {isFirstDayOfStop && d.stopLength! > 1 && ' · arrival'}
+                      {d.dayOfStop === d.stopLength && d.stopLength! > 1 && ' · departure'}
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <WeatherBadge city={d.stop.city} date={d.date} />
+                    <span className="text-xs font-medium text-muted-foreground">
+                      ~${Math.round(d.dailyCost)}
+                    </span>
+                  </div>
+                </div>
+              ) : (
+                <div className="text-muted-foreground italic text-sm">No stop assigned</div>
+              )}
+
+              {d.stop && d.activities.length === 0 && (
+                <p className="mt-3 text-xs text-muted-foreground italic">
+                  No activities planned — a free day to explore {d.stop.city}.
+                </p>
+              )}
+
+              {d.activities.length > 0 && (
+                <ul className="mt-3 space-y-1.5">
+                  {d.activities.map(a => (
+                    <li key={a.id} className="flex items-start gap-3 text-sm">
+                      <span className="text-xs font-mono text-muted-foreground w-12 shrink-0 pt-0.5">
+                        {a.time || '--:--'}
+                      </span>
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2">
+                          <span className="font-medium truncate">{a.name}</span>
+                          <span className="text-xs text-muted-foreground capitalize shrink-0">· {a.category}</span>
+                        </div>
+                        {a.description && (
+                          <p className="text-xs text-muted-foreground truncate">{a.description}</p>
+                        )}
+                      </div>
+                      <span className="text-xs text-muted-foreground shrink-0 flex items-center gap-1">
+                        <Clock className="h-3 w-3" />{a.durationHours}h · ${a.cost}
+                      </span>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </div>
           </div>
-          <div className="flex-1 border-l border-border pl-4">
-            {d.stop ? (
-              <div className="font-display font-semibold flex items-center gap-2"><MapPin className="h-4 w-4 text-primary" />{d.stop.city}, {d.stop.country}</div>
-            ) : (
-              <div className="text-muted-foreground italic text-sm">No stop assigned</div>
-            )}
-            {d.activities.length > 0 && (
-              <ul className="mt-2 space-y-1">
-                {d.activities.map(a => (
-                  <li key={a.id} className="text-sm flex items-center gap-2">
-                    <span className="text-xs text-muted-foreground w-12">{a.time || '--:--'}</span>
-                    <span>{a.name}</span>
-                    <span className="text-xs text-muted-foreground">· ${a.cost}</span>
-                  </li>
-                ))}
-              </ul>
-            )}
-          </div>
-        </div>
-      ))}
+        );
+      })}
     </div>
   );
 }
