@@ -112,9 +112,9 @@ export default function Auth({ mode }: { mode: 'login' | 'signup' }) {
 
           <Card variant="premium" className="p-8">
             <Eyebrow>{mode === 'login' ? 'Welcome back' : 'Get started'}</Eyebrow>
-            <h2 className="mt-2 font-display text-3xl font-extrabold tracking-tight">
+            <Heading level={2} className="mt-2" weight="bold">
               {mode === 'login' ? 'Sign in to your account' : 'Create your account'}
-            </h2>
+            </Heading>
             <Muted className="mt-2 text-sm">
               {mode === 'login' ? 'Pick up where you left off.' : 'Start planning your next adventure in seconds.'}
             </Muted>
