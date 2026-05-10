@@ -266,7 +266,10 @@ export default function RouteMap({ stops, onSelectStop, highlightedStopId }: { s
                     <animate attributeName="r" values="8;16;8" dur="2.4s" repeatCount="indefinite" />
                     <animate attributeName="fill-opacity" values="0.25;0;0.25" dur="2.4s" repeatCount="indefinite" />
                   </circle>
-                  <circle r={isSelected ? 7.5 : 5.5} fill={fill} stroke="white" strokeWidth={isSelected ? 2.5 : 1.8} />
+                  <circle r={isSelected ? 7.5 : 5.5} fill={fill} stroke="white" strokeWidth={1.8} />
+                  {isSelected && (
+                    <circle r={11} fill="none" stroke={ringColor} strokeWidth={2} strokeDasharray="3 2" />
+                  )}
                   <text
                     textAnchor="middle"
                     y={-12}
