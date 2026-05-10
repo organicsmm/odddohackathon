@@ -1,5 +1,10 @@
 import { Link } from 'react-router-dom';
-import { Plus, ArrowRight, Calendar, MapPin, Wallet, Sparkles } from 'lucide-react';
+import { Plus, ArrowRight, Calendar, MapPin, Wallet, Sparkles, Wand2 } from 'lucide-react';
+import AiTripGenerator from '@/components/AiTripGenerator';
+import { TEMPLATES } from '@/lib/templates';
+import { newTrip, upsertTrip } from '@/lib/store';
+import { toast } from 'sonner';
+import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { useTrips } from '@/hooks/use-trips';
 import { tripCost, tripDays } from '@/lib/store';
