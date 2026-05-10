@@ -261,6 +261,7 @@ function Itinerary({ trip, update, highlightedStopId }: { trip: Trip; update: (p
                   <SortableStopCard
                     key={s.id} stop={s} index={i}
                     onRemove={removeStop} onUpdate={updateStop} onSetDuration={setDuration}
+                    highlighted={highlightedStopId === s.id}
                   />
                 ))}
               </div>
