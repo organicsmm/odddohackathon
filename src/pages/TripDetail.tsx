@@ -343,7 +343,7 @@ function Itinerary({ trip, update, highlightedStopId, currency }: { trip: Trip; 
 
       {trip.stops.length === 0 && (
         <div className="rounded-2xl border border-dashed border-border bg-muted/30 p-12 text-center">
-          <h3 className="text-xl font-display font-semibold">No stops yet</h3>
+          <Heading level={3} className="!text-xl">No stops yet</Heading>
           <p className="mt-1 text-muted-foreground">Add cities to start building your route.</p>
         </div>
       )}
@@ -442,10 +442,10 @@ function StopCard({ stop, index, onRemove, onUpdate, onSetDuration, dragHandle, 
 
         {/* title block */}
         <div className="min-w-0 self-end">
-          <h3 className="font-display text-3xl font-bold leading-tight tracking-tight md:text-4xl">
+          <Heading level={3} className="!text-3xl leading-tight tracking-tight md:!text-4xl">
             {stop.city}
             <span className="ml-2 text-base font-normal text-muted-foreground">{stop.country}</span>
-          </h3>
+          </Heading>
           <div className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1.5 text-xs text-muted-foreground">
             <span className="inline-flex items-center gap-1.5 tabular-nums">
               <Calendar className="h-3 w-3" /> {startFmt} <span className="text-border">→</span> {endFmt}
@@ -492,7 +492,7 @@ function StopCard({ stop, index, onRemove, onUpdate, onSetDuration, dragHandle, 
       <div className="grid gap-8 px-6 py-6 md:grid-cols-[1fr_260px] md:px-8 md:py-8">
         <div className="space-y-4">
           <div className="flex items-center justify-between gap-3 border-b border-border/60 pb-3">
-            <h4 className="font-display text-[11px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">Activities</h4>
+            <Eyebrow className="block">Activities</Eyebrow>
             <ActivitySearchDialog onAdd={addActivity} trigger={
               <Button size="sm" variant="ghost" className="-mr-2 h-7 gap-1 text-xs"><Plus className="h-3.5 w-3.5" /> Add</Button>
             } />
@@ -541,7 +541,7 @@ function StopCard({ stop, index, onRemove, onUpdate, onSetDuration, dragHandle, 
 
         {/* cost panel */}
         <aside className="space-y-3 rounded-2xl border border-border/60 bg-muted/30 p-5">
-          <h4 className="font-display text-[11px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">Costs · entered in USD</h4>
+          <Eyebrow className="block">Costs · entered in USD</Eyebrow>
           <CostInput label="Transport" value={stop.costs.transport} onChange={v => onUpdate(stop.id, { costs: { ...stop.costs, transport: v } })} />
           <CostInput label="Stay / night" value={stop.costs.stay} onChange={v => onUpdate(stop.id, { costs: { ...stop.costs, stay: v } })} />
           <CostInput label="Meals / day" value={stop.costs.meals} onChange={v => onUpdate(stop.id, { costs: { ...stop.costs, meals: v } })} />
@@ -769,7 +769,7 @@ function BudgetView({ trip, update, currency }: { trip: Trip; update: (p: Partia
           <header className="flex items-center justify-between gap-3 border-b border-border/60 bg-gradient-aurora px-6 py-4">
             <div>
               <div className="text-[10px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">Composition</div>
-              <h3 className="font-display text-lg font-bold leading-tight">Cost by category</h3>
+              <Heading level={3} className="!text-lg leading-tight">Cost by category</Heading>
             </div>
             <span className="rounded-full bg-card px-2.5 py-1 text-[11px] font-semibold tabular-nums shadow-ring">
               {formatMoney(cost.total, currency)}
@@ -836,7 +836,7 @@ function BudgetView({ trip, update, currency }: { trip: Trip; update: (p: Partia
           <header className="flex items-center justify-between gap-3 border-b border-border/60 bg-gradient-aurora px-6 py-4">
             <div>
               <div className="text-[10px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">Targets</div>
-              <h3 className="font-display text-lg font-bold leading-tight">Budget tracker</h3>
+              <Heading level={3} className="!text-lg leading-tight">Budget tracker</Heading>
             </div>
             {trip.budget ? (
               <span
@@ -881,7 +881,7 @@ function BudgetView({ trip, update, currency }: { trip: Trip; update: (p: Partia
           )}
 
           <div className="mt-6 space-y-1">
-            <h4 className="font-display text-[11px] font-semibold uppercase tracking-[0.16em] text-muted-foreground">Category goals</h4>
+            <Eyebrow className="block">Category goals</Eyebrow>
             <p className="text-xs text-muted-foreground">Set a target per category to track each one independently.</p>
           </div>
           <div className="mt-3 space-y-3">
@@ -911,7 +911,7 @@ function BudgetView({ trip, update, currency }: { trip: Trip; update: (p: Partia
         <header className="flex items-center justify-between gap-3 border-b border-border/60 bg-gradient-aurora px-6 py-4">
           <div>
             <div className="text-[10px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">Per stop</div>
-            <h3 className="font-display text-lg font-bold leading-tight">Spend per stop</h3>
+            <Heading level={3} className="!text-lg leading-tight">Spend per stop</Heading>
           </div>
           <div className="hidden sm:flex items-center gap-3 text-[11px] text-muted-foreground">
             {(['Transport','Stay','Meals','Activities'] as const).map(k => (
@@ -1094,14 +1094,14 @@ function Packing({ trip, update }: { trip: Trip; update: (p: Partial<Trip> | ((t
     <div className="grid gap-6 lg:grid-cols-[1fr_320px]">
       <Card className="p-6">
         <div className="flex items-center justify-between">
-          <h3 className="font-display text-xl font-bold">Packing checklist</h3>
+          <Heading level={3} className="!text-xl">Packing checklist</Heading>
           <span className="text-sm text-muted-foreground">{packed} / {total} packed</span>
         </div>
         <Progress value={total ? (packed / total) * 100 : 0} className="mt-3" />
         <div className="mt-6 space-y-6">
           {Object.entries(grouped).map(([category, items]) => (
             <div key={category}>
-              <h4 className="font-display font-semibold capitalize text-sm text-muted-foreground mb-2">{category}</h4>
+              <Heading level={4} className="!text-sm capitalize !text-muted-foreground mb-2">{category}</Heading>
               <ul className="space-y-1">
                 {items.map(p => (
                   <li key={p.id} className="flex items-center gap-3 rounded-lg px-2 py-1 hover:bg-muted/50">
@@ -1116,7 +1116,7 @@ function Packing({ trip, update }: { trip: Trip; update: (p: Partial<Trip> | ((t
         </div>
       </Card>
       <Card className="h-fit p-6">
-        <h3 className="font-display text-lg font-bold">Add item</h3>
+        <Heading level={3} className="!text-lg">Add item</Heading>
         <form onSubmit={add} className="mt-3 space-y-3">
           <Input value={label} onChange={e => setLabel(e.target.value)} placeholder="e.g. Hiking boots" />
           <Select value={cat} onValueChange={v => setCat(v as PackItem['category'])}>
@@ -1151,7 +1151,7 @@ function Notes({ trip, update }: { trip: Trip; update: (p: Partial<Trip> | ((t: 
   return (
     <div className="grid gap-6 lg:grid-cols-[320px_1fr]">
       <Card className="h-fit p-6">
-        <h3 className="font-display text-lg font-bold">New note</h3>
+        <Heading level={3} className="!text-lg">New note</Heading>
         <form onSubmit={add} className="mt-3 space-y-3">
           <Input value={title} onChange={e => setTitle(e.target.value)} placeholder="Title" />
           <Textarea value={body} onChange={e => setBody(e.target.value)} placeholder="Anything to remember..." rows={5} />
@@ -1164,7 +1164,7 @@ function Notes({ trip, update }: { trip: Trip; update: (p: Partial<Trip> | ((t: 
           <Card key={n.id} className="p-5">
             <div className="flex items-start justify-between gap-3">
               <div className="min-w-0 flex-1">
-                <h4 className="font-display font-semibold">{n.title}</h4>
+                <Heading level={4} className="!text-base">{n.title}</Heading>
                 <p className="mt-1 whitespace-pre-wrap text-sm text-muted-foreground">{n.body}</p>
                 <p className="mt-2 text-xs text-muted-foreground">{new Date(n.createdAt).toLocaleString()}</p>
               </div>
@@ -1182,7 +1182,7 @@ function Notes({ trip, update }: { trip: Trip; update: (p: Partial<Trip> | ((t: 
 function Settings({ trip, update, onDelete }: { trip: Trip; update: (p: Partial<Trip>) => void; onDelete: () => void }) {
   return (
     <Card className="max-w-xl p-6">
-      <h3 className="font-display text-xl font-bold">Trip settings</h3>
+      <Heading level={3} className="!text-xl">Trip settings</Heading>
       <div className="mt-4 space-y-4">
         <div>
           <Label>Trip name</Label>

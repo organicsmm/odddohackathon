@@ -4,6 +4,7 @@ import { Plane, MapPin, ZoomIn, ZoomOut, Maximize2, Hash, Route, Flag } from 'lu
 import type { Stop } from '@/lib/types';
 import { getCoords, geocodeCityMeta, type GeoConfidence, type GeoResult } from '@/lib/coords';
 import { Button } from '@/components/ui/button';
+import { Heading, Eyebrow } from '@/components/ui/typography';
 
 // Public world topology (110m countries)
 const GEO_URL = 'https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json';
@@ -196,7 +197,7 @@ export default function RouteMap({ stops, onSelectStop, highlightedStopId }: { s
             <Plane className="h-4 w-4" />
           </span>
           <div>
-            <h3 className="font-display text-lg font-bold leading-tight">Route map</h3>
+            <Heading level={3} className="!text-lg leading-tight">Route map</Heading>
             <p className="text-xs text-muted-foreground">{subtitle}</p>
           </div>
         </div>
@@ -542,7 +543,7 @@ export default function RouteMap({ stops, onSelectStop, highlightedStopId }: { s
           tabIndex={0}
           className="pointer-events-auto absolute bottom-3 left-3 rounded-lg border border-border/60 bg-card/90 px-2.5 py-1.5 text-[10px] shadow-soft backdrop-blur outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
         >
-          <h3 id="legend-marker-heading" className="mb-1 font-semibold uppercase tracking-wider text-muted-foreground">Legend</h3>
+          <Eyebrow id="legend-marker-heading" className="mb-1 block">Legend</Eyebrow>
           <ul
             className="flex flex-wrap items-center gap-x-3 gap-y-1"
             role="list"
@@ -590,7 +591,7 @@ export default function RouteMap({ stops, onSelectStop, highlightedStopId }: { s
             </li>
           </ul>
           <div className="mt-1.5 border-t border-border/60 pt-1.5">
-            <h3 id="legend-confidence-heading" className="mb-1 font-semibold uppercase tracking-wider text-muted-foreground">Confidence</h3>
+            <Eyebrow id="legend-confidence-heading" className="mb-1 block">Confidence</Eyebrow>
             <ul
               className="flex flex-wrap items-center gap-x-3 gap-y-1"
               role="list"

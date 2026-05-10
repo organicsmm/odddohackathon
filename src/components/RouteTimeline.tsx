@@ -1,5 +1,6 @@
 import type { Stop } from '@/lib/types';
 import { Plane, MapPin } from 'lucide-react';
+import { Heading } from '@/components/ui/typography';
 
 // Visual horizontal route timeline showing stops with connecting dashed plane line.
 export default function RouteTimeline({ stops }: { stops: Stop[] }) {
@@ -7,9 +8,9 @@ export default function RouteTimeline({ stops }: { stops: Stop[] }) {
   return (
     <div className="rounded-2xl border border-border/60 bg-gradient-card p-5 shadow-soft">
       <div className="mb-4 flex items-center justify-between">
-        <h3 className="font-display text-lg font-bold flex items-center gap-2">
+        <Heading level={3} className="!text-lg flex items-center gap-2">
           <Plane className="h-4 w-4 text-primary" /> Route
-        </h3>
+        </Heading>
         <span className="text-xs text-muted-foreground">{stops.length} stops</span>
       </div>
       <div className="relative">
