@@ -6,6 +6,110 @@
 
 ---
 
+## 📸 Screenshots
+
+> Drop PNGs into `docs/screenshots/` with these filenames to populate the grid.
+
+| Landing | Dashboard |
+|---|---|
+| ![Landing](docs/screenshots/01-landing.png) | ![Dashboard](docs/screenshots/02-dashboard.png) |
+
+| Create Trip | Itinerary Builder |
+|---|---|
+| ![Create Trip](docs/screenshots/03-create-trip.png) | ![Itinerary](docs/screenshots/04-itinerary.png) |
+
+| AI Trip Generator | Admin Panel |
+|---|---|
+| ![AI Generator](docs/screenshots/05-ai-generator.png) | ![Admin](docs/screenshots/06-admin.png) |
+
+> 💡 **How to capture:** open the live app at 1440×900 and use your OS screenshot tool. Save into `docs/screenshots/` with the filenames above.
+
+---
+
+## 🏛️ Architecture
+
+```mermaid
+graph TB
+    subgraph Client["Browser - React 18 + Vite + TS"]
+        UI[Pages and Components<br/>shadcn + Tailwind]
+        Router[React Router v6<br/>lazy routes]
+        Store[lib/store.ts<br/>localStorage mirror]
+        Query[TanStack Query<br/>cache 60s]
+        AuthCtx[AuthContext]
+    end
+
+    subgraph Cloud["Lovable Cloud - Supabase"]
+        Auth[Supabase Auth<br/>email + Google OAuth]
+        DB[(Postgres + RLS)]
+        Edge1[Edge Function<br/>generate-trip]
+        Edge2[Edge Function<br/>trip-suggestions]
+    end
+
+    subgraph AI["AI Layer"]
+        Gateway[Lovable AI Gateway]
+        Gemini[Google Gemini 2.5<br/>Flash / Pro]
+    end
+
+    UI --> Router
+    Router --> AuthCtx
+    UI --> Store
+    UI --> Query
+    AuthCtx -->|sign in/out| Auth
+    Store -->|upsert on change| DB
+    Query -->|select / mutate| DB
+    UI -->|invoke| Edge1
+    UI -->|invoke| Edge2
+    Edge1 --> Gateway
+    Edge2 --> Gateway
+    Gateway --> Gemini
+    Edge1 -.read/write.-> DB
+```
+
+> Source: [`docs/architecture.mmd`](docs/architecture.mmd)
+
+---
+
+## 🔄 Data Flow (key user journeys)
+
+```mermaid
+sequenceDiagram
+    autonumber
+    actor U as User
+    participant UI as React UI
+    participant Store as Local Store
+    participant DB as Supabase DB (RLS)
+    participant Edge as Edge Function
+    participant AI as Lovable AI Gateway
+
+    Note over U,UI: Sign up / Log in
+    U->>UI: Enter credentials
+    UI->>DB: supabase.auth.signIn
+    DB-->>UI: JWT session
+
+    Note over U,DB: Create a trip
+    U->>UI: Fill Create Trip form
+    UI->>Store: save to localStorage
+    Store->>DB: upsert into trips (RLS: user_id = auth.uid)
+
+    Note over U,AI: AI Trip Generator
+    U->>UI: Enter prompt
+    UI->>Edge: invoke generate-trip
+    Edge->>AI: prompt + system instructions
+    AI-->>Edge: structured JSON itinerary
+    Edge-->>UI: stops, activities, packing
+    UI->>Store: merge into trip
+    Store->>DB: upsert trips
+
+    Note over U,DB: Share publicly
+    U->>UI: Toggle isPublic
+    UI->>DB: update is_public=true
+    UI-->>U: /share/:shareId link
+```
+
+> Source: [`docs/data-flow.mmd`](docs/data-flow.mmd)
+
+---
+
 ## ✨ Vision
 
 Traveloop is a personalized, intelligent, and collaborative platform that transforms the way individuals plan and experience travel. We empower users to **dream, design, and organize trips** with ease — combining flexibility, interactivity, and beautiful design so that planning a trip feels as exciting as the trip itself.
