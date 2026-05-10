@@ -384,6 +384,7 @@ function SortableStopCard(props: {
   onUpdate: (id: string, p: Partial<Stop>) => void;
   onSetDuration: (id: string, days: number) => void;
   highlighted?: boolean;
+  currency: CurrencyCode;
 }) {
   const { stop, highlighted } = props;
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id: stop.id });
@@ -405,12 +406,13 @@ function SortableStopCard(props: {
   );
 }
 
-function StopCard({ stop, index, onRemove, onUpdate, onSetDuration, dragHandle }: {
+function StopCard({ stop, index, onRemove, onUpdate, onSetDuration, dragHandle, currency }: {
   stop: Stop; index: number;
   onRemove: (id: string) => void;
   onUpdate: (id: string, p: Partial<Stop>) => void;
   onSetDuration: (id: string, days: number) => void;
   dragHandle?: React.HTMLAttributes<HTMLButtonElement>;
+  currency: CurrencyCode;
 }) {
   const days = stopDays(stop);
   const stopTotal =
