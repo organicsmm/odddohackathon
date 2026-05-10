@@ -2,13 +2,21 @@ import { useEffect, useMemo, useState } from 'react';
 import { ComposableMap, Geographies, Geography, Marker, Line, ZoomableGroup } from 'react-simple-maps';
 import { Plane, MapPin, ZoomIn, ZoomOut, Maximize2, Hash, Route, Flag } from 'lucide-react';
 import type { Stop } from '@/lib/types';
-import { getCoords, geocodeCity } from '@/lib/coords';
+import { getCoords, geocodeCityMeta, type GeoConfidence, type GeoResult } from '@/lib/coords';
 import { Button } from '@/components/ui/button';
 
 // Public world topology (110m countries)
 const GEO_URL = 'https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json';
 
-type PlottedStop = { stop: Stop; coords: [number, number]; index: number };
+type PlottedStop = {
+  stop: Stop;
+  coords: [number, number];
+  index: number;
+  confidence: GeoConfidence;
+  source: 'builtin' | 'geocoder';
+  matchedName?: string;
+  country?: string;
+};
 
 // Haversine great-circle distance in km
 function distanceKm(a: [number, number], b: [number, number]): number {
@@ -50,15 +58,18 @@ export default function RouteMap({ stops, onSelectStop, highlightedStopId }: { s
   const [hover, setHover] = useState<string | null>(null);
   const [zoom, setZoom] = useState(1);
   const [center, setCenter] = useState<[number, number]>([0, 20]);
-  const [resolved, setResolved] = useState<Record<string, [number, number]>>({});
+  const [resolved, setResolved] = useState<Record<string, GeoResult>>({});
   const [failed, setFailed] = useState<Record<string, true>>({});
   const [pendingCount, setPendingCount] = useState(0);
   const [showNumbers, setShowNumbers] = useState(true);
   const [dashedPaths, setDashedPaths] = useState(true);
   const [highlightEnds, setHighlightEnds] = useState(true);
 
-  const lookup = (city: string): [number, number] | null =>
-    getCoords(city) ?? resolved[city.trim().toLowerCase()] ?? null;
+  const lookupMeta = (city: string): GeoResult | null => {
+    const builtin = getCoords(city);
+    if (builtin) return { coords: builtin, confidence: 'exact', source: 'builtin', matchedName: city };
+    return resolved[city.trim().toLowerCase()] ?? null;
+  };
 
   // Async-resolve any cities not in the built-in list
   useEffect(() => {
@@ -70,12 +81,12 @@ export default function RouteMap({ stops, onSelectStop, highlightedStopId }: { s
 
     setPendingCount(missingCities.length);
     (async () => {
-      const updates: Record<string, [number, number]> = {};
+      const updates: Record<string, GeoResult> = {};
       const fails: Record<string, true> = {};
       for (const city of missingCities) {
-        const c = await geocodeCity(city);
+        const r = await geocodeCityMeta(city);
         const key = city.trim().toLowerCase();
-        if (c) updates[key] = c;
+        if (r) updates[key] = r;
         else fails[key] = true;
         if (!cancelled) setPendingCount(n => Math.max(0, n - 1));
       }
@@ -88,12 +99,17 @@ export default function RouteMap({ stops, onSelectStop, highlightedStopId }: { s
   }, [stops, resolved, failed]);
 
   const plotted: PlottedStop[] = useMemo(() => {
-    return stops
-      .map((s, i) => {
-        const c = lookup(s.city);
-        return c ? { stop: s, coords: c, index: i } : null;
-      })
-      .filter((x): x is PlottedStop => x !== null);
+    const out: PlottedStop[] = [];
+    stops.forEach((s, i) => {
+      const m = lookupMeta(s.city);
+      if (!m) return;
+      out.push({
+        stop: s, index: i,
+        coords: m.coords, confidence: m.confidence, source: m.source,
+        matchedName: m.matchedName, country: m.country,
+      });
+    });
+    return out;
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [stops, resolved]);
 
@@ -266,9 +282,27 @@ export default function RouteMap({ stops, onSelectStop, highlightedStopId }: { s
                     <animate attributeName="r" values="8;16;8" dur="2.4s" repeatCount="indefinite" />
                     <animate attributeName="fill-opacity" values="0.25;0;0.25" dur="2.4s" repeatCount="indefinite" />
                   </circle>
-                  <circle r={isSelected ? 7.5 : 5.5} fill={fill} stroke="white" strokeWidth={1.8} />
+                  {/* dashed outer = approximate location, solid = exact */}
+                  <circle
+                    r={isSelected ? 7.5 : 5.5}
+                    fill={fill}
+                    stroke="white"
+                    strokeWidth={1.8}
+                    strokeDasharray={p.confidence === 'approximate' ? '2 1.5' : undefined}
+                  />
                   {isSelected && (
                     <circle r={11} fill="none" stroke={ringColor} strokeWidth={2} strokeDasharray="3 2" />
+                  )}
+                  {/* tiny "?" badge for approximate */}
+                  {p.confidence === 'approximate' && (
+                    <g transform="translate(6,-6)">
+                      <circle r={4} fill="hsl(var(--warning))" stroke="white" strokeWidth={1} />
+                      <text
+                        textAnchor="middle"
+                        y={1.5}
+                        style={{ fontSize: 6, fontWeight: 700, fill: 'white', fontFamily: 'inherit' }}
+                      >?</text>
+                    </g>
                   )}
                   <text
                     textAnchor="middle"
@@ -313,6 +347,31 @@ export default function RouteMap({ stops, onSelectStop, highlightedStopId }: { s
               </div>
               <div className="mt-1 text-xs text-primary font-medium">
                 {p.stop.activities.length} activit{p.stop.activities.length === 1 ? 'y' : 'ies'}
+              </div>
+              <div className="mt-1.5 flex items-center gap-1.5 text-[10px]">
+                <span
+                  className={`inline-flex items-center gap-1 rounded-full px-1.5 py-0.5 font-semibold uppercase tracking-wider ${
+                    p.confidence === 'exact'
+                      ? 'bg-success/10 text-success'
+                      : 'bg-warning/15 text-warning-foreground'
+                  }`}
+                  title={
+                    p.source === 'builtin'
+                      ? 'Pinpointed from built-in city database'
+                      : p.confidence === 'exact'
+                        ? `Geocoder match: ${p.matchedName ?? p.stop.city}${p.country ? ', ' + p.country : ''}`
+                        : `Best-effort match: ${p.matchedName ?? '—'}${p.country ? ', ' + p.country : ''}. Verify the marker.`
+                  }
+                >
+                  <span className={`h-1.5 w-1.5 rounded-full ${p.confidence === 'exact' ? 'bg-success' : 'bg-warning'}`} />
+                  {p.confidence === 'exact' ? 'Exact' : 'Approx.'}
+                </span>
+                <span className="text-muted-foreground">
+                  {p.source === 'builtin' ? 'built-in' : 'geocoded'}
+                  {p.matchedName && p.matchedName.toLowerCase() !== p.stop.city.toLowerCase() && (
+                    <> · matched “{p.matchedName}”</>
+                  )}
+                </span>
               </div>
               {(inLeg || outLeg) && (
                 <div className="mt-2 space-y-0.5 border-t border-border/60 pt-2 text-xs">

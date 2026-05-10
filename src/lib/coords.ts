@@ -98,6 +98,17 @@ export const CITY_COORDS: Record<string, [number, number]> = {
   Tasmania: [146.5, -42],
 };
 
+export type GeoConfidence = 'exact' | 'approximate' | 'failed';
+export interface GeoResult {
+  coords: [number, number];
+  confidence: GeoConfidence;
+  source: 'builtin' | 'geocoder';
+  /** Resolved/canonical name returned by the source, when available. */
+  matchedName?: string;
+  country?: string;
+  admin1?: string;
+}
+
 export function getCoords(city: string): [number, number] | null {
   if (CITY_COORDS[city]) return CITY_COORDS[city];
   // case-insensitive lookup
@@ -105,9 +116,15 @@ export function getCoords(city: string): [number, number] | null {
   return key ? CITY_COORDS[key] : null;
 }
 
+function getBuiltinName(city: string): string | null {
+  if (CITY_COORDS[city]) return city;
+  return Object.keys(CITY_COORDS).find(k => k.toLowerCase() === city.toLowerCase()) ?? null;
+}
+
 /* ---------- Async geocoding fallback (Open-Meteo, no API key) ---------- */
 
 const LS_KEY = 'traveloop:geocode-cache:v1';
+const META_LS_KEY = 'traveloop:geocode-meta:v1';
 
 function loadCache(): Record<string, [number, number] | null> {
   try { return JSON.parse(localStorage.getItem(LS_KEY) || '{}'); } catch { return {}; }
@@ -115,29 +132,60 @@ function loadCache(): Record<string, [number, number] | null> {
 function saveCache(c: Record<string, [number, number] | null>) {
   try { localStorage.setItem(LS_KEY, JSON.stringify(c)); } catch { /* ignore quota */ }
 }
+function loadMeta(): Record<string, GeoResult> {
+  try { return JSON.parse(localStorage.getItem(META_LS_KEY) || '{}'); } catch { return {}; }
+}
+function saveMeta(m: Record<string, GeoResult>) {
+  try { localStorage.setItem(META_LS_KEY, JSON.stringify(m)); } catch { /* ignore quota */ }
+}
 
 const memCache: Record<string, [number, number] | null> = loadCache();
-const inflight = new Map<string, Promise<[number, number] | null>>();
+const metaCache: Record<string, GeoResult> = loadMeta();
+const inflight = new Map<string, Promise<GeoResult | null>>();
 
-export async function geocodeCity(city: string): Promise<[number, number] | null> {
-  const local = getCoords(city);
-  if (local) return local;
+function classify(city: string, hit: { name?: string; population?: number; country?: string }): GeoConfidence {
+  const wantedTokens = city.trim().toLowerCase().split(/[\s,]+/).filter(Boolean);
+  const name = (hit.name || '').toLowerCase();
+  const nameMatch = wantedTokens.length > 0 && wantedTokens.every(t => name.includes(t));
+  const popOk = (hit.population ?? 0) >= 50_000;
+  if (nameMatch && hit.country) return 'exact';
+  if (nameMatch || popOk) return 'approximate';
+  return 'approximate';
+}
+
+export async function geocodeCityMeta(city: string): Promise<GeoResult | null> {
+  const builtinName = getBuiltinName(city);
+  if (builtinName) {
+    return { coords: CITY_COORDS[builtinName], confidence: 'exact', source: 'builtin', matchedName: builtinName };
+  }
 
   const key = city.trim().toLowerCase();
-  if (key in memCache) return memCache[key];
+  if (metaCache[key]) return metaCache[key];
+  if (key in memCache && memCache[key] === null) return null;
   if (inflight.has(key)) return inflight.get(key)!;
 
-  const p = (async () => {
+  const p = (async (): Promise<GeoResult | null> => {
     try {
       const url = `https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(city)}&count=1&language=en&format=json`;
       const res = await fetch(url);
       if (!res.ok) throw new Error(`geocode ${res.status}`);
       const data = await res.json();
       const hit = data?.results?.[0];
-      const coords: [number, number] | null = hit ? [hit.longitude, hit.latitude] : null;
-      memCache[key] = coords;
-      saveCache(memCache);
-      return coords;
+      if (!hit) {
+        memCache[key] = null; saveCache(memCache);
+        return null;
+      }
+      const result: GeoResult = {
+        coords: [hit.longitude, hit.latitude],
+        confidence: classify(city, hit),
+        source: 'geocoder',
+        matchedName: hit.name,
+        country: hit.country,
+        admin1: hit.admin1,
+      };
+      memCache[key] = result.coords; saveCache(memCache);
+      metaCache[key] = result; saveMeta(metaCache);
+      return result;
     } catch {
       return null;
     } finally {
@@ -148,4 +196,11 @@ export async function geocodeCity(city: string): Promise<[number, number] | null
   inflight.set(key, p);
   return p;
 }
+
+/** Coords-only convenience wrapper (back-compat). */
+export async function geocodeCity(city: string): Promise<[number, number] | null> {
+  const r = await geocodeCityMeta(city);
+  return r ? r.coords : null;
+}
+
 
