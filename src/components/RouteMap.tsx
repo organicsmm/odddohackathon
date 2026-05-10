@@ -10,6 +10,42 @@ const GEO_URL = 'https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json'
 
 type PlottedStop = { stop: Stop; coords: [number, number]; index: number };
 
+// Haversine great-circle distance in km
+function distanceKm(a: [number, number], b: [number, number]): number {
+  const R = 6371;
+  const toRad = (d: number) => (d * Math.PI) / 180;
+  const [lng1, lat1] = a;
+  const [lng2, lat2] = b;
+  const dLat = toRad(lat2 - lat1);
+  const dLng = toRad(lng2 - lng1);
+  const s =
+    Math.sin(dLat / 2) ** 2 +
+    Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) * Math.sin(dLng / 2) ** 2;
+  return 2 * R * Math.asin(Math.sqrt(s));
+}
+
+// Pick a sensible mode + speed (km/h) and add overhead
+function estimateLeg(km: number): { mode: 'walk' | 'car' | 'train' | 'flight'; hours: number; label: string } {
+  if (km < 3) return { mode: 'walk', hours: km / 5, label: 'walk' };
+  if (km < 60) return { mode: 'car', hours: km / 60 + 0.2, label: 'drive' };
+  if (km < 400) return { mode: 'train', hours: km / 90 + 0.5, label: 'train/drive' };
+  // Flight: account for airport overhead (~3.5h) + ~750 km/h cruise
+  return { mode: 'flight', hours: km / 750 + 3.5, label: 'flight' };
+}
+
+function fmtHours(h: number): string {
+  if (h < 1) return `${Math.max(5, Math.round(h * 60 / 5) * 5)} min`;
+  const hh = Math.floor(h);
+  const mm = Math.round((h - hh) * 60);
+  return mm === 0 ? `${hh}h` : `${hh}h ${mm}m`;
+}
+
+function fmtKm(km: number): string {
+  if (km < 10) return `${km.toFixed(1)} km`;
+  return `${Math.round(km).toLocaleString()} km`;
+}
+
+
 export default function RouteMap({ stops, onSelectStop, highlightedStopId }: { stops: Stop[]; onSelectStop?: (id: string) => void; highlightedStopId?: string | null }) {
   const [hover, setHover] = useState<string | null>(null);
   const [zoom, setZoom] = useState(1);
