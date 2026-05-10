@@ -1,0 +1,54 @@
+graph TB
+    subgraph Client["Browser - React 18 + Vite + TS"]
+        UI[Pages and Components<br/>shadcn + Tailwind]
+        Router[React Router v6<br/>lazy routes]
+        Store[lib/store.ts<br/>localStorage mirror]
+        Query[TanStack Query<br/>cache 60s]
+        AuthCtx[AuthContext]
+    end
+
+    subgraph Cloud["Lovable Cloud - Supabase"]
+        Auth[Supabase Auth<br/>email + Google OAuth]
+        DB[(Postgres + RLS)]
+        Edge1[Edge Function<br/>generate-trip]
+        Edge2[Edge Function<br/>trip-suggestions]
+    end
+
+    subgraph AI["AI Layer"]
+        Gateway[Lovable AI Gateway]
+        Gemini[Google Gemini 2.5<br/>Flash / Pro]
+    end
+
+    subgraph Tables["Database Tables"]
+        T1[profiles]
+        T2[user_roles]
+        T3[trips]
+        T4[site_settings]
+    end
+
+    UI --> Router
+    Router --> AuthCtx
+    UI --> Store
+    UI --> Query
+    AuthCtx -->|sign in/out| Auth
+    Store -->|upsert on change| DB
+    Query -->|select / mutate| DB
+    UI -->|invoke| Edge1
+    UI -->|invoke| Edge2
+    Edge1 --> Gateway
+    Edge2 --> Gateway
+    Gateway --> Gemini
+    Edge1 -.read/write.-> DB
+    DB --- T1
+    DB --- T2
+    DB --- T3
+    DB --- T4
+
+    classDef cloud fill:#1e40af,stroke:#1e3a8a,color:#fff
+    classDef ai fill:#7c3aed,stroke:#5b21b6,color:#fff
+    classDef client fill:#0891b2,stroke:#0e7490,color:#fff
+    classDef table fill:#334155,stroke:#1e293b,color:#fff
+    class Auth,DB,Edge1,Edge2 cloud
+    class Gateway,Gemini ai
+    class UI,Router,Store,Query,AuthCtx client
+    class T1,T2,T3,T4 table

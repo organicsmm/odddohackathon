@@ -1,0 +1,34 @@
+sequenceDiagram
+    autonumber
+    actor U as User
+    participant UI as React UI
+    participant Store as Local Store
+    participant DB as Supabase DB (RLS)
+    participant Edge as Edge Function
+    participant AI as Lovable AI Gateway
+
+    Note over U,UI: Sign up / Log in
+    U->>UI: Enter credentials
+    UI->>DB: supabase.auth.signIn
+    DB-->>UI: JWT session
+    UI->>UI: AuthContext caches user
+
+    Note over U,DB: Create a trip
+    U->>UI: Fill Create Trip form
+    UI->>Store: save to localStorage
+    Store->>DB: upsert into trips (RLS: user_id = auth.uid)
+    DB-->>Store: ok
+
+    Note over U,AI: AI Trip Generator
+    U->>UI: Enter prompt "5 days in Goa, beach vibe"
+    UI->>Edge: invoke generate-trip
+    Edge->>AI: prompt + system instructions
+    AI-->>Edge: structured itinerary JSON
+    Edge-->>UI: stops, activities, packing
+    UI->>Store: merge into trip
+    Store->>DB: upsert trips
+
+    Note over U,DB: Share publicly
+    U->>UI: Toggle isPublic
+    UI->>DB: update trip set is_public=true
+    UI-->>U: /share/:shareId link
