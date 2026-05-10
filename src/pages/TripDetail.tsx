@@ -7,7 +7,7 @@ import {
 } from 'lucide-react';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuSeparator } from '@/components/ui/dropdown-menu';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogDescription } from '@/components/ui/dialog';
-import { Select as USelect, SelectContent as USelectContent, SelectItem as USelectItem, SelectTrigger as USelectTrigger, SelectValue as USelectValue } from '@/components/ui/select';
+
 import { exportTripPDF, exportTripCSV } from '@/lib/export';
 import { useAuth } from '@/contexts/AuthContext';
 import { getTrip, upsertTrip, uid, tripCost, stopDays, tripDays, resequenceStops, createInvite, revokeInvite, unshareWith } from '@/lib/store';
