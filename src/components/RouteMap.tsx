@@ -161,16 +161,41 @@ export default function RouteMap({ stops, onSelectStop, highlightedStopId }: { s
             {/* Travel paths between consecutive stops */}
             {plotted.slice(0, -1).map((p, i) => {
               const next = plotted[i + 1];
+              const km = distanceKm(p.coords, next.coords);
+              const leg = estimateLeg(km);
+              const mid: [number, number] = [
+                (p.coords[0] + next.coords[0]) / 2,
+                (p.coords[1] + next.coords[1]) / 2,
+              ];
               return (
-                <Line
-                  key={`line-${p.stop.id}-${next.stop.id}`}
-                  from={p.coords}
-                  to={next.coords}
-                  stroke="hsl(var(--primary))"
-                  strokeWidth={1.6}
-                  strokeLinecap="round"
-                  strokeDasharray="4 4"
-                />
+                <g key={`line-${p.stop.id}-${next.stop.id}`}>
+                  <Line
+                    from={p.coords}
+                    to={next.coords}
+                    stroke="hsl(var(--primary))"
+                    strokeWidth={1.6}
+                    strokeLinecap="round"
+                    strokeDasharray="4 4"
+                  />
+                  <Marker coordinates={mid}>
+                    <text
+                      textAnchor="middle"
+                      y={4}
+                      style={{
+                        fontFamily: 'inherit',
+                        fontSize: 9,
+                        fontWeight: 600,
+                        fill: 'hsl(var(--foreground))',
+                        paintOrder: 'stroke',
+                        stroke: 'hsl(var(--background))',
+                        strokeWidth: 3,
+                        strokeLinejoin: 'round',
+                      }}
+                    >
+                      {fmtKm(km)} · {fmtHours(leg.hours)}
+                    </text>
+                  </Marker>
+                </g>
               );
             })}
 
