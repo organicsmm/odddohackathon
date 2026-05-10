@@ -52,7 +52,7 @@ export default function TripDetail() {
   const [trip, setTrip] = useState<Trip | undefined>(getTrip(id!));
   const [activeTab, setActiveTab] = useState('itinerary');
   const [highlightedStopId, setHighlightedStopId] = useState<string | null>(null);
-  const [displayCurrency, setDisplayCurrency] = useState<CurrencyCode>('USD');
+  const [displayCurrency, setDisplayCurrency] = useState<CurrencyCode>('INR');
   const exportCurrency = displayCurrency;
   const setExportCurrency = setDisplayCurrency;
 
