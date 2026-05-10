@@ -63,15 +63,15 @@ export function HeroBackgroundMarquee({ className }: Props) {
       }}
     >
       {/* Layered scrolling rows at different speeds for parallax depth */}
-      <div className="absolute inset-0 flex flex-col justify-center gap-6 opacity-[0.65] blur-[1px]">
+      <div className="absolute inset-0 flex flex-col justify-center gap-6 opacity-[0.22] blur-[3px]">
         <BgRow direction="left" speed="140s" rotate={1} />
         <BgRow direction="right" speed="180s" rotate={1.5} offset={-200} />
         <BgRow direction="left" speed="160s" rotate={1} offset={-100} />
       </div>
 
-      {/* Soft overlay tuned for readability while keeping imagery vivid */}
-      <div className="absolute inset-0 bg-background/30" />
-      <div className="absolute inset-0 bg-gradient-to-b from-background/70 via-background/10 to-background/80" />
+      {/* Soft dark + brand gradient overlay for readability */}
+      <div className="absolute inset-0 bg-background/55" />
+      <div className="absolute inset-0 bg-gradient-to-b from-background via-background/30 to-background" />
     </div>
   );
 }
