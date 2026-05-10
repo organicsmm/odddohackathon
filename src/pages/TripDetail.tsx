@@ -1,8 +1,8 @@
-import { Link, useNavigate, useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { useEffect, useMemo, useState } from 'react';
 import {
   Calendar, MapPin, Plus, Trash2, ArrowUp, ArrowDown, Share2, Globe, Lock,
-  Wallet, ListChecks, StickyNote, MapIcon, Copy, ChevronLeft, Clock,
+  Wallet, ListChecks, StickyNote, MapIcon, ChevronLeft, Clock,
 } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { getTrip, upsertTrip, uid, tripCost, stopDays, tripDays } from '@/lib/store';
