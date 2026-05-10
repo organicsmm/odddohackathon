@@ -37,6 +37,13 @@ export type PackItem = {
   packed: boolean;
 };
 
+export type TripInvite = {
+  token: string;
+  invitedEmail?: string; // optional, restricts to a specific friend
+  createdAt: string;
+  acceptedBy: string[]; // emails that accepted
+};
+
 export type Trip = {
   id: string;
   ownerEmail: string;
@@ -51,8 +58,16 @@ export type Trip = {
   packing: PackItem[];
   notes: Note[];
   budget?: number;
+  invites?: TripInvite[];
+  sharedWith?: string[]; // emails with private access
   createdAt: string;
   updatedAt: string;
+};
+
+export type Friend = {
+  email: string;
+  name: string;
+  addedAt: string;
 };
 
 export type User = {
@@ -60,4 +75,5 @@ export type User = {
   name: string;
   language: 'en' | 'hi' | 'es';
   saved: string[]; // saved city names
+  friends?: Friend[];
 };
