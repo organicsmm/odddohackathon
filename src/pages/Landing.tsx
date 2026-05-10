@@ -64,72 +64,50 @@ export default function Landing() {
         </div>
       </header>
 
-      {/* HERO — full-bleed swipe slider */}
-      <section className="relative h-[calc(100vh-4rem)] min-h-[600px] w-full overflow-hidden">
-        <HeroSlider
-          slides={[
-            {
-              image: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?q=80&w=2400&auto=format&fit=crop",
-              eyebrow: "Coastal escapes",
-              title: "Plan trips you'll actually take",
-              subtitle: "Beautiful itineraries, smart budgets and day-wise plans — built in seconds.",
-            },
-            {
-              image: "https://images.unsplash.com/photo-1530789253388-582c481c54b0?q=80&w=2400&auto=format&fit=crop",
-              eyebrow: "Mountain trails",
-              title: "From Reykjavík to Kyoto",
-              subtitle: "Multi-city routes with weather, transit and packing — all in one view.",
-            },
-            {
-              image: "https://images.unsplash.com/photo-1517760444937-f6397edcbbcd?q=80&w=2400&auto=format&fit=crop",
-              eyebrow: "City lights",
-              title: "Share a cinematic itinerary",
-              subtitle: "Public read-only links unfurl into a stunning preview page.",
-            },
-            {
-              image: "https://images.unsplash.com/photo-1502920917128-1aa500764cbd?q=80&w=2400&auto=format&fit=crop",
-              eyebrow: "Desert horizons",
-              title: "AI builds it. You refine it.",
-              subtitle: "Describe the vibe — get a fully-built trip in seconds.",
-            },
-          ]}
-        >
-          {(slide) => (
-            <div className="container relative flex h-full items-center justify-center text-center">
-              <div className="mx-auto max-w-4xl animate-fade-in" key={slide.title}>
-                <Badge variant="glass" className="border-border/60 mx-auto">
-                  <Sparkles className="h-3 w-3 text-accent" /> {slide.eyebrow ?? "AI Trip Generator"}
-                </Badge>
-                <h1 className="mt-6 font-display font-black tracking-tight text-balance text-5xl leading-[1.02] md:text-7xl lg:text-[5.5rem]">
-                  <span className="block">{slide.title.split(' ').slice(0, -2).join(' ')}</span>
-                  <span className="block font-serif italic font-medium text-gradient">
-                    {slide.title.split(' ').slice(-2).join(' ')}
-                  </span>
-                </h1>
-                <Lead className="mt-6 mx-auto max-w-2xl text-lg md:text-xl">
-                  {slide.subtitle}
-                </Lead>
-                <div className="mt-9 flex flex-wrap justify-center gap-3">
-                  <Button asChild size="xl" variant="premium">
-                    <Link to={cta}>Start planning <ArrowRight className="h-4 w-4" /></Link>
-                  </Button>
-                  <Button asChild size="xl" variant="glass">
-                    <Link to={cta}>See a demo trip</Link>
-                  </Button>
-                </div>
-                <div className="mt-10 flex flex-wrap items-center justify-center gap-6 text-sm text-muted-foreground">
-                  <div className="flex items-center gap-1 text-warning">
-                    {Array.from({ length: 5 }).map((_, i) => <Star key={i} className="h-4 w-4 fill-warning" />)}
-                    <span className="ml-1 font-semibold text-foreground">4.9</span>
-                    <span className="text-muted-foreground">/5 from 1.2k travelers</span>
-                  </div>
-                  <span className="hidden sm:inline opacity-30">·</span>
-                  <div className="inline-flex items-center gap-1.5"><ShieldCheck className="h-4 w-4 text-success" /> No card required</div>
-                </div>
-              </div>
+      {/* HERO — centered intro + cinematic travel marquee */}
+      <section className="relative overflow-hidden">
+        {/* aurora backdrop */}
+        <div aria-hidden className="absolute inset-0 bg-gradient-aurora opacity-70" />
+        <div aria-hidden className="absolute -top-40 left-1/2 h-[480px] w-[480px] -translate-x-1/2 rounded-full bg-primary/15 blur-[160px]" />
+
+        <div className="relative container flex flex-col items-center justify-center text-center pt-20 pb-10 md:pt-28 md:pb-14">
+          <div className="mx-auto max-w-4xl animate-fade-in">
+            <Badge variant="glass" className="border-border/60 mx-auto">
+              <Sparkles className="h-3 w-3 text-accent" /> New · AI Trip Generator
+            </Badge>
+            <h1 className="mt-6 font-display font-black tracking-tight text-balance text-5xl leading-[1.02] md:text-7xl lg:text-[5.5rem]">
+              <span className="block">Plan trips you'll</span>
+              <span className="block font-serif italic font-medium text-gradient">
+                actually take
+              </span>
+            </h1>
+            <Lead className="mt-6 mx-auto max-w-2xl text-lg md:text-xl">
+              Cinematic itineraries, smart budgets and day-wise plans for hill stations, mountains and luxury escapes — built in seconds.
+            </Lead>
+            <div className="mt-9 flex flex-wrap justify-center gap-3">
+              <Button asChild size="xl" variant="premium">
+                <Link to={cta}>Start planning <ArrowRight className="h-4 w-4" /></Link>
+              </Button>
+              <Button asChild size="xl" variant="glass">
+                <Link to={cta}>See a demo trip</Link>
+              </Button>
             </div>
-          )}
-        </HeroSlider>
+            <div className="mt-10 flex flex-wrap items-center justify-center gap-6 text-sm text-muted-foreground">
+              <div className="flex items-center gap-1 text-warning">
+                {Array.from({ length: 5 }).map((_, i) => <Star key={i} className="h-4 w-4 fill-warning" />)}
+                <span className="ml-1 font-semibold text-foreground">4.9</span>
+                <span className="text-muted-foreground">/5 from 1.2k travelers</span>
+              </div>
+              <span className="hidden sm:inline opacity-30">·</span>
+              <div className="inline-flex items-center gap-1.5"><ShieldCheck className="h-4 w-4 text-success" /> No card required</div>
+            </div>
+          </div>
+        </div>
+
+        {/* Cinematic travel marquee — lower hero */}
+        <div className="relative pb-16 md:pb-20">
+          <TravelMarquee />
+        </div>
       </section>
 
       {/* Marquee of destinations */}
