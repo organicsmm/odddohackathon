@@ -42,7 +42,7 @@ export default function Landing() {
         <div className="container grid items-center gap-10 py-12 md:py-20 lg:grid-cols-2">
           <div className="animate-fade-in">
             <span className="inline-flex items-center gap-2 rounded-full bg-primary/10 px-3 py-1 text-xs font-medium text-primary">
-              <span className="h-2 w-2 rounded-full bg-primary animate-pulse" /> Personalized travel planning
+              <Sparkles className="h-3 w-3" /> Now with AI Trip Generator
             </span>
             <h1 className="mt-4 font-display text-5xl font-extrabold leading-[1.05] sm:text-6xl lg:text-7xl">
               Plan trips you'll <span className="text-gradient">actually take</span>.
