@@ -39,7 +39,13 @@ export default function Auth({ mode }: { mode: 'login' | 'signup' }) {
         toast.success('Welcome back!');
       }
       refresh();
-      navigate('/app');
+      const pending = sessionStorage.getItem('traveloop:pending-invite');
+      if (pending) {
+        sessionStorage.removeItem('traveloop:pending-invite');
+        navigate(`/invite/${pending}`);
+      } else {
+        navigate('/app');
+      }
     } catch (err: unknown) {
       const message = err instanceof z.ZodError ? err.errors[0].message : (err as Error).message;
       toast.error(message);

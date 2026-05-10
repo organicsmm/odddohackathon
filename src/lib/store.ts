@@ -1,4 +1,4 @@
-import type { Trip, User, PackItem, Stop } from './types';
+import type { Trip, User, PackItem, Stop, Friend, TripInvite } from './types';
 import { DEFAULT_PACKING } from './catalog';
 
 const TRIPS_KEY = 'traveloop:trips';
@@ -29,6 +29,88 @@ export function getTrip(id: string): Trip | undefined {
 }
 export function getTripByShare(shareId: string): Trip | undefined {
   return loadTrips().find(t => t.shareId === shareId && t.isPublic);
+}
+// Private-access lookup: returns trip if shareId matches AND viewer's email is in sharedWith.
+export function getTripByShareForViewer(shareId: string, viewerEmail: string | null): Trip | undefined {
+  const t = loadTrips().find(tr => tr.shareId === shareId);
+  if (!t) return undefined;
+  if (t.isPublic) return t;
+  if (!viewerEmail) return undefined;
+  if (t.ownerEmail === viewerEmail) return t;
+  if ((t.sharedWith || []).includes(viewerEmail)) return t;
+  return undefined;
+}
+
+// ---- Friends ----
+export function getFriends(): Friend[] {
+  const u = currentUser();
+  return (u?.friends || []) as Friend[];
+}
+export function addFriend(email: string, name: string): Friend {
+  const me = currentUser();
+  if (!me) throw new Error('Not signed in');
+  if (email === me.email) throw new Error("That's you!");
+  const friends = (me.friends || []).slice();
+  if (friends.find(f => f.email === email)) throw new Error('Already in your friends list');
+  const friend: Friend = { email, name: name || email.split('@')[0], addedAt: new Date().toISOString() };
+  friends.push(friend);
+  updateUser({ friends });
+  return friend;
+}
+export function removeFriend(email: string) {
+  const me = currentUser();
+  if (!me) return;
+  updateUser({ friends: (me.friends || []).filter(f => f.email !== email) });
+}
+
+// ---- Invites ----
+export function createInvite(tripId: string, invitedEmail?: string): TripInvite {
+  const trip = getTrip(tripId);
+  if (!trip) throw new Error('Trip not found');
+  const invite: TripInvite = {
+    token: uid() + uid(),
+    invitedEmail: invitedEmail?.trim().toLowerCase() || undefined,
+    createdAt: new Date().toISOString(),
+    acceptedBy: [],
+  };
+  const next: Trip = { ...trip, invites: [...(trip.invites || []), invite] };
+  upsertTrip(next);
+  return invite;
+}
+export function revokeInvite(tripId: string, token: string) {
+  const trip = getTrip(tripId);
+  if (!trip) return;
+  upsertTrip({ ...trip, invites: (trip.invites || []).filter(i => i.token !== token) });
+}
+export function findInvite(token: string): { trip: Trip; invite: TripInvite } | undefined {
+  for (const t of loadTrips()) {
+    const inv = (t.invites || []).find(i => i.token === token);
+    if (inv) return { trip: t, invite: inv };
+  }
+  return undefined;
+}
+export function acceptInvite(token: string, viewerEmail: string): Trip {
+  const found = findInvite(token);
+  if (!found) throw new Error('Invite not found or revoked');
+  const { trip, invite } = found;
+  if (invite.invitedEmail && invite.invitedEmail !== viewerEmail) {
+    throw new Error('This invite is for a different email address');
+  }
+  const sharedWith = Array.from(new Set([...(trip.sharedWith || []), viewerEmail]));
+  const invites = (trip.invites || []).map(i =>
+    i.token === token ? { ...i, acceptedBy: Array.from(new Set([...i.acceptedBy, viewerEmail])) } : i
+  );
+  const next: Trip = { ...trip, sharedWith, invites };
+  upsertTrip(next);
+  return next;
+}
+export function unshareWith(tripId: string, email: string) {
+  const trip = getTrip(tripId);
+  if (!trip) return;
+  upsertTrip({ ...trip, sharedWith: (trip.sharedWith || []).filter(e => e !== email) });
+}
+export function tripsSharedWithMe(viewerEmail: string): Trip[] {
+  return loadTrips().filter(t => t.ownerEmail !== viewerEmail && (t.sharedWith || []).includes(viewerEmail));
 }
 
 export function newTrip(ownerEmail: string, partial: Partial<Trip>): Trip {
