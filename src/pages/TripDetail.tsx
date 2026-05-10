@@ -1182,7 +1182,7 @@ function Notes({ trip, update }: { trip: Trip; update: (p: Partial<Trip> | ((t: 
 function Settings({ trip, update, onDelete }: { trip: Trip; update: (p: Partial<Trip>) => void; onDelete: () => void }) {
   return (
     <Card className="max-w-xl p-6">
-      <h3 className="font-display text-xl font-bold">Trip settings</h3>
+      <Heading level={3} className="!text-xl">Trip settings</Heading>
       <div className="mt-4 space-y-4">
         <div>
           <Label>Trip name</Label>
