@@ -59,8 +59,9 @@ export default function CreateTrip() {
           <Plane className="h-6 w-6 text-primary-foreground" />
         </span>
         <div>
-          <h1 className="font-display text-3xl font-bold tracking-tight">Create new trip</h1>
-          <p className="text-muted-foreground">Start with the basics — you can always edit later.</p>
+          <Eyebrow tone="primary">Plan</Eyebrow>
+          <Heading level={1} className="mt-1" weight="bold">Create new trip</Heading>
+          <Lead muted className="mt-1">Start with the basics — you can always edit later.</Lead>
         </div>
       </div>
 
