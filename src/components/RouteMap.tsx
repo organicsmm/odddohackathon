@@ -1,0 +1,189 @@
+import { useMemo, useState } from 'react';
+import { ComposableMap, Geographies, Geography, Marker, Line, ZoomableGroup } from 'react-simple-maps';
+import { Plane, MapPin, ZoomIn, ZoomOut, Maximize2 } from 'lucide-react';
+import type { Stop } from '@/lib/types';
+import { getCoords } from '@/lib/coords';
+import { Button } from '@/components/ui/button';
+
+// Public world topology (110m countries)
+const GEO_URL = 'https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json';
+
+type PlottedStop = { stop: Stop; coords: [number, number]; index: number };
+
+export default function RouteMap({ stops }: { stops: Stop[] }) {
+  const [hover, setHover] = useState<string | null>(null);
+  const [zoom, setZoom] = useState(1);
+  const [center, setCenter] = useState<[number, number]>([0, 20]);
+
+  const plotted: PlottedStop[] = useMemo(() => {
+    return stops
+      .map((s, i) => {
+        const c = getCoords(s.city);
+        return c ? { stop: s, coords: c, index: i } : null;
+      })
+      .filter((x): x is PlottedStop => x !== null);
+  }, [stops]);
+
+  const missing = stops.length - plotted.length;
+
+  // Auto-fit center on plotted stops
+  const fitView = () => {
+    if (plotted.length === 0) return;
+    const lngs = plotted.map(p => p.coords[0]);
+    const lats = plotted.map(p => p.coords[1]);
+    const cx = (Math.min(...lngs) + Math.max(...lngs)) / 2;
+    const cy = (Math.min(...lats) + Math.max(...lats)) / 2;
+    const span = Math.max(Math.max(...lngs) - Math.min(...lngs), Math.max(...lats) - Math.min(...lats));
+    const z = span < 20 ? 4 : span < 60 ? 2.5 : span < 120 ? 1.5 : 1;
+    setCenter([cx, cy]);
+    setZoom(z);
+  };
+
+  if (stops.length === 0) return null;
+
+  return (
+    <div className="overflow-hidden rounded-2xl border border-border/60 bg-gradient-card shadow-soft">
+      <div className="flex items-center justify-between border-b border-border/60 px-5 py-3">
+        <div className="flex items-center gap-2">
+          <span className="grid h-8 w-8 place-items-center rounded-lg bg-gradient-ocean text-primary-foreground">
+            <Plane className="h-4 w-4" />
+          </span>
+          <div>
+            <h3 className="font-display text-lg font-bold leading-tight">Route map</h3>
+            <p className="text-xs text-muted-foreground">
+              {plotted.length} stops plotted{missing > 0 ? ` · ${missing} unmapped` : ''}
+            </p>
+          </div>
+        </div>
+        <div className="flex gap-1">
+          <Button size="icon" variant="ghost" onClick={() => setZoom(z => Math.min(z * 1.5, 16))} aria-label="Zoom in"><ZoomIn className="h-4 w-4" /></Button>
+          <Button size="icon" variant="ghost" onClick={() => setZoom(z => Math.max(z / 1.5, 1))} aria-label="Zoom out"><ZoomOut className="h-4 w-4" /></Button>
+          <Button size="icon" variant="ghost" onClick={fitView} aria-label="Fit"><Maximize2 className="h-4 w-4" /></Button>
+        </div>
+      </div>
+
+      <div className="relative aspect-[16/9] w-full bg-[hsl(var(--accent-soft))]">
+        <ComposableMap
+          projectionConfig={{ scale: 155 }}
+          width={980}
+          height={520}
+          style={{ width: '100%', height: '100%' }}
+        >
+          <ZoomableGroup
+            zoom={zoom}
+            center={center}
+            onMoveEnd={({ coordinates, zoom }) => {
+              setCenter(coordinates as [number, number]);
+              setZoom(zoom);
+            }}
+            minZoom={1}
+            maxZoom={16}
+          >
+            <Geographies geography={GEO_URL}>
+              {({ geographies }) =>
+                geographies.map(geo => (
+                  <Geography
+                    key={geo.rsmKey}
+                    geography={geo}
+                    style={{
+                      default: { fill: 'hsl(var(--muted))', stroke: 'hsl(var(--border))', strokeWidth: 0.4, outline: 'none' },
+                      hover: { fill: 'hsl(var(--muted-foreground) / 0.25)', outline: 'none' },
+                      pressed: { fill: 'hsl(var(--muted))', outline: 'none' },
+                    }}
+                  />
+                ))
+              }
+            </Geographies>
+
+            {/* Travel paths between consecutive stops */}
+            {plotted.slice(0, -1).map((p, i) => {
+              const next = plotted[i + 1];
+              return (
+                <Line
+                  key={`line-${p.stop.id}-${next.stop.id}`}
+                  from={p.coords}
+                  to={next.coords}
+                  stroke="hsl(var(--primary))"
+                  strokeWidth={1.6}
+                  strokeLinecap="round"
+                  strokeDasharray="4 4"
+                />
+              );
+            })}
+
+            {/* Stop markers */}
+            {plotted.map(p => {
+              const isHover = hover === p.stop.id;
+              const isStart = p.index === 0;
+              const isEnd = p.index === stops.length - 1;
+              const fill = isStart
+                ? 'hsl(var(--accent))'
+                : isEnd
+                  ? 'hsl(var(--primary))'
+                  : 'hsl(var(--primary))';
+              return (
+                <Marker
+                  key={p.stop.id}
+                  coordinates={p.coords}
+                  onMouseEnter={() => setHover(p.stop.id)}
+                  onMouseLeave={() => setHover(null)}
+                  style={{ default: { cursor: 'pointer' }, hover: { cursor: 'pointer' }, pressed: { cursor: 'pointer' } }}
+                >
+                  {/* pulse ring */}
+                  <circle r={isHover ? 14 : 10} fill={fill} fillOpacity={0.18}>
+                    <animate attributeName="r" values="8;16;8" dur="2.4s" repeatCount="indefinite" />
+                    <animate attributeName="fill-opacity" values="0.25;0;0.25" dur="2.4s" repeatCount="indefinite" />
+                  </circle>
+                  <circle r={5.5} fill={fill} stroke="white" strokeWidth={1.8} />
+                  <text
+                    textAnchor="middle"
+                    y={-12}
+                    style={{
+                      fontFamily: 'inherit',
+                      fontSize: 11,
+                      fontWeight: 700,
+                      fill: 'hsl(var(--foreground))',
+                      paintOrder: 'stroke',
+                      stroke: 'hsl(var(--background))',
+                      strokeWidth: 3,
+                      strokeLinejoin: 'round',
+                    }}
+                  >
+                    {p.index + 1}. {p.stop.city}
+                  </text>
+                </Marker>
+              );
+            })}
+          </ZoomableGroup>
+        </ComposableMap>
+
+        {/* Hover tooltip */}
+        {hover && (() => {
+          const p = plotted.find(x => x.stop.id === hover);
+          if (!p) return null;
+          return (
+            <div className="pointer-events-none absolute left-4 top-4 max-w-xs rounded-xl border border-border bg-card/95 p-3 shadow-elegant backdrop-blur">
+              <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                <MapPin className="h-3 w-3" /> Stop {p.index + 1} of {stops.length}
+              </div>
+              <div className="font-display text-base font-bold">{p.stop.city}</div>
+              <div className="text-xs text-muted-foreground">{p.stop.country}</div>
+              <div className="mt-1 text-xs">
+                {new Date(p.stop.startDate).toLocaleDateString()} → {new Date(p.stop.endDate).toLocaleDateString()}
+              </div>
+              <div className="mt-1 text-xs text-primary font-medium">
+                {p.stop.activities.length} activit{p.stop.activities.length === 1 ? 'y' : 'ies'}
+              </div>
+            </div>
+          );
+        })()}
+
+        {missing > 0 && (
+          <div className="pointer-events-none absolute bottom-3 right-3 rounded-md bg-card/90 px-2 py-1 text-[10px] text-muted-foreground shadow-soft backdrop-blur">
+            {missing} stop{missing > 1 ? 's' : ''} without map data
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
