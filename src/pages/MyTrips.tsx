@@ -7,6 +7,7 @@ import { deleteTrip, tripCost, tripDays } from '@/lib/store';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { toast } from 'sonner';
+import AiTripGenerator from '@/components/AiTripGenerator';
 
 export default function MyTrips() {
   const { user } = useAuth();
@@ -37,7 +38,8 @@ export default function MyTrips() {
             <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
             <Input value={q} onChange={e => setQ(e.target.value)} placeholder="Search trips or cities" className="pl-9 w-64" />
           </div>
-          <Button asChild variant="hero"><Link to="/app/new"><Plus className="h-4 w-4" /> New trip</Link></Button>
+          <AiTripGenerator />
+          <Button asChild variant="outline"><Link to="/app/new"><Plus className="h-4 w-4" /> New trip</Link></Button>
         </div>
       </div>
 

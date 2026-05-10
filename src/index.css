@@ -125,3 +125,16 @@
   .transition-smooth { transition: var(--transition-smooth); }
   .text-gradient { background: var(--gradient-hero); -webkit-background-clip: text; background-clip: text; color: transparent; }
 }
+
+@media print {
+  header, nav, button, [role="tablist"], .no-print { display: none !important; }
+  body { background: white !important; color: black !important; }
+  .container { max-width: 100% !important; padding: 0 !important; }
+  .bg-gradient-hero, .bg-gradient-ocean, .bg-gradient-sunset {
+    background: white !important;
+    color: black !important;
+    box-shadow: none !important;
+  }
+  .shadow-soft, .shadow-elegant, .shadow-glow { box-shadow: none !important; }
+  [data-state="inactive"] { display: block !important; }
+}

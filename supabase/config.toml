@@ -1,0 +1,4 @@
+project_id = "traveloop"
+
+[functions.generate-trip]
+verify_jwt = false

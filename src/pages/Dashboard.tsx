@@ -1,5 +1,10 @@
 import { Link } from 'react-router-dom';
-import { Plus, ArrowRight, Calendar, MapPin, Wallet, Sparkles } from 'lucide-react';
+import { Plus, ArrowRight, Calendar, MapPin, Wallet, Sparkles, Wand2 } from 'lucide-react';
+import AiTripGenerator from '@/components/AiTripGenerator';
+import { TEMPLATES } from '@/lib/templates';
+import { newTrip, upsertTrip } from '@/lib/store';
+import { toast } from 'sonner';
+import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { useTrips } from '@/hooks/use-trips';
 import { tripCost, tripDays } from '@/lib/store';
@@ -10,6 +15,7 @@ import { useMemo } from 'react';
 
 export default function Dashboard() {
   const { user } = useAuth();
+  const navigate = useNavigate();
   const allTrips = useTrips();
   const trips = useMemo(() => allTrips.filter(t => t.ownerEmail === user?.email), [allTrips, user]);
   const upcoming = trips
@@ -29,9 +35,9 @@ export default function Dashboard() {
             <h1 className="mt-1 text-3xl md:text-5xl font-display font-extrabold">{user?.name} ✈️</h1>
             <p className="mt-2 max-w-lg opacity-90">Where will the next chapter take you? Build a brand new itinerary or pick up an existing trip.</p>
           </div>
-          <div className="flex gap-3">
-            <Button asChild size="lg" variant="secondary"><Link to="/app/new"><Plus className="h-4 w-4" /> Plan new trip</Link></Button>
-            <Button asChild size="lg" variant="outline" className="bg-transparent border-white/40 text-primary-foreground hover:bg-white/10"><Link to="/app/trips">My trips</Link></Button>
+          <div className="flex flex-wrap gap-3">
+            <AiTripGenerator trigger={<Button size="lg" variant="secondary"><Sparkles className="h-4 w-4" /> Generate with AI</Button>} />
+            <Button asChild size="lg" variant="outline" className="bg-transparent border-white/40 text-primary-foreground hover:bg-white/10"><Link to="/app/new"><Plus className="h-4 w-4" /> Manual trip</Link></Button>
           </div>
         </div>
         <div className="mt-8 grid gap-4 sm:grid-cols-3">
@@ -80,6 +86,36 @@ export default function Dashboard() {
                 <div className="text-xs opacity-80">{c.country}</div>
               </div>
             </Card>
+          ))}
+        </div>
+      </section>
+
+      {/* Templates */}
+      <section>
+        <SectionHeader title="Start from a template" icon={Wand2} />
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          {TEMPLATES.map(t => (
+            <button
+              key={t.id}
+              onClick={() => {
+                if (!user) return;
+                const data = t.build();
+                const trip = newTrip(user.email, data);
+                trip.stops = data.stops;
+                upsertTrip(trip);
+                toast.success(`${t.title} added to your trips!`);
+                navigate(`/app/trips/${trip.id}`);
+              }}
+              className="group flex flex-col rounded-2xl border border-border/60 bg-gradient-card p-5 text-left shadow-soft transition-smooth hover:-translate-y-1 hover:shadow-elegant"
+            >
+              <div className="text-3xl">{t.emoji}</div>
+              <h3 className="mt-2 font-display text-lg font-bold">{t.title}</h3>
+              <p className="text-sm text-muted-foreground">{t.tagline}</p>
+              <div className="mt-3 flex items-center justify-between border-t border-border/60 pt-3 text-xs text-muted-foreground">
+                <span>{t.days} days</span>
+                <span className="font-semibold text-primary">~${t.estimate}</span>
+              </div>
+            </button>
           ))}
         </div>
       </section>
