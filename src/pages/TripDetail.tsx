@@ -80,49 +80,79 @@ export default function TripDetail() {
   const cost = tripCost(trip);
   const overBudget = trip.budget && cost.total > trip.budget;
 
-  return (
-    <div className="space-y-6">
-      <Button variant="ghost" size="sm" onClick={() => navigate('/app/trips')}><ChevronLeft className="h-4 w-4" /> Back to trips</Button>
+  const budgetPct = trip.budget ? Math.min(100, (cost.total / trip.budget) * 100) : 0;
+  const fmtUsd = (n: number) => `$${Math.round(n).toLocaleString()}`;
 
-      <header className="overflow-hidden rounded-3xl bg-gradient-hero p-6 text-primary-foreground shadow-elegant md:p-10">
-        <div className="flex flex-wrap items-start justify-between gap-4">
-          <div className="min-w-0 flex-1">
-            <div className="flex flex-wrap items-center gap-2 text-xs uppercase tracking-wider opacity-90">
-              <Calendar className="h-3 w-3" /> {new Date(trip.startDate).toLocaleDateString()} → {new Date(trip.endDate).toLocaleDateString()}
-              <span>·</span> {tripDays(trip)} days <span>·</span> {trip.stops.length} stops
-            </div>
-            <h1 className="mt-2 font-display text-4xl font-extrabold leading-tight md:text-5xl">{trip.name}</h1>
-            {trip.description && <p className="mt-2 max-w-2xl opacity-90">{trip.description}</p>}
-          </div>
+  return (
+    <div className="space-y-10 pb-12">
+      <Button variant="ghost" size="sm" onClick={() => navigate('/app/trips')} className="-ml-2 text-muted-foreground hover:text-foreground">
+        <ChevronLeft className="h-4 w-4" /> Back to trips
+      </Button>
+
+      {/* ───────── EDITORIAL HERO ───────── */}
+      <header className="relative animate-fade-up">
+        {/* eyebrow */}
+        <div className="flex flex-wrap items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
+          <span className="inline-flex items-center gap-1.5">
+            <span className="h-1.5 w-1.5 rounded-full bg-primary animate-pulse" />
+            {trip.isPublic ? 'Public itinerary' : 'Private itinerary'}
+          </span>
+          <span className="text-border">·</span>
+          <span className="tabular-nums">{new Date(trip.startDate).toLocaleDateString(undefined, { day: 'numeric', month: 'short', year: 'numeric' })}</span>
+          <span className="text-border">→</span>
+          <span className="tabular-nums">{new Date(trip.endDate).toLocaleDateString(undefined, { day: 'numeric', month: 'short', year: 'numeric' })}</span>
+        </div>
+
+        <h1 className="mt-3 font-display text-5xl font-extrabold leading-[1.02] tracking-tight md:text-7xl">
+          {trip.name}
+        </h1>
+
+        {trip.description && (
+          <p className="mt-4 max-w-2xl text-lg leading-relaxed text-muted-foreground">{trip.description}</p>
+        )}
+
+        {/* meta strip + actions */}
+        <div className="mt-8 flex flex-wrap items-center justify-between gap-4 border-t border-border/60 pt-6">
+          <dl className="flex flex-wrap items-center gap-x-8 gap-y-3">
+            <HeroStat label="Duration" value={`${tripDays(trip)} days`} />
+            <HeroStat label="Stops" value={trip.stops.length.toString()} />
+            <HeroStat label="Estimated" value={fmtUsd(cost.total)} accent />
+            {trip.budget && (
+              <HeroStat
+                label={overBudget ? 'Over budget' : 'Remaining'}
+                value={fmtUsd(Math.abs(trip.budget - cost.total))}
+                tone={overBudget ? 'destructive' : 'success'}
+              />
+            )}
+          </dl>
+
           <div className="flex flex-wrap gap-2">
-            <Button variant="secondary" onClick={() => {
+            <Button variant="ghost" size="sm" className="gap-1.5" onClick={() => {
               update({ isPublic: !trip.isPublic });
               toast.success(trip.isPublic ? 'Trip is now private' : 'Trip is now public');
             }}>
-              {trip.isPublic ? <><Globe className="h-4 w-4" /> Public</> : <><Lock className="h-4 w-4" /> Private</>}
+              {trip.isPublic ? <><Globe className="h-3.5 w-3.5" /> Public</> : <><Lock className="h-3.5 w-3.5" /> Private</>}
             </Button>
             <ShareDialog trip={trip} update={update} />
             {trip.isPublic && (
-              <Button variant="secondary" onClick={() => {
+              <Button variant="ghost" size="sm" className="gap-1.5" onClick={() => {
                 const url = `${window.location.origin}/share/${trip.shareId}`;
                 navigator.clipboard.writeText(url);
                 toast.success('Public link copied!');
-              }}><Share2 className="h-4 w-4" /> Copy link</Button>
+              }}><Share2 className="h-3.5 w-3.5" /> Copy link</Button>
             )}
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="secondary"><Download className="h-4 w-4" /> Export</Button>
+                <Button size="sm" className="gap-1.5"><Download className="h-3.5 w-3.5" /> Export</Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-64">
                 <div className="px-2 py-1.5">
-                  <label className="text-xs text-muted-foreground">Currency</label>
+                  <label className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">Currency</label>
                   <Select value={exportCurrency} onValueChange={(v) => setExportCurrency(v as CurrencyCode)}>
                     <SelectTrigger className="mt-1 h-8"><SelectValue /></SelectTrigger>
                     <SelectContent className="max-h-72">
                       {CURRENCIES.map(c => (
-                        <SelectItem key={c.code} value={c.code}>
-                          {c.symbol} {c.code} — {c.name}
-                        </SelectItem>
+                        <SelectItem key={c.code} value={c.code}>{c.symbol} {c.code} — {c.name}</SelectItem>
                       ))}
                     </SelectContent>
                   </Select>
@@ -143,29 +173,31 @@ export default function TripDetail() {
           </div>
         </div>
 
-        {/* budget bar */}
-        <div className="mt-6 rounded-2xl bg-white/15 p-4 backdrop-blur">
-          <div className="flex items-center justify-between text-sm">
-            <span className="opacity-90">Estimated cost</span>
-            <span className="font-display text-2xl font-bold">${cost.total.toLocaleString()}</span>
+        {/* refined budget meter */}
+        {trip.budget && (
+          <div className="mt-6 animate-fade-up" style={{ animationDelay: '120ms' }}>
+            <div className="flex items-end justify-between text-xs text-muted-foreground">
+              <span className="font-medium">{Math.round(budgetPct)}% of budget</span>
+              <span className="tabular-nums">{fmtUsd(cost.total)} <span className="text-border">/</span> {fmtUsd(trip.budget)}</span>
+            </div>
+            <div className="mt-2 h-[3px] w-full overflow-hidden rounded-full bg-muted">
+              <div
+                className={`h-full rounded-full transition-all duration-700 ease-out ${overBudget ? 'bg-destructive' : 'bg-foreground'}`}
+                style={{ width: `${budgetPct}%` }}
+              />
+            </div>
           </div>
-          {trip.budget ? (
-            <>
-              <Progress value={Math.min(100, (cost.total / trip.budget) * 100)} className="mt-2 h-2 bg-white/30" />
-              <div className="mt-1 flex justify-between text-xs opacity-90">
-                <span>Budget: ${trip.budget.toLocaleString()}</span>
-                <span className={overBudget ? 'font-bold' : ''}>{overBudget ? `Over by $${(cost.total - trip.budget).toLocaleString()}` : `$${(trip.budget - cost.total).toLocaleString()} left`}</span>
-              </div>
-            </>
-          ) : (
-            <p className="mt-1 text-xs opacity-80">Set a budget in Settings to track spending.</p>
-          )}
-        </div>
+        )}
       </header>
 
-      {trip.stops.length > 0 && <RouteTimeline stops={trip.stops} />}
       {trip.stops.length > 0 && (
-        <RouteMap stops={trip.stops} onSelectStop={focusStop} highlightedStopId={highlightedStopId} />
+        <div className="animate-fade-up" style={{ animationDelay: '160ms' }}>
+          <SectionLabel>The route</SectionLabel>
+          <div className="mt-4 space-y-6">
+            <RouteTimeline stops={trip.stops} />
+            <RouteMap stops={trip.stops} onSelectStop={focusStop} highlightedStopId={highlightedStopId} />
+          </div>
+        </div>
       )}
 
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
