@@ -210,7 +210,7 @@ export default function Landing() {
             {steps.map((s, i) => (
               <Card key={s.n} variant="glass" className="p-6 animate-fade-up" style={{ animationDelay: `${i * 80}ms` }}>
                 <div className="font-display text-5xl font-extrabold text-gradient leading-none">{s.n}</div>
-                <h3 className="mt-3 font-display text-lg font-bold">{s.title}</h3>
+                <Heading level={3} className="mt-3 !text-lg">{s.title}</Heading>
                 <Muted className="mt-1 text-sm">{s.desc}</Muted>
               </Card>
             ))}
