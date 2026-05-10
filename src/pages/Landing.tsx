@@ -65,8 +65,13 @@ export default function Landing() {
 
       {/* HERO */}
       <section className="relative overflow-hidden">
-        {/* aurora backdrop */}
-        <div aria-hidden className="absolute inset-0 bg-gradient-aurora" />
+        {/* gallery backdrop */}
+        <div aria-hidden className="absolute inset-0 scale-110 opacity-40 blur-sm">
+          <ImageGallery showHeader={false} className="h-full" />
+        </div>
+        {/* aurora + dim overlay on top of gallery */}
+        <div aria-hidden className="absolute inset-0 bg-gradient-aurora opacity-80" />
+        <div aria-hidden className="absolute inset-0 bg-background/60 backdrop-blur-xl" />
         <div aria-hidden className="absolute -top-40 -left-20 h-[480px] w-[480px] rounded-full bg-primary/20 blur-[140px]" />
         <div aria-hidden className="absolute -bottom-40 -right-20 h-[520px] w-[520px] rounded-full bg-accent/20 blur-[160px]" />
 
@@ -102,7 +107,7 @@ export default function Landing() {
             </div>
           </div>
 
-          {/* Hero gallery */}
+          {/* Hero gallery card (foreground) */}
           <div className="relative animate-scale-in">
             <div aria-hidden className="absolute -inset-8 rounded-[2.5rem] bg-gradient-hero opacity-30 blur-3xl" />
             <div className="relative rounded-[2rem] surface-premium p-4 md:p-5">
