@@ -252,7 +252,7 @@ function ReviewStep({
     return total;
   }, [draft]);
 
-  const setStop = (idx: number, patch: Partial<Stop>) => {
+  const setStop = (idx: number, patch: Partial<DraftStop>) => {
     const stops = draft.stops.slice();
     stops[idx] = { ...stops[idx], ...patch };
     onChange({ ...draft, stops });
@@ -350,13 +350,13 @@ function StopEditor({
   index, stop, errors, onChange, onRemove,
 }: {
   index: number;
-  stop: Stop;
+  stop: DraftStop;
   errors: FieldErrors;
-  onChange: (patch: Partial<Stop>) => void;
+  onChange: (patch: Partial<DraftStop>) => void;
   onRemove: () => void;
 }) {
   const base = `stops.${index}`;
-  const setActivity = (aIdx: number, patch: Partial<Activity>) => {
+  const setActivity = (aIdx: number, patch: Partial<DraftActivity>) => {
     const activities = stop.activities.slice();
     activities[aIdx] = { ...activities[aIdx], ...patch };
     onChange({ activities });
