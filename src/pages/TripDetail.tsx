@@ -215,7 +215,7 @@ function Itinerary({ trip, update }: { trip: Trip; update: (p: Partial<Trip> | (
       <div className="flex flex-wrap items-center justify-between gap-2">
         <div className="flex gap-1 rounded-lg bg-muted p-1">
           <button onClick={() => setView('list')} className={`rounded-md px-3 py-1 text-sm ${view === 'list' ? 'bg-card shadow-soft font-medium' : 'text-muted-foreground'}`}>List</button>
-          <button onClick={() => setView('calendar')} className={`rounded-md px-3 py-1 text-sm ${view === 'calendar' ? 'bg-card shadow-soft font-medium' : 'text-muted-foreground'}`}>Calendar</button>
+          <button onClick={() => setView('calendar')} className={`rounded-md px-3 py-1 text-sm ${view === 'calendar' ? 'bg-card shadow-soft font-medium' : 'text-muted-foreground'}`}>Day-by-day</button>
         </div>
         <CitySearchDialog
           defaultStart={trip.startDate}
