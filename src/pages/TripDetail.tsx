@@ -146,9 +146,11 @@ export default function TripDetail() {
       </header>
 
       {trip.stops.length > 0 && <RouteTimeline stops={trip.stops} />}
-      {trip.stops.length > 0 && <RouteMap stops={trip.stops} />}
+      {trip.stops.length > 0 && (
+        <RouteMap stops={trip.stops} onSelectStop={focusStop} highlightedStopId={highlightedStopId} />
+      )}
 
-      <Tabs defaultValue="itinerary" className="w-full">
+      <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
         <TabsList className="grid w-full grid-cols-2 sm:grid-cols-5 sm:w-auto">
           <TabsTrigger value="itinerary"><MapIcon className="h-4 w-4 mr-1" />Itinerary</TabsTrigger>
           <TabsTrigger value="budget"><Wallet className="h-4 w-4 mr-1" />Budget</TabsTrigger>
@@ -157,7 +159,7 @@ export default function TripDetail() {
           <TabsTrigger value="settings">Settings</TabsTrigger>
         </TabsList>
 
-        <TabsContent value="itinerary" className="mt-6"><Itinerary trip={trip} update={update} /></TabsContent>
+        <TabsContent value="itinerary" className="mt-6"><Itinerary trip={trip} update={update} highlightedStopId={highlightedStopId} /></TabsContent>
         <TabsContent value="budget" className="mt-6"><BudgetView trip={trip} update={update} /></TabsContent>
         <TabsContent value="packing" className="mt-6"><Packing trip={trip} update={update} /></TabsContent>
         <TabsContent value="notes" className="mt-6"><Notes trip={trip} update={update} /></TabsContent>
