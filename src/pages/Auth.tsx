@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card } from '@/components/ui/card';
-import { Display, Lead, Eyebrow, Muted } from '@/components/ui/typography';
+import { Display, Heading, Lead, Eyebrow, Muted } from '@/components/ui/typography';
 import { login, signup } from '@/lib/store';
 import { useAuth } from '@/contexts/AuthContext';
 import { toast } from 'sonner';
