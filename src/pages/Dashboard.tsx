@@ -29,9 +29,9 @@ export default function Dashboard() {
             <h1 className="mt-1 text-3xl md:text-5xl font-display font-extrabold">{user?.name} ✈️</h1>
             <p className="mt-2 max-w-lg opacity-90">Where will the next chapter take you? Build a brand new itinerary or pick up an existing trip.</p>
           </div>
-          <div className="flex gap-3">
-            <Button asChild size="lg" variant="secondary"><Link to="/app/new"><Plus className="h-4 w-4" /> Plan new trip</Link></Button>
-            <Button asChild size="lg" variant="outline" className="bg-transparent border-white/40 text-primary-foreground hover:bg-white/10"><Link to="/app/trips">My trips</Link></Button>
+          <div className="flex flex-wrap gap-3">
+            <AiTripGenerator trigger={<Button size="lg" variant="secondary"><Sparkles className="h-4 w-4" /> Generate with AI</Button>} />
+            <Button asChild size="lg" variant="outline" className="bg-transparent border-white/40 text-primary-foreground hover:bg-white/10"><Link to="/app/new"><Plus className="h-4 w-4" /> Manual trip</Link></Button>
           </div>
         </div>
         <div className="mt-8 grid gap-4 sm:grid-cols-3">
